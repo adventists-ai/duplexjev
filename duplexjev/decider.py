@@ -43,10 +43,13 @@ def load_audio(x: Any) -> np.ndarray:
     a = np.asarray(x, dtype=np.float32)
     if a.ndim > 1:
         a = a.mean(axis=1) if a.shape[1] <= 8 else a.mean(axis=0)
-    if sr != SAMPLE_RATE:
-        import librosa
+    if sr != SAMPLE_RATE:  # polyphase resampling: fast and without a one-off JIT warm-up
+        from math import gcd
 
-        a = librosa.resample(a, orig_sr=sr, target_sr=SAMPLE_RATE)
+        from scipy.signal import resample_poly
+
+        g = gcd(int(sr), SAMPLE_RATE)
+        a = resample_poly(a, SAMPLE_RATE // g, int(sr) // g).astype(np.float32)
     return a
 
 
@@ -72,7 +75,9 @@ class Decider:
         self.tok = tokenizer
         self.processor = processor
         self.is_audio = is_audio
-        self.device = torch.device(device) if device is not None else next(model.parameters()).device
+        if device is None or str(device) == "auto":  # sharded model: inputs go where the embeddings live
+            device = model.get_input_embeddings().weight.device if not is_audio else model.language_model.get_input_embeddings().weight.device
+        self.device = torch.device(device)
         self.lm = model.language_model if is_audio else model
         self.base = getattr(self.lm, self.lm.base_model_prefix)
         self.head = self.lm.get_output_embeddings()
@@ -95,23 +100,34 @@ class Decider:
     ) -> "Decider":
         """Load a text LLM (any causal LM on the Hugging Face hub) or an Ultravox-format speech checkpoint.
 
+        ``device="auto"`` shards the model over all visible GPUs (needs ``accelerate``).
         ``text_model`` / ``audio_model`` override the LLM and encoder a speech checkpoint points to (e.g. a local
         copy of Qwen3-32B). Remaining kwargs go to ``from_pretrained`` of the model.
         """
         import transformers
 
+        dkw = "dtype" if tuple(int(x) for x in transformers.__version__.split(".")[:2]) >= (4, 56) else "torch_dtype"
         if device is None:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         if dtype is None:
-            dtype = torch.bfloat16 if str(device).startswith("cuda") else torch.float32
+            dtype = torch.bfloat16 if str(device).startswith("cuda") or device == "auto" else torch.float32
+        dmap = "auto" if device == "auto" else {"": device}
         cfg = transformers.AutoConfig.from_pretrained(name_or_path, trust_remote_code=True)
         if getattr(cfg, "model_type", "") == "ultravox":
+            if dkw == "dtype":
+                import warnings
+
+                warnings.warn(
+                    "Ultravox-format checkpoints ship remote code written for transformers 4.51-4.55; with "
+                    f"transformers {transformers.__version__} loading can be extremely slow (weights built on CPU). "
+                    'Install with `pip install "duplexjev[speech]"` to get a compatible version.'
+                )
             if text_model:
                 cfg.text_model_id = text_model
             if audio_model:
                 cfg.audio_model_id = audio_model
             model = transformers.AutoModel.from_pretrained(
-                name_or_path, config=cfg, trust_remote_code=True, torch_dtype=dtype, device_map={"": device}, **kwargs
+                name_or_path, config=cfg, trust_remote_code=True, device_map=dmap, **{dkw: dtype}, **kwargs
             )
             processor = transformers.AutoProcessor.from_pretrained(name_or_path, trust_remote_code=True)
             if not hasattr(processor, "audio_processor"):  # e.g. a stray preprocessor_config.json took precedence
@@ -124,10 +140,13 @@ class Decider:
                 processor.audio_processor = transformers.WhisperProcessor(
                     feature_extractor=ap, tokenizer=processor.tokenizer
                 )
-            return cls(model, processor.tokenizer, processor, device=device, is_audio=True)
+            return cls(model, processor.tokenizer, processor, device=None if device == "auto" else device, is_audio=True)
         tok = transformers.AutoTokenizer.from_pretrained(name_or_path, **{k: v for k, v in kwargs.items() if k == "revision"})
-        model = transformers.AutoModelForCausalLM.from_pretrained(name_or_path, torch_dtype=dtype, **kwargs).to(device)
-        return cls(model, tok, device=device, is_audio=False)
+        if device == "auto":
+            model = transformers.AutoModelForCausalLM.from_pretrained(name_or_path, device_map="auto", **{dkw: dtype}, **kwargs)
+        else:
+            model = transformers.AutoModelForCausalLM.from_pretrained(name_or_path, **{dkw: dtype}, **kwargs).to(device)
+        return cls(model, tok, device=None if device == "auto" else device, is_audio=False)
 
     # ------------------------------------------------------------------ prompt pieces
     def _head_tail(self, context: str | None, content: str, lang: str) -> tuple[str, str]:
@@ -260,6 +279,7 @@ class Decider:
         seed: int = 0,
         lang: str | None = None,
         max_items: int | None = None,
+        max_tokens: int | None = None,
     ) -> list[dict]:
         """Answer every question about every item in one batched pass.
 
@@ -271,7 +291,9 @@ class Decider:
             n_perm: average over this many option orders (reduces position bias; costs more suffix tokens).
             seed: selects the option orders.
             lang: language of the fixed prompt words; defaults to each item's ``lang`` or the first question's.
-            max_items: split into forward passes of at most this many items (bounds activation memory).
+            max_items: split into forward passes of at most this many items.
+            max_tokens: split so that each pass holds at most this many prompt tokens (prefixes + all suffixes).
+                Bounds activation memory; an item larger than the budget still runs, alone.
 
         Returns:
             one dict per item: ``{question_id: {"answer": option, "confidence": p, "probs": {option: p}}}``.
@@ -295,9 +317,8 @@ class Decider:
         n_pass = 0
         for with_audio in (True, False):  # speech and text-only items go in separate passes
             group = [p for p in plans if (p["pre"]["audio"] is not None) == with_audio]
-            step = max_items or len(group) or 1
-            for i in range(0, len(group), step):
-                run(group[i:i + step])
+            for chunk in _chunks(group, max_items, max_tokens, packed=mode == "packed"):
+                run(chunk)
                 n_pass += 1
         if self.device.type == "cuda":
             torch.cuda.synchronize(self.device)
@@ -398,3 +419,21 @@ class Decider:
                 "probs": {o: round(float(v), 6) for o, v in zip(q.options, acc)},
             }
         return res
+
+
+def _chunks(plans, max_items, max_tokens, packed=True):
+    """Split plans into passes bounded by item count and by prompt tokens."""
+    def cost(p):
+        pre, suf = len(p["pre"]["ids"]), [len(s["ids"]) for s in p["sufs"]]
+        return pre + sum(suf) if packed else len(suf) * pre + sum(suf)
+
+    cur, tok = [], 0
+    for p in plans:
+        c = cost(p)
+        if cur and ((max_items and len(cur) >= max_items) or (max_tokens and tok + c > max_tokens)):
+            yield cur
+            cur, tok = [], 0
+        cur.append(p)
+        tok += c
+    if cur:
+        yield cur

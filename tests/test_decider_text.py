@@ -57,3 +57,10 @@ def test_audio_rejected_by_text_model(tiny_decider):
 
     with pytest.raises(ValueError):
         tiny_decider.decide([np.zeros(16000, dtype="float32")], Q)
+
+
+def test_token_budget_chunks_give_same_answers(tiny_decider):
+    whole = tiny_decider.decide(ITEMS, Q)
+    small = tiny_decider.decide(ITEMS, Q, max_tokens=300)
+    assert tiny_decider.last_stats["batches"] >= 2
+    assert maxdiff(whole, small) < 1e-4

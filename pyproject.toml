@@ -15,6 +15,7 @@ dependencies = [
   "transformers>=4.51,<4.58",
   "numpy",
   "soundfile",
+  "scipy",
 ]
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
@@ -24,9 +25,9 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-speech = ["accelerate", "peft", "librosa"]
+speech = ["accelerate", "peft", "transformers>=4.51,<4.56"]
 server = ["fastapi", "uvicorn", "pydantic>=2"]
-all = ["accelerate", "peft", "librosa", "fastapi", "uvicorn", "pydantic>=2"]
+all = ["accelerate", "peft", "transformers>=4.51,<4.56", "fastapi", "uvicorn", "pydantic>=2"]
 dev = ["pytest", "httpx"]
 
 [project.scripts]

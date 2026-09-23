@@ -103,11 +103,15 @@ curl -s localhost:8000/v1/decide -H 'content-type: application/json' \
   -d '{"text": "Call my", "questions": [{"id": "turn", "text": "Has the user finished?", "options": ["finished", "not finished"]}]}'
 ```
 
-What the package guarantees (covered by `tests/`):
+What the package guarantees (unit tests in `tests/`, checked on Qwen3-32B and Ultravox v0.6 on an A800):
 
 - **0 decode steps.** Each answer is the next-token softmax over its option letters; options appear under permuted letters (`n_perm` averages several orders).
-- **Exact prefix sharing** (`mode="packed"`, default): the context and audio of an item are encoded once and all its questions are packed into one row under a block-diagonal mask; answers equal one-row-per-question runs up to float noise.
-- **Batch invariance.** An item's answers do not depend on which other items share the pass. For speech this requires aligning every clip to whole audio tokens, which the package does (batched Ultravox inference otherwise leaks padding into the last audio token of shorter clips).
+- **Exact prefix sharing** (`mode="packed"`, default): the context and audio of an item are encoded once and all its questions are packed into one row under a block-diagonal mask. In fp32 on Qwen3-32B, packed and one-row-per-question differ by at most 2e-5; in bf16 the mean difference is 0.001–0.002, with at most 1/100 answers changed.
+- **Batch invariance.** An item's answers do not depend on which other items share the pass (fp32: max difference 1e-5). For speech this requires aligning every clip to whole audio tokens, which the package does (batched Ultravox inference otherwise leaks padding into the last audio token of shorter clips). In bf16, GPU kernels depend on batch shape, so running an item alone vs. in a batch changed 1/100 answers (text and speech).
+- **Checked accuracy.** qa100 through the package: 0.88–0.90 with Ultravox v0.6 (audio), 0.92 with Qwen3-32B (transcript).
+- **Speed (current).** Plain PyTorch, one A800, bf16: 8 questions for 64 calls in 9 s (about 140 ms per call); 48 concurrent server requests are answered in one tick. The paper's latency numbers use a vLLM engine; a vLLM backend for the package is on the roadmap.
+
+Speech checkpoints need transformers 4.51–4.55 (installed by the `speech` extra); text models also work with newer versions.
 
 More in [`examples/`](examples): tick-batch timing, server client, speech quick start.
 
