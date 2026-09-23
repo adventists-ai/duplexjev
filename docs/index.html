@@ -1,17 +1,21 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>DuplexJev</title>
-<meta name="description" content="DuplexJev: batched speech decisions without decoding — a modular decision sidecar for full-duplex spoken agents.">
+<meta name="description" content="DuplexJev: batched speech decisions without decoding — typed single-token readout from a frozen speech LLM for full-duplex spoken agents.">
+<meta property="og:title" content="DuplexJev — Batched Speech Decisions Without Decoding">
+<meta property="og:description" content="One forward pass, many typed decisions, zero decode steps. Code, qa100 test set and measured latency.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230B7A64'/%3E%3Cpath d='M6 16h3l2-6 3 12 3-9 2 3h7' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@500;700&display=swap">
 <style>
 :root{
   --ground:#F4F6F8; --panel:#FFFFFF; --ink:#16202B; --ink-2:#4A5866; --rule:#D5DCE3;
-  --signal:#0B7A64; --signal-soft:#D6EEE8; --slow:#B7791F; --slow-soft:#F5E7CF; --warn:#A33B2B;
-  --grid:#E4E9EE;
-  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
-  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --signal:#0B7A64; --signal-soft:#D6EEE8; --slow:#B7791F; --slow-soft:#F5E7CF; --warn:#A33B2B; --grid:#E4E9EE;
+  --display:"IBM Plex Sans Condensed","Noto Sans SC","Arial Narrow",system-ui,sans-serif;
+  --body:"Source Serif 4","Noto Serif SC",Georgia,"Songti SC","Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,"Noto Sans SC",monospace;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
@@ -27,14 +31,21 @@
 }
 *{box-sizing:border-box}
 body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;margin:0}
-.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:40px 64px}
-h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
 h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.01em}
-h2{font-size:26px;font-weight:600;margin-block:0 12px}
+h2{font-size:clamp(22px,3.2vw,26px);font-weight:600;margin-block:0 12px}
 h3{font-size:18px;font-weight:600}
 p{margin:0 0 12px;max-width:68ch}
+:lang(zh) p{max-width:40em}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--signal)}
-.authors{font-family:var(--display);font-size:17px;margin-top:14px;color:var(--ink)}
+.lang{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden;flex:none}
+.lang button{font-family:var(--mono);font-size:12px;padding:5px 10px;border:0;background:var(--panel);color:var(--ink-2);cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.lang button:focus-visible,.tabs button:focus-visible,.copyrow button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.sub{font-family:var(--mono);font-size:14px;color:var(--ink-2);margin-top:8px}
+.authors{font-family:var(--display);font-size:17px;margin-top:14px}
 .authors sup{font-size:11px;color:var(--ink-2)}
 .affil{font-size:14px;color:var(--ink-2);margin-top:4px;line-height:1.5}
 .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
@@ -43,23 +54,24 @@ p{margin:0 0 12px;max-width:68ch}
 .links span{color:var(--ink-2)}
 .lede{font-size:19px;margin-top:22px}
 section{margin-top:56px}
-.note{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
-.badge{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:2px 8px;border-radius:3px;background:var(--slow-soft);color:var(--slow);vertical-align:middle}
-/* demo */
+.badge{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.03em;padding:2px 8px;border-radius:3px;background:var(--slow-soft);color:var(--slow)}
 .demo{background:var(--panel);border:1px solid var(--rule);border-radius:6px;margin-top:24px}
-.demo-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.demo-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--rule)}
 .tabs{display:flex;flex-wrap:wrap;gap:6px}
 .tabs button{font-family:var(--mono);font-size:13px;padding:6px 10px;border:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:4px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:var(--panel)}
-.tabs button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
-.demo-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:0}
+.phbar{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;background:var(--slow-soft);color:var(--ink);font-size:14px;border-bottom:1px solid var(--rule);line-height:1.5}
+.phbar b{font-family:var(--mono);font-size:12px;color:var(--slow);white-space:nowrap;padding-top:1px}
+.demo-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
 .clip{padding:16px;border-right:1px solid var(--rule)}
 .clip canvas{width:100%;height:120px;display:block}
 .clip .meta{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-top:8px;display:flex;flex-wrap:wrap;gap:4px 14px}
 .clip .tx{font-size:16px;margin-top:10px}
 .clip audio{width:100%;margin-top:10px}
+.noaudio{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-top:10px;padding:8px 10px;border:1px dashed var(--rule);border-radius:4px}
 .qs{padding:8px 16px 16px}
-.q{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:10px 0;border-bottom:1px solid var(--grid)}
+.qs.ph .bars,.qs.ph .q-ans{opacity:.55}
+.q{display:grid;gap:4px;padding:10px 0;border-bottom:1px solid var(--grid)}
 .q:last-child{border-bottom:0}
 .q-top{display:flex;justify-content:space-between;gap:10px;font-size:14px}
 .q-top b{font-weight:600}
@@ -69,10 +81,11 @@ section{margin-top:56px}
 .opts{font-family:var(--mono);font-size:11px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:2px 10px}
 .pass{font-family:var(--mono);font-size:12px;color:var(--ink-2);padding:10px 16px;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:6px 18px}
 .pass b{color:var(--ink);font-weight:500}
-/* figures */
 .fig{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px;margin-top:18px}
+.fig svg{display:block;width:100%;height:auto}
 .fig-cap{font-size:14px;color:var(--ink-2);margin-top:10px;max-width:none}
-.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}
+.two p{margin-top:6px}
 svg text{font-family:var(--mono)}
 .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
@@ -81,16 +94,15 @@ th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
 th{font-family:var(--display);font-weight:600;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--rule)}
 td.good{color:var(--signal);font-weight:600}
 td.none{color:var(--warn)}
-.legend{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-bottom:8px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-bottom:10px}
 .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 ul.plain{padding-left:18px;margin:0;max-width:68ch}
 ul.plain li{margin-bottom:6px}
 pre{font-family:var(--mono);font-size:12.5px;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;overflow-x:auto;line-height:1.5;margin:0}
 .copyrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
 .copyrow button{font-family:var(--mono);font-size:12px;padding:5px 10px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:4px;cursor:pointer}
-.copyrow button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
 footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
-.tick-grid{display:grid;grid-template-columns:repeat(48,minmax(0,1fr));gap:2px;margin-top:10px}
+.tick-grid{display:grid;grid-template-columns:repeat(48,minmax(0,1fr));gap:2px}
 .tick-grid span{aspect-ratio:1;border-radius:2px;background:var(--grid);max-width:100%}
 .tick-grid span.on{background:var(--signal)}
 .tick-grid span.ev{background:var(--slow)}
@@ -99,6 +111,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
   .clip{border-right:0;border-bottom:1px solid var(--rule)}
   .two{grid-template-columns:minmax(0,1fr)}
   .tick-grid{grid-template-columns:repeat(24,minmax(0,1fr))}
+  .lede{font-size:18px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -106,35 +119,40 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">ICASSP 2027 submission · Speech-to-Decision</div>
-    <h1 style="margin-top:10px">Batched Speech Decisions Without Decoding</h1>
-    <p class="note" style="margin-top:8px;font-size:14px">DuplexJev — a modular decision sidecar for full-duplex spoken agents</p>
+    <div class="topbar">
+      <div class="eyebrow" data-i18n="eyebrow"></div>
+      <div class="lang" role="group" aria-label="Language / 语言">
+        <button type="button" id="lang-en" data-lang="en">EN</button>
+        <button type="button" id="lang-zh" data-lang="zh">中文</button>
+      </div>
+    </div>
+    <h1 data-i18n="title"></h1>
+    <p class="sub" data-i18n="subtitle"></p>
     <div class="authors">Jie Jin<sup>1,★</sup>, Ziyin Ma<sup>2</sup>, Min Yin<sup>3</sup>, Jinyu Chen<sup>4</sup>, Zhikun Pang<sup>1</sup>, Xiaowen Zhang<sup>1</sup></div>
-    <div class="affil"><sup>1</sup>Adventists.ai, Melbourne · <sup>2</sup>College of CS&amp;T, Zhejiang University · <sup>3</sup>Future Design Lab, Innovation Center of Yangtze River Delta, Zhejiang University · <sup>4</sup>University of Virginia · <sup>★</sup>jiejin@adventists.ai</div>
+    <div class="affil" data-i18n="affil"></div>
     <nav class="links" aria-label="Resources">
-      <span>Paper · arXiv soon</span>
-      <a href="https://github.com/adventists-ai/duplexjev">Code</a>
-      <span>Weights · soon</span>
-      <a href="https://github.com/adventists-ai/duplexjev/tree/main/data/qa100">qa100 test set</a>
-      <a href="#cite">Cite</a>
+      <span data-i18n="l_paper"></span>
+      <a href="https://github.com/adventists-ai/duplexjev" data-i18n="l_code"></a>
+      <span data-i18n="l_weights"></span>
+      <a href="https://github.com/adventists-ai/duplexjev/tree/main/data/qa100" data-i18n="l_qa100"></a>
+      <a href="#cite" data-i18n="l_cite"></a>
     </nav>
-    <p class="lede">A full-duplex voice agent must keep answering small, closed questions — <em>has the user finished? which filler fits? which step of the flow is this?</em> DuplexJev reads every such question as one constrained token from a frozen speech LLM. No ASR decoding, no text decoding, and many questions — over one call or across calls — share a single forward pass.</p>
+    <p class="lede" data-i18n="lede"></p>
   </header>
 
   <section id="demo" aria-labelledby="demo-h">
-    <h2 id="demo-h">One utterance, one pass, many answers</h2>
-    <p>Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked).</p>
+    <h2 id="demo-h" data-i18n="demo_h"></h2>
+    <p data-i18n="demo_p"></p>
     <div class="demo">
-      <div class="demo-head">
-        <div class="tabs" id="tabs" role="group" aria-label="Example clips"></div>
-        <span id="ph" class="badge" hidden>Placeholder values — replaced by released-checkpoint outputs</span>
-      </div>
+      <div class="demo-head"><div class="tabs" id="tabs" role="group" aria-label="Examples"></div></div>
+      <div class="phbar" id="ph" hidden><b data-i18n="ph_tag"></b><span data-i18n="ph_text"></span></div>
       <div class="demo-body">
         <div class="clip">
-          <canvas id="wave" aria-label="Waveform with audio-token boundaries" role="img"></canvas>
+          <canvas id="wave" role="img" aria-label="Waveform with audio-token boundaries"></canvas>
           <div class="meta" id="meta"></div>
           <div class="tx" id="tx"></div>
-          <audio id="aud" controls preload="none"></audio>
+          <audio id="aud" controls preload="metadata" hidden></audio>
+          <div class="noaudio" id="noaudio" hidden data-i18n="noaudio"></div>
         </div>
         <div class="qs" id="qs"></div>
       </div>
@@ -143,86 +161,70 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
   </section>
 
   <section id="how" aria-labelledby="how-h">
-    <h2 id="how-h">How it works</h2>
-    <div class="fig scroll">
-      <svg id="arch" viewBox="0 0 900 250" width="100%" style="min-width:640px" role="img" aria-label="Architecture: frozen ASR encoder, fusion and projector, frozen LLM, single-token readout"></svg>
-    </div>
-    <div class="two" style="margin-top:18px">
-      <div>
-        <h3>Typed single-token readout</h3>
-        <p style="margin-top:6px">Each question lists its options under letters in a random order. The answer is the LLM's next-token distribution restricted to those letters — always a valid option, with a confidence score for free.</p>
-      </div>
-      <div>
-        <h3>Prefix sharing</h3>
-        <p style="margin-top:6px">The shared prefix (dialogue context and audio) is encoded once; all questions are packed into one row under a block-diagonal mask. Memory grows with the questions, not with copies of the context.</p>
-      </div>
-      <div>
-        <h3>Paralinguistics through fusion</h3>
-        <p style="margin-top:6px">Variant A lets the final encoder layer attend to layers 14 and 9, where speaker and prosody cues survive. The fusion starts at zero, so A begins identical to the last-layer variant B.</p>
-      </div>
-      <div>
-        <h3>Swap the parts</h3>
-        <p style="margin-top:6px">Encoder and LLM stay frozen; only a 40&nbsp;M-parameter projector (plus 3&nbsp;M for fusion) is trained. Any open ASR encoder and any LLM that accepts input embeddings will do.</p>
-      </div>
+    <h2 id="how-h" data-i18n="how_h"></h2>
+    <div class="fig"><svg id="arch" role="img" aria-label="Architecture"></svg></div>
+    <div class="two">
+      <div><h3 data-i18n="h_readout"></h3><p data-i18n="p_readout"></p></div>
+      <div><h3 data-i18n="h_prefix"></h3><p data-i18n="p_prefix"></p></div>
+      <div><h3 data-i18n="h_fusion"></h3><p data-i18n="p_fusion"></p></div>
+      <div><h3 data-i18n="h_swap"></h3><p data-i18n="p_swap"></p></div>
     </div>
   </section>
 
   <section id="latency" aria-labelledby="lat-h">
-    <h2 id="lat-h">Ten decisions: 92 ms instead of two seconds</h2>
-    <p>Same GPU (1× H200), same frozen Qwen3-32B, same vLLM engine. The cascade transcribes, then generates the ten answers as JSON; the readout answers them as single tokens.</p>
+    <h2 id="lat-h" data-i18n="lat_h"></h2>
+    <p data-i18n="lat_p"></p>
     <div class="fig">
-      <div class="legend"><span><i class="sw" style="background:var(--slow)"></i>LLM generation</span><span><i class="sw" style="background:var(--slow-soft);outline:1px solid var(--slow)"></i>ASR decoding</span><span><i class="sw" style="background:var(--signal)"></i>single-token readout</span></div>
-      <svg id="latchart" viewBox="0 0 900 220" width="100%" role="img" aria-label="Per-event latency bars"></svg>
-      <p class="fig-cap">Median over 30 real utterances (2–12 s), ten questions per event. “Context” adds a 1,471-token dialogue context — the median input of the tool-need check in our deployed in-car assistant.</p>
+      <div class="legend"><span><i class="sw" style="background:var(--slow)"></i><span data-i18n="lg_gen"></span></span><span><i class="sw" style="background:var(--slow-soft);outline:1px solid var(--slow)"></i><span data-i18n="lg_asr"></span></span><span><i class="sw" style="background:var(--signal)"></i><span data-i18n="lg_ro"></span></span></div>
+      <svg id="latchart" role="img" aria-label="Per-event latency"></svg>
+      <p class="fig-cap" data-i18n="lat_cap"></p>
     </div>
-    <div class="fig scroll">
-      <table aria-label="Events per second within a latency budget">
-        <thead><tr><th>context</th><th>method</th><th>decode steps</th><th>≤ 0.25 s</th><th>≤ 0.5 s</th><th>≤ 2 s</th><th>saturated</th></tr></thead>
-        <tbody>
-          <tr><td>none</td><td>ASR → JSON</td><td>12.5 + 86</td><td class="none">0</td><td class="none">0</td><td>16.9</td><td>311</td></tr>
-          <tr><td>none</td><td>readout</td><td>0</td><td class="good">17.3</td><td class="good">20.4</td><td class="good">33.5</td><td>335</td></tr>
-          <tr><td>1.5k</td><td>ASR → JSON</td><td>12.5 + 87</td><td class="none">0</td><td class="none">0</td><td>8.4</td><td>251</td></tr>
-          <tr><td>1.5k</td><td>readout</td><td>0</td><td class="good">9.7</td><td class="good">12.0</td><td class="good">18.4</td><td>227</td></tr>
-        </tbody>
-      </table>
-      <p class="fig-cap">Events per second one GPU can serve while every event finishes within the budget; last column: decisions per second at full saturation. At a conversational budget the cascade serves nothing; at saturation the two are on par — the gain is latency and capacity under a budget, not raw throughput.</p>
+    <div class="fig">
+      <div class="scroll">
+        <table>
+          <thead><tr><th data-i18n="t_ctx"></th><th data-i18n="t_method"></th><th data-i18n="t_steps"></th><th>≤ 0.25 s</th><th>≤ 0.5 s</th><th>≤ 2 s</th><th data-i18n="t_sat"></th></tr></thead>
+          <tbody>
+            <tr><td data-i18n="c_none"></td><td data-i18n="m_json"></td><td>12.5 + 86</td><td class="none">0</td><td class="none">0</td><td>16.9</td><td>311</td></tr>
+            <tr><td data-i18n="c_none"></td><td data-i18n="m_ro"></td><td>0</td><td class="good">17.3</td><td class="good">20.4</td><td class="good">33.5</td><td>335</td></tr>
+            <tr><td>1.5k</td><td data-i18n="m_json"></td><td>12.5 + 87</td><td class="none">0</td><td class="none">0</td><td>8.4</td><td>251</td></tr>
+            <tr><td>1.5k</td><td data-i18n="m_ro"></td><td>0</td><td class="good">9.7</td><td class="good">12.0</td><td class="good">18.4</td><td>227</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fig-cap" data-i18n="tab_cap"></p>
     </div>
   </section>
 
   <section id="prefix" aria-labelledby="pre-h">
-    <h2 id="pre-h">Long contexts stop multiplying</h2>
+    <h2 id="pre-h" data-i18n="pre_h"></h2>
     <div class="fig">
-      <svg id="prechart" viewBox="0 0 900 250" width="100%" role="img" aria-label="Prefix sharing cost versus sequential calls, log scale"></svg>
-      <p class="fig-cap">Wall time for N questions over one utterance (plain PyTorch, eager attention; ratios are what matter). Shared and one-by-one answers agree on 195/200 and 198/200 items for the two variants and 40/40 with 0.5–5k-token contexts; remaining differences are near-ties at bf16 precision.</p>
+      <div class="legend"><span><i class="sw" style="background:var(--slow)"></i><span data-i18n="lg_seq"></span></span><span><i class="sw" style="background:var(--ink-2);opacity:.6"></i><span data-i18n="lg_rep"></span></span><span><i class="sw" style="background:var(--signal)"></i><span data-i18n="lg_sh"></span></span></div>
+      <svg id="prechart" role="img" aria-label="Prefix sharing, log scale"></svg>
+      <p class="fig-cap" data-i18n="pre_cap"></p>
     </div>
   </section>
 
   <section id="tick" aria-labelledby="tick-h">
-    <h2 id="tick-h">One clock for every call</h2>
-    <p>Because a decision is a single step, a server can gather the latest audio of every active call on a fixed tick and answer all of them in one batch — something a cascade cannot do, since each transcription needs its own sequence of decode steps. Below, each column is a tick and each row a call; amber marks a pause where a decision is due.</p>
+    <h2 id="tick-h" data-i18n="tick_h"></h2>
+    <p data-i18n="tick_p"></p>
     <div class="fig">
       <div class="tick-grid" id="ticks" aria-hidden="true"></div>
-      <p class="fig-cap">Illustration. In our deployment, consecutive user turns in a session are a median 9.9 s apart, so decision events are sparse and batch well.</p>
+      <p class="fig-cap" data-i18n="tick_cap"></p>
     </div>
   </section>
 
   <section id="results" aria-labelledby="res-h">
-    <h2 id="res-h">Understanding and paralinguistics</h2>
-    <p>With a well-aligned speech path, reading the answer as one constrained token costs almost nothing against reading the transcript: 89 vs 91 on qa100 (Ultravox v0.6 Whisper path, Qwen3-32B). Results for our released speech paths — qa100, the ZJU gender benchmark and the ZJU main-language benchmark with real speech — will appear here with the final checkpoints. <span class="badge">pending</span></p>
+    <h2 id="res-h" data-i18n="res_h"></h2>
+    <p><span data-i18n="res_p"></span> <span class="badge" data-i18n="pending"></span></p>
   </section>
 
   <section id="limits" aria-labelledby="lim-h">
-    <h2 id="lim-h">Limitations</h2>
-    <ul class="plain">
-      <li>Turn-taking from audio is not solved yet: current speech paths stay near the prior on Easy-Turn, while the same readout reaches 84.9% from the transcript.</li>
-      <li>qa100 is synthetic speech; real-speech understanding is measured on the ZJU main-language benchmark.</li>
-      <li>Confidence gates abstention but does not reveal a missing skill: a path that cannot hear gender is still confident.</li>
-      <li>Gender labels are corpus-provided and binary; the classifier is a probe of information flow, not a tool for identifying people.</li>
-    </ul>
+    <h2 id="lim-h" data-i18n="lim_h"></h2>
+    <ul class="plain"><li data-i18n="lim1"></li><li data-i18n="lim2"></li><li data-i18n="lim3"></li><li data-i18n="lim4"></li></ul>
   </section>
 
   <section id="cite" aria-labelledby="cite-h">
-    <div class="copyrow"><h2 id="cite-h" style="margin:0">Cite</h2><button type="button" id="copybib">Copy BibTeX</button></div>
+    <div class="copyrow"><h2 id="cite-h" style="margin:0" data-i18n="cite_h"></h2><button type="button" id="copybib" data-i18n="copy"></button></div>
 <pre id="bib">@misc{jin2026duplexjev,
   title  = {Batched Speech Decisions Without Decoding: A Modular Decision Sidecar for Full-Duplex Spoken Agents},
   author = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Pang, Zhikun and Zhang, Xiaowen},
@@ -231,185 +233,364 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
 }</pre>
   </section>
 
-  <footer>Code and weights: Apache-2.0 · qa100: CC-BY-4.0 · Built on Ultravox, Qwen3 and Qwen3-ASR.</footer>
+  <footer data-i18n="footer"></footer>
 </div>
 
 <script type="application/json" id="examples-data">
-{"placeholder":true,"note":"Layout preview. Values are illustrative placeholders, to be regenerated by research/demo/make_examples.py from the released checkpoint.","examples":[
- {"id":"ex1","label":"EN · pause mid-request","lang":"en","source":"placeholder clip","transcript":"Could you turn the air conditioning down a little and, um —","audio":"audio/ex1.wav","duration_s":3.4,"seed":3,
+{"placeholder":true,"examples":[
+ {"id":"ex1","label":"EN · pause mid-request","label_zh":"英文 · 话说到一半停顿","lang":"en","source":"placeholder","transcript":"Could you turn the air conditioning down a little and, um —","audio":"audio/ex1.wav","duration_s":3.4,"seed":3,
   "questions":[
-   {"q":"Has the user finished the turn?","options":["finished","not finished"],"p":[0.18,0.82]},
-   {"q":"What does the user want?","options":["climate","media","navigation","phone","vehicle info","chit-chat"],"p":[0.86,0.02,0.03,0.02,0.04,0.03]},
-   {"q":"Which filler fits?","options":["“Sure —”","“One moment.”","“Got it.”","(stay silent)"],"p":[0.11,0.07,0.12,0.70]},
-   {"q":"Speaker gender","options":["female","male"],"p":[0.21,0.79]},
-   {"q":"Language","options":["English","Chinese","other"],"p":[0.97,0.02,0.01]},
-   {"q":"Urgency (1–5)","options":["1","2","3","4","5"],"p":[0.30,0.45,0.18,0.05,0.02]},
-   {"q":"Sentiment","options":["positive","neutral","negative"],"p":[0.14,0.78,0.08]},
-   {"q":"Needs a human agent?","options":["yes","no"],"p":[0.03,0.97]}]},
- {"id":"ex2","label":"ZH · complete request","lang":"zh","source":"placeholder clip","transcript":"帮我导航到最近的充电站。","audio":"audio/ex2.wav","duration_s":2.6,"seed":7,
+   {"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.18,0.82]},
+   {"q_en":"What does the user want?","q_zh":"用户想做什么？","options_en":["climate","media","navigation","phone","vehicle info","chit-chat"],"options_zh":["空调","媒体","导航","电话","车辆信息","闲聊"],"p":[0.86,0.02,0.03,0.02,0.04,0.03]},
+   {"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“Sure —”","“One moment —”","“On it, searching now —”","(stay silent)"],"options_zh":["“好的，”","“稍等，”","“马上为您查找，”","（不说话）"],"p":[0.11,0.07,0.12,0.70]},
+   {"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.21,0.79]},
+   {"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.97,0.02,0.01]},
+   {"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.30,0.45,0.18,0.05,0.02]},
+   {"q_en":"Sentiment","q_zh":"情绪","options_en":["positive","neutral","negative"],"options_zh":["正面","中性","负面"],"p":[0.14,0.78,0.08]},
+   {"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.03,0.97]}]},
+ {"id":"ex2","label":"ZH · complete request","label_zh":"中文 · 完整请求","lang":"zh","source":"placeholder","transcript":"帮我导航到最近的充电站。","audio":"audio/ex2.wav","duration_s":2.6,"seed":7,
   "questions":[
-   {"q":"Has the user finished the turn?","options":["finished","not finished"],"p":[0.93,0.07]},
-   {"q":"What does the user want?","options":["climate","media","navigation","phone","vehicle info","chit-chat"],"p":[0.02,0.01,0.91,0.01,0.04,0.01]},
-   {"q":"Which filler fits?","options":["“好的，”","“稍等，”","“马上为您查找，”","(stay silent)"],"p":[0.19,0.08,0.66,0.07]},
-   {"q":"Speaker gender","options":["female","male"],"p":[0.84,0.16]},
-   {"q":"Language","options":["English","Chinese","other"],"p":[0.01,0.98,0.01]},
-   {"q":"Urgency (1–5)","options":["1","2","3","4","5"],"p":[0.10,0.28,0.40,0.17,0.05]},
-   {"q":"Sentiment","options":["positive","neutral","negative"],"p":[0.08,0.86,0.06]},
-   {"q":"Needs a human agent?","options":["yes","no"],"p":[0.02,0.98]}]},
- {"id":"ex3","label":"EN · frustrated caller","lang":"en","source":"placeholder clip","transcript":"This is the third time I'm calling about the same bill.","audio":"audio/ex3.wav","duration_s":3.1,"seed":11,
+   {"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.93,0.07]},
+   {"q_en":"What does the user want?","q_zh":"用户想做什么？","options_en":["climate","media","navigation","phone","vehicle info","chit-chat"],"options_zh":["空调","媒体","导航","电话","车辆信息","闲聊"],"p":[0.02,0.01,0.91,0.01,0.04,0.01]},
+   {"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“Sure —”","“One moment —”","“On it, searching now —”","(stay silent)"],"options_zh":["“好的，”","“稍等，”","“马上为您查找，”","（不说话）"],"p":[0.19,0.08,0.66,0.07]},
+   {"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.84,0.16]},
+   {"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.01,0.98,0.01]},
+   {"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.10,0.28,0.40,0.17,0.05]},
+   {"q_en":"Sentiment","q_zh":"情绪","options_en":["positive","neutral","negative"],"options_zh":["正面","中性","负面"],"p":[0.08,0.86,0.06]},
+   {"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.02,0.98]}]},
+ {"id":"ex3","label":"EN · frustrated caller","label_zh":"英文 · 不满的来电者","lang":"en","source":"placeholder","transcript":"This is the third time I'm calling about the same bill.","audio":"audio/ex3.wav","duration_s":3.1,"seed":11,
   "questions":[
-   {"q":"Has the user finished the turn?","options":["finished","not finished"],"p":[0.71,0.29]},
-   {"q":"What does the user want?","options":["billing","technical","account","cancel","other","chit-chat"],"p":[0.83,0.03,0.06,0.05,0.02,0.01]},
-   {"q":"Which filler fits?","options":["“I'm sorry about that —”","“One moment.”","“Got it.”","(stay silent)"],"p":[0.74,0.10,0.09,0.07]},
-   {"q":"Speaker gender","options":["female","male"],"p":[0.66,0.34]},
-   {"q":"Language","options":["English","Chinese","other"],"p":[0.96,0.02,0.02]},
-   {"q":"Urgency (1–5)","options":["1","2","3","4","5"],"p":[0.02,0.06,0.22,0.46,0.24]},
-   {"q":"Sentiment","options":["positive","neutral","negative"],"p":[0.02,0.17,0.81]},
-   {"q":"Needs a human agent?","options":["yes","no"],"p":[0.58,0.42]}]}
+   {"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.71,0.29]},
+   {"q_en":"What does the caller want?","q_zh":"来电者想做什么？","options_en":["billing","technical","account","cancel","other","chit-chat"],"options_zh":["账单","技术问题","账户","退订","其他","闲聊"],"p":[0.83,0.03,0.06,0.05,0.02,0.01]},
+   {"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“I'm sorry about that —”","“One moment —”","“Got it —”","(stay silent)"],"options_zh":["“非常抱歉，”","“稍等，”","“明白，”","（不说话）"],"p":[0.74,0.10,0.09,0.07]},
+   {"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.66,0.34]},
+   {"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.96,0.02,0.02]},
+   {"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.02,0.06,0.22,0.46,0.24]},
+   {"q_en":"Sentiment","q_zh":"情绪","options_en":["positive","neutral","negative"],"options_zh":["正面","中性","负面"],"p":[0.02,0.17,0.81]},
+   {"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.58,0.42]}]}
 ],"pass":{"forward_ms":92,"decode_steps":0,"engine":"vLLM, 1× H200, Qwen3-32B"}}
 </script>
 
 <script>
 (function(){
-  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-  const $ = id => document.getElementById(id);
-  let DATA = JSON.parse($("examples-data").textContent);
-  let cur = 0;
+const T = {
+ en: {
+  doc_title:"DuplexJev",
+  eyebrow:"ICASSP 2027 submission · Speech-to-Decision",
+  title:"Batched Speech Decisions Without Decoding",
+  subtitle:"DuplexJev — a modular decision sidecar for full-duplex spoken agents",
+  affil:"<sup>1</sup>Adventists.ai, Melbourne · <sup>2</sup>College of CS&amp;T, Zhejiang University · <sup>3</sup>Future Design Lab, Innovation Center of Yangtze River Delta, Zhejiang University · <sup>4</sup>University of Virginia · <sup>★</sup>jiejin@adventists.ai",
+  l_paper:"Paper · arXiv soon", l_code:"Code", l_weights:"Weights · soon", l_qa100:"qa100 test set", l_cite:"Cite",
+  lede:"A full-duplex voice agent must keep answering small, closed questions — <em>has the user finished? which filler fits? which step of the flow is this?</em> DuplexJev reads every such question as one constrained token from a frozen speech LLM. No ASR decoding, no text decoding, and many questions — over one call or across calls — share a single forward pass.",
+  demo_h:"One utterance, one pass, many answers",
+  demo_p:"Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked).",
+  ph_tag:"LAYOUT PREVIEW",
+  ph_text:"The clips and probabilities below are illustrative placeholders, not model outputs. They will be replaced by outputs of the released checkpoint on real recordings.",
+  noaudio:"Audio is published together with the released-checkpoint examples.",
+  src_ph:"placeholder clip",
+  pass_q:"questions", pass_f:"forward passes", pass_d:"decode steps", pass_l:"event latency", pass_e:"engine",
+  how_h:"How it works",
+  h_readout:"Typed single-token readout", p_readout:"Each question lists its options under letters in a random order. The answer is the LLM's next-token distribution restricted to those letters — always a valid option, with a confidence score for free.",
+  h_prefix:"Prefix sharing", p_prefix:"The shared prefix (dialogue context and audio) is encoded once; all questions are packed into one row under a block-diagonal mask. Memory grows with the questions, not with copies of the context.",
+  h_fusion:"Paralinguistics through fusion", p_fusion:"Variant A lets the final encoder layer attend to layers 14 and 9, where speaker and prosody cues survive. The fusion starts at zero, so A begins identical to the last-layer variant B.",
+  h_swap:"Swap the parts", p_swap:"Encoder and LLM stay frozen; only a 40&nbsp;M-parameter projector (plus 3&nbsp;M for fusion) is trained. Any open ASR encoder and any LLM that accepts input embeddings will do.",
+  a_audio:"audio", a_audio2:"user speech", a_enc:"ASR encoder", a_enc2:"frozen · 12.5 Hz", a_fus:"A: cross-attn fusion", a_fus2:"Q=h18 · K=h14 · V=h9", a_last:"B: last layer h18",
+  a_proj:"projector", a_proj2:"stack 2 → 6.25 tok/s", a_llm:"frozen LLM", a_llm2:"Qwen3-32B · 1 pass", a_q:"state + N typed questions", a_q2:"options under permuted letters",
+  a_out:"p(option | q) × N", a_out2:"0 decode steps", a_or:"or", a_note:"shaded: trained (43.1 M for A, 39.9 M for B) · everything else frozen",
+  lat_h:"Ten decisions: 92 ms instead of two seconds",
+  lat_p:"Same GPU (1× H200), same frozen Qwen3-32B, same vLLM engine. The cascade transcribes, then generates the ten answers as JSON; the readout answers them as single tokens.",
+  lg_gen:"LLM generation", lg_asr:"ASR decoding", lg_ro:"single-token readout",
+  r_nc:"no context · cascade", r_nr:"no context · readout", r_cc:"1.5k context · cascade", r_cr:"1.5k context · readout",
+  lat_cap:"Median over 30 real utterances (2–12 s), ten questions per event. “Context” adds a 1,471-token dialogue context — the median input of the tool-need check in our deployed in-car assistant.",
+  t_ctx:"context", t_method:"method", t_steps:"decode steps", t_sat:"saturated", c_none:"none", m_json:"ASR → JSON", m_ro:"readout",
+  tab_cap:"Events per second one GPU can serve while every event finishes within the budget; last column: decisions per second at full saturation. At a conversational budget the cascade serves nothing; at saturation the two are on par — the gain is latency and capacity under a budget, not raw throughput.",
+  pre_h:"Long contexts stop multiplying",
+  lg_seq:"sequential calls", lg_rep:"batch-repeat", lg_sh:"shared prefix",
+  g0:"no context, N=100", g1:"1.5k context, N=100", g2:"5k context, N=50", notrun:"batch-repeat: not run (> 60k tokens)", oom:"batch-repeat: out of memory",
+  pre_cap:"Wall time for N questions over one utterance (plain PyTorch, eager attention; ratios are what matter). Shared and one-by-one answers agree on 195/200 and 198/200 items for the two variants and 40/40 with 0.5–5k-token contexts; remaining differences are near-ties at bf16 precision.",
+  tick_h:"One clock for every call",
+  tick_p:"Because a decision is a single step, a server can gather the latest audio of every active call on a fixed tick and answer all of them in one batch — something a cascade cannot do, since each transcription needs its own sequence of decode steps. Below, each column is a tick and each row a call; amber marks a pause where a decision is due.",
+  tick_cap:"Illustration. In our deployment, consecutive user turns in a session are a median 9.9 s apart, so decision events are sparse and batch well.",
+  res_h:"Understanding and paralinguistics",
+  res_p:"With a well-aligned speech path, reading the answer as one constrained token costs almost nothing against reading the transcript: 89 vs 91 on qa100 (Ultravox v0.6 Whisper path, Qwen3-32B). Results for our released speech paths — qa100, the ZJU gender benchmark and the ZJU main-language benchmark with real speech — will appear here with the final checkpoints.",
+  pending:"pending",
+  lim_h:"Limitations",
+  lim1:"Turn-taking from audio is not solved yet: current speech paths stay near the prior on Easy-Turn, while the same readout reaches 84.9% from the transcript.",
+  lim2:"qa100 is synthetic speech; real-speech understanding is measured on the ZJU main-language benchmark.",
+  lim3:"Confidence gates abstention but does not reveal a missing skill: a path that cannot hear gender is still confident.",
+  lim4:"Gender labels are corpus-provided and binary; the classifier is a probe of information flow, not a tool for identifying people.",
+  cite_h:"Cite", copy:"Copy BibTeX", copied:"Copied", selected:"Selected — press Ctrl/Cmd+C",
+  footer:"Code and weights: Apache-2.0 · qa100: CC-BY-4.0 · Built on Ultravox, Qwen3 and Qwen3-ASR.",
+  audio_tokens:"audio tokens", illus:"illustrative waveform"
+ },
+ zh: {
+  doc_title:"DuplexJev",
+  eyebrow:"ICASSP 2027 投稿 · Speech-to-Decision",
+  title:"不解码的批量语音判断",
+  subtitle:"DuplexJev —— 面向全双工语音智能体的模块化决策旁路",
+  affil:"<sup>1</sup>Adventists.ai（墨尔本）· <sup>2</sup>浙江大学计算机科学与技术学院 · <sup>3</sup>浙江大学长三角智慧绿洲创新中心 Future Design Lab · <sup>4</sup>弗吉尼亚大学 · <sup>★</sup>jiejin@adventists.ai",
+  l_paper:"论文 · arXiv 即将发布", l_code:"代码", l_weights:"权重 · 即将发布", l_qa100:"qa100 测试集", l_cite:"引用",
+  lede:"全双工语音智能体要不停地回答一些小而封闭的问题——<em>用户说完了吗？先说哪句垫话？流程走到哪一步了？</em>DuplexJev 把每个这样的问题都从冻结的语音大模型里读成一个受约束的 token：不做语音转写的解码，不做文本解码；同一通电话、甚至多通电话里的许多问题，共用一次前向计算。",
+  demo_h:"一句话，一次前向，许多答案",
+  demo_p:"选一段音频。右侧面板显示在同一次前向里回答的每个类型化问题，各自给出在自己选项上的概率。波形下方的刻度标出 160&nbsp;毫秒一段——每段变成大模型的一个音频 token（Qwen3-ASR 12.5&nbsp;Hz，两帧拼一）。",
+  ph_tag:"版式预览",
+  ph_text:"下面的音频与概率是示意占位，不是模型输出；将替换为正式发布的 checkpoint 在真实录音上的结果。",
+  noaudio:"音频将随正式 checkpoint 的示例一起发布。",
+  src_ph:"占位示例",
+  pass_q:"问题数", pass_f:"前向次数", pass_d:"解码步数", pass_l:"单事件延迟", pass_e:"推理环境",
+  how_h:"工作原理",
+  h_readout:"类型化单 token 读出", p_readout:"每个问题把选项放在随机排列的字母下，答案就是大模型下一个 token 在这些字母上的分布——永远是合法选项，还顺带得到置信度。",
+  h_prefix:"前缀共享", p_prefix:"共享前缀（对话上下文和音频）只编码一次；所有问题打包进同一行，用块对角掩码隔开。显存随问题数增长，而不是随上下文的副本数增长。",
+  h_fusion:"用融合带出副语言", p_fusion:"A 版本让编码器最后一层去关注第 14 层和第 9 层，那里还保留着说话人和韵律信息。融合层从零初始化，所以 A 一开始和只用最后一层的 B 版本完全相同。",
+  h_swap:"部件可替换", p_swap:"编码器和大模型都冻结，只训练一个约 4000&nbsp;万参数的投影器（融合层另加约 300&nbsp;万）。任何开源的语音识别编码器、任何接受嵌入输入的大模型都可以接上。",
+  a_audio:"音频", a_audio2:"用户语音", a_enc:"ASR 编码器", a_enc2:"冻结 · 12.5 Hz", a_fus:"A：交叉注意力融合", a_fus2:"Q=h18 · K=h14 · V=h9", a_last:"B：只用最后一层 h18",
+  a_proj:"投影器", a_proj2:"两帧拼一 → 6.25 token/秒", a_llm:"冻结的大模型", a_llm2:"Qwen3-32B · 一次前向", a_q:"状态 + N 个类型化问题", a_q2:"选项放在打乱的字母下",
+  a_out:"p(选项 | 问题) × N", a_out2:"0 步解码", a_or:"或", a_note:"着色部分参与训练（A 4310 万，B 3990 万参数），其余全部冻结",
+  lat_h:"十个判断：92 毫秒，而不是两秒",
+  lat_p:"同一张 GPU（1× H200）、同一个冻结的 Qwen3-32B、同一个 vLLM 引擎。级联方案先转写，再把十个答案生成成 JSON；读出方案把它们各读成一个 token。",
+  lg_gen:"大模型逐字生成", lg_asr:"语音转写解码", lg_ro:"单 token 读出",
+  r_nc:"无上下文 · 级联", r_nr:"无上下文 · 读出", r_cc:"1.5k 上下文 · 级联", r_cr:"1.5k 上下文 · 读出",
+  lat_cap:"30 段真实语音（2–12 秒）的中位数，每个事件 10 个问题。“上下文”是加上 1,471 个 token 的对话上下文——我们已上线的车载助手里“要不要调工具”判断的中位输入长度。",
+  t_ctx:"上下文", t_method:"方法", t_steps:"解码步数", t_sat:"满载", c_none:"无", m_json:"转写 → JSON", m_ro:"读出",
+  tab_cap:"在每个事件都于预算内完成的前提下，一张 GPU 每秒能处理的事件数；最后一列是满载时每秒的判断数。在对话级的延迟预算下级联方案一个事件都完不成；满载时两者持平——优势在于延迟和预算内的容量，而不是原始吞吐。",
+  pre_h:"长上下文不再成倍增加成本",
+  lg_seq:"逐题调用", lg_rep:"整段复制成批", lg_sh:"前缀共享",
+  g0:"无上下文，N=100", g1:"1.5k 上下文，N=100", g2:"5k 上下文，N=50", notrun:"整段复制：未运行（超过 6 万 token）", oom:"整段复制：显存不足",
+  pre_cap:"同一段语音上 N 个问题的耗时（PyTorch 即时模式，只看比例）。前缀共享与逐题单跑的答案在两个版本上分别有 195/200、198/200 一致，在 0.5–5k 上下文下 40/40 一致；剩下的差别都是 bf16 精度下的近似平局。",
+  tick_h:"所有通话共用一个时钟",
+  tick_p:"因为一次判断只要一步，服务器可以按固定节拍收集所有在线通话的最新音频，一批全部回答——级联做不到这一点，因为每一路转写都要走自己的多步解码。下图每一列是一个节拍、每一行是一通电话；琥珀色表示出现停顿、需要做判断。",
+  tick_cap:"示意图。在我们的线上系统里，同一段对话中相邻两轮用户发言的中位间隔是 9.9 秒，判断事件稀疏，非常适合批量处理。",
+  res_h:"语义理解与副语言",
+  res_p:"语音通路对齐良好时，把答案读成一个受约束的 token，和直接读转写文本相比几乎没有损失：qa100 上 89 对 91（Ultravox v0.6 Whisper 通路，Qwen3-32B）。我们发布的语音通路在 qa100、浙大性别基准和浙大主语言基准（含真人语音）上的结果，会在最终 checkpoint 完成后放在这里。",
+  pending:"待补",
+  lim_h:"局限",
+  lim1:"从音频判断话轮还没有解决：现有语音通路在 Easy-Turn 上接近先验水平，而同样的读出方式从转写文本能达到 84.9%。",
+  lim2:"qa100 是合成语音；真人语音的理解能力在浙大主语言基准上衡量。",
+  lim3:"置信度可以用来决定是否弃答，但看不出能力缺失：一个听不出性别的通路照样很有把握。",
+  lim4:"性别标签来自语料库、只有两类；这个分类器是用来探查信息流的，不是用来识别个人的工具。",
+  cite_h:"引用", copy:"复制 BibTeX", copied:"已复制", selected:"已选中，按 Ctrl/Cmd+C 复制",
+  footer:"代码与权重：Apache-2.0 · qa100：CC-BY-4.0 · 基于 Ultravox、Qwen3 与 Qwen3-ASR 构建。",
+  audio_tokens:"个音频 token", illus:"示意波形"
+ }
+};
 
-  function rng(seed){ let s = seed>>>0 || 1; return () => (s = (s*1664525 + 1013904223)>>>0) / 4294967296; }
-  function drawWave(ex){
-    const c = $("wave"), dpr = window.devicePixelRatio || 1;
-    const w = c.clientWidth, h = c.clientHeight;
-    c.width = w*dpr; c.height = h*dpr;
-    const g = c.getContext("2d"); g.scale(dpr,dpr); g.clearRect(0,0,w,h);
-    const r = rng(ex.seed || 1), N = Math.max(60, Math.floor(w/3)), top = 18, mid = (h - top - 22)/2;
-    // token boundaries: 160 ms
-    const tokens = Math.ceil(ex.duration_s / 0.16);
-    g.strokeStyle = css("--grid"); g.lineWidth = 1;
-    for(let i=0;i<=tokens;i++){ const x = Math.round(i*w/tokens)+.5; g.beginPath(); g.moveTo(x,h-14); g.lineTo(x,h-4); g.stroke(); }
-    g.fillStyle = css("--ink-2"); g.font = "11px " + css("--mono");
-    g.fillText(tokens + " audio tokens · " + ex.duration_s.toFixed(1) + " s", 0, 11);
-    // envelope-shaped bars (illustrative when no real waveform is loaded)
-    g.fillStyle = css("--signal");
-    let env = 0;
-    for(let i=0;i<N;i++){
-      const t = i/N; const syll = Math.abs(Math.sin(t*Math.PI*ex.duration_s*2.2));
-      env = 0.7*env + 0.3*(0.25 + 0.75*syll*(0.6+0.4*r()));
-      const tail = t > 0.9 ? (1-t)/0.1 : 1;
-      const a = Math.max(1, env*tail*(mid-2));
-      g.fillRect(i*w/N, top+mid-a, Math.max(1, w/N-1), 2*a);
-    }
-  }
-  function renderQs(ex){
-    const pal = [css("--signal"), css("--ink-2"), css("--slow"), css("--rule"), css("--grid"), css("--ink")];
-    $("qs").innerHTML = "";
-    ex.questions.forEach(q => {
-      const k = q.p.indexOf(Math.max(...q.p));
-      const d = document.createElement("div"); d.className = "q";
-      const top = document.createElement("div"); top.className = "q-top";
-      const t = document.createElement("span"); t.innerHTML = "<b></b>"; t.firstChild.textContent = q.q;
-      const a = document.createElement("span"); a.className = "q-ans"; a.textContent = q.options[k] + "  " + (q.p[k]*100).toFixed(0) + "%";
-      top.append(t, a);
-      const bars = document.createElement("div"); bars.className = "bars";
-      q.p.forEach((p,i) => { const s = document.createElement("i"); s.style.width = (p*100)+"%"; s.style.background = i===k ? css("--signal") : (i%2 ? css("--rule") : css("--ink-2")); s.style.opacity = i===k ? 1 : .55; s.title = q.options[i] + " " + (p*100).toFixed(1)+"%"; bars.append(s); });
-      const opts = document.createElement("div"); opts.className = "opts";
-      q.options.forEach((o,i) => { const s = document.createElement("span"); s.textContent = o + " " + (q.p[i]*100).toFixed(0) + "%"; if(i===k) s.style.color = css("--signal"); opts.append(s); });
-      d.append(top, bars, opts); $("qs").append(d);
-    });
-  }
-  function select(i){
-    cur = i; const ex = DATA.examples[i];
-    [...$("tabs").children].forEach((b,j) => b.setAttribute("aria-pressed", j===i ? "true" : "false"));
-    $("meta").innerHTML = ""; [ex.lang.toUpperCase(), ex.duration_s.toFixed(1)+" s", ex.source].forEach(s => { const e = document.createElement("span"); e.textContent = s; $("meta").append(e); });
-    $("tx").textContent = "“" + ex.transcript + "”";
-    const au = $("aud"); au.hidden = false; au.src = ex.audio; au.onerror = () => { au.hidden = true; };
-    drawWave(ex); renderQs(ex);
-    const P = DATA.pass || {};
-    $("pass").innerHTML = "";
-    [["questions", ex.questions.length], ["forward passes", 1], ["decode steps", P.decode_steps ?? 0], ["event latency", (P.forward_ms ?? "–") + " ms"], ["engine", P.engine || ""]].forEach(([k,v]) => { const s = document.createElement("span"); s.innerHTML = k + " <b></b>"; s.lastChild.textContent = v; $("pass").append(s); });
-  }
-  function buildTabs(){
-    $("tabs").innerHTML = "";
-    DATA.examples.forEach((ex,i) => { const b = document.createElement("button"); b.type = "button"; b.id = "tab-"+ex.id; b.textContent = ex.label; b.addEventListener("click", () => select(i)); $("tabs").append(b); });
-    $("ph").hidden = !DATA.placeholder;
-    select(0);
-  }
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const $ = id => document.getElementById(id);
+let DATA = JSON.parse($("examples-data").textContent);
+let cur = 0;
+let LANG = "en";
+const t = k => (T[LANG][k] ?? T.en[k] ?? k);
 
-  // --- static figures ---
-  const NS = "http://www.w3.org/2000/svg";
-  function el(tag, attrs, parent, text){ const e = document.createElementNS(NS, tag); for(const k in attrs) e.setAttribute(k, attrs[k]); if(text!==undefined) e.textContent = text; parent && parent.append(e); return e; }
-  function arch(){
-    const s = $("arch"); s.innerHTML = "";
-    const box = (x,y,w,h,label,sub,kind) => {
-      const fill = kind==="train" ? css("--signal-soft") : css("--panel");
-      const stroke = kind==="train" ? css("--signal") : css("--rule");
-      el("rect",{x,y,width:w,height:h,rx:4,fill,stroke,"stroke-width":1.2},s);
-      el("text",{x:x+w/2,y:y+h/2-(sub?4:-4),"text-anchor":"middle","font-size":13,fill:css("--ink")},s,label);
-      if(sub) el("text",{x:x+w/2,y:y+h/2+14,"text-anchor":"middle","font-size":11,fill:css("--ink-2")},s,sub);
-    };
-    const arrow = (x1,y1,x2,y2,dash) => { el("line",{x1,y1,x2,y2,stroke:css("--ink-2"),"stroke-width":1.2,"stroke-dasharray":dash?"4 4":"none","marker-end":"url(#ah)"},s); };
-    const defs = el("defs",{},s); const m = el("marker",{id:"ah",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs); el("path",{d:"M0,0 L10,5 L0,10 z",fill:css("--ink-2")},m);
-    box(10,40,90,56,"audio","user speech");
-    box(135,40,150,56,"ASR encoder","frozen · 12.5 Hz");
-    box(320,20,190,56,"A: cross-attn fusion","Q=h18 · K=h14 · V=h9","train");
-    box(320,100,190,40,"B: last layer h18","");
-    box(545,40,150,56,"projector","stack 2 → 6.25 tok/s","train");
-    box(545,160,150,56,"frozen LLM","Qwen3-32B · 1 pass");
-    box(135,160,340,56,"state + N typed questions","options under permuted letters");
-    box(730,160,160,56,"p(option | q) × N","0 decode steps");
-    arrow(100,68,133,68); arrow(285,60,318,50); arrow(285,78,318,118,true); arrow(510,48,543,62); arrow(510,120,543,80,true);
-    arrow(620,96,620,158); arrow(475,188,543,188); arrow(695,188,728,188);
-    el("text",{x:10,y:240,"font-size":11,fill:css("--ink-2")},s,"shaded: trained (43.1 M for A, 39.9 M for B) · everything else frozen");
-  }
-  function latChart(){
-    const s = $("latchart"); s.innerHTML = "";
-    const rows = [["no context · cascade",411,1567,0],["no context · readout",0,0,92],["1.5k context · cascade",411,1598,0],["1.5k context · readout",0,0,144]];
-    const L = 190, W = 900-L-70, max = 2100, y0 = 14, bh = 30, gap = 18;
-    for(let t=0;t<=2000;t+=500){ const x = L + W*t/max; el("line",{x1:x,y1:y0-4,x2:x,y2:y0+rows.length*(bh+gap)-gap+4,stroke:css("--grid")},s); el("text",{x,y:y0+rows.length*(bh+gap)+10,"text-anchor":"middle","font-size":11,fill:css("--ink-2")},s,t+" ms"); }
-    rows.forEach((r,i) => {
-      const y = y0 + i*(bh+gap);
-      el("text",{x:L-10,y:y+bh/2+4,"text-anchor":"end","font-size":12,fill:css("--ink")},s,r[0]);
-      let x = L;
-      if(r[1]){ const w = W*r[1]/max; el("rect",{x,y,width:w,height:bh,fill:css("--slow-soft"),stroke:css("--slow")},s); x += w; }
-      if(r[2]){ const w = W*r[2]/max; el("rect",{x,y,width:w,height:bh,fill:css("--slow")},s); x += w; el("text",{x:x+6,y:y+bh/2+4,"font-size":12,fill:css("--ink")},s,(r[1]+r[2]).toLocaleString()+" ms"); }
-      if(r[3]){ const w = Math.max(3, W*r[3]/max); el("rect",{x,y,width:w,height:bh,fill:css("--signal")},s); el("text",{x:x+w+6,y:y+bh/2+4,"font-size":12,fill:css("--signal")},s,r[3]+" ms"); }
-    });
-  }
-  function preChart(){
-    const s = $("prechart"); s.innerHTML = "";
-    const groups = [["no context, N=100",[7560,3108,1597]],["1.5k context, N=100",[37920,null,5106]],["5k context, N=50",[111500,"OOM",5482]]];
-    const labels = ["sequential","batch-repeat","shared"], cols = [css("--slow"), css("--ink-2"), css("--signal")];
-    const L = 160, W = 900-L-110, lo = Math.log10(1000), hi = Math.log10(200000);
-    const X = v => L + W*(Math.log10(v)-lo)/(hi-lo);
-    [1000,10000,100000].forEach(t => { const x = X(t); el("line",{x1:x,y1:6,x2:x,y2:222,stroke:css("--grid")},s); el("text",{x,y:238,"text-anchor":"middle","font-size":11,fill:css("--ink-2")},s,(t/1000)+" s"); });
-    groups.forEach((g,i) => {
-      const y = 10 + i*74;
-      el("text",{x:L-10,y:y+30,"text-anchor":"end","font-size":12,fill:css("--ink")},s,g[0]);
-      g[1].forEach((v,j) => {
-        const yy = y + j*21;
-        if(typeof v === "number"){ el("rect",{x:L,y:yy,width:Math.max(2,X(v)-L),height:16,fill:cols[j],opacity:j===1?.6:1},s); el("text",{x:X(v)+6,y:yy+12,"font-size":11,fill:j===2?css("--signal"):css("--ink-2")},s,labels[j]+" "+(v/1000).toFixed(1)+" s"); }
-        else el("text",{x:L+4,y:yy+12,"font-size":11,fill:css(v==="OOM"?"--warn":"--ink-2")},s,labels[j]+" — "+(v==="OOM"?"out of memory":"not run (> 60k tokens)"));
-      });
-    });
-  }
-  function ticks(){
-    const g = $("ticks"); g.innerHTML = ""; const r = rng(42); const cols = window.matchMedia("(max-width:760px)").matches ? 24 : 48;
-    for(let row=0; row<8; row++) for(let c=0;c<cols;c++){ const s = document.createElement("span"); const v = r(); s.className = v < .12 ? "ev" : (v < .5 ? "on" : ""); g.append(s); }
-  }
-  $("copybib").addEventListener("click", async () => {
-    const b = $("copybib");
-    try { await navigator.clipboard.writeText($("bib").textContent); b.textContent = "Copied"; }
-    catch(e){ const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents($("bib")); sel.removeAllRanges(); sel.addRange(rg); b.textContent = "Selected — press Ctrl/Cmd+C"; }
-    setTimeout(() => b.textContent = "Copy BibTeX", 2000);
-  });
-
-  function drawAll(){ arch(); latChart(); preChart(); ticks(); if(DATA.examples.length) select(cur); }
+function pickLang(){
+  const h = (location.hash || "").replace("#","");
+  if (h === "zh" || h === "en") return h;
+  try { const q = new URLSearchParams(location.search).get("lang"); if (q === "zh" || q === "en") return q; } catch(e){}
+  try { const s = localStorage.getItem("dj-lang"); if (s === "zh" || s === "en") return s; } catch(e){}
+  return "en";
+}
+function applyLang(l){
+  LANG = l;
+  document.documentElement.lang = l === "zh" ? "zh-CN" : "en";
+  document.title = t("doc_title");
+  document.querySelectorAll("[data-i18n]").forEach(e => { e.innerHTML = t(e.getAttribute("data-i18n")); });
+  ["en","zh"].forEach(x => $("lang-"+x).setAttribute("aria-pressed", x === l ? "true" : "false"));
+  try { localStorage.setItem("dj-lang", l); } catch(e){}
   buildTabs(); drawAll();
-  window.addEventListener("resize", () => drawWave(DATA.examples[cur]));
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", drawAll);
-  new MutationObserver(drawAll).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
-  // on GitHub Pages, examples.json (generated from the released checkpoint) overrides the embedded preview data
-  fetch("examples.json").then(r => r.ok ? r.json() : null).then(d => { if(d && d.examples && d.examples.length){ DATA = d; cur = 0; buildTabs(); } }).catch(() => {});
+}
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
+
+// ---------- demo ----------
+function rng(seed){ let s = seed>>>0 || 1; return () => (s = (s*1664525 + 1013904223)>>>0) / 4294967296; }
+const peaksCache = {};
+async function realPeaks(ex){
+  if (peaksCache[ex.id] !== undefined) return peaksCache[ex.id];
+  peaksCache[ex.id] = null;
+  try {
+    const r = await fetch(ex.audio); if (!r.ok) return null;
+    const buf = await r.arrayBuffer();
+    const Ctx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+    const ab = await new Ctx(1, 16000, 16000).decodeAudioData(buf);
+    const ch = ab.getChannelData(0), N = 400, step = Math.max(1, Math.floor(ch.length / N)), out = [];
+    for (let i = 0; i < N; i++){ let m = 0; for (let j = i*step; j < Math.min(ch.length,(i+1)*step); j++){ const v = Math.abs(ch[j]); if (v > m) m = v; } out.push(m); }
+    const mx = Math.max(...out, 1e-6); peaksCache[ex.id] = out.map(v => v/mx);
+  } catch(e){ peaksCache[ex.id] = null; }
+  return peaksCache[ex.id];
+}
+function drawWave(ex, peaks){
+  const c = $("wave"), dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  if (!w) return;
+  c.width = w*dpr; c.height = h*dpr;
+  const g = c.getContext("2d"); g.scale(dpr,dpr); g.clearRect(0,0,w,h);
+  const top = 18, mid = (h - top - 22)/2, tokens = Math.ceil(ex.duration_s / 0.16);
+  g.strokeStyle = css("--rule"); g.lineWidth = 1;
+  for (let i = 0; i <= tokens; i++){ const x = Math.round(i*w/tokens)+.5; g.beginPath(); g.moveTo(x,h-14); g.lineTo(x,h-4); g.stroke(); }
+  g.fillStyle = css("--ink-2"); g.font = "11px " + css("--mono");
+  g.fillText(tokens + " " + t("audio_tokens") + " · " + ex.duration_s.toFixed(1) + " s" + (peaks ? "" : " · " + t("illus")), 0, 11);
+  g.fillStyle = css("--signal");
+  const N = Math.max(60, Math.floor(w/3));
+  if (peaks){
+    for (let i = 0; i < N; i++){ const v = peaks[Math.floor(i*peaks.length/N)]; const a = Math.max(1, v*(mid-2)); g.fillRect(i*w/N, top+mid-a, Math.max(1,w/N-1), 2*a); }
+    return;
+  }
+  const r = rng(ex.seed || 1); let env = 0;
+  for (let i = 0; i < N; i++){
+    const tt = i/N, syll = Math.abs(Math.sin(tt*Math.PI*ex.duration_s*2.2));
+    env = 0.7*env + 0.3*(0.25 + 0.75*syll*(0.6+0.4*r()));
+    const tail = tt > 0.9 ? (1-tt)/0.1 : 1, a = Math.max(1, env*tail*(mid-2));
+    g.fillRect(i*w/N, top+mid-a, Math.max(1,w/N-1), 2*a);
+  }
+}
+function qText(q){ return LANG === "zh" ? (q.q_zh || q.q_en || q.q) : (q.q_en || q.q); }
+function qOpts(q){ return LANG === "zh" ? (q.options_zh || q.options_en || q.options) : (q.options_en || q.options); }
+function renderQs(ex){
+  const box = $("qs"); box.innerHTML = ""; box.classList.toggle("ph", !!DATA.placeholder);
+  ex.questions.forEach(q => {
+    const opts = qOpts(q), k = q.p.indexOf(Math.max(...q.p));
+    const d = document.createElement("div"); d.className = "q";
+    const top = document.createElement("div"); top.className = "q-top";
+    const tt = document.createElement("b"); tt.textContent = qText(q);
+    const a = document.createElement("span"); a.className = "q-ans"; a.textContent = opts[k] + "  " + (q.p[k]*100).toFixed(0) + "%";
+    top.append(tt, a);
+    const bars = document.createElement("div"); bars.className = "bars";
+    q.p.forEach((p,i) => { const s = document.createElement("i"); s.style.width = (p*100)+"%"; s.style.background = i===k ? css("--signal") : (i%2 ? css("--rule") : css("--ink-2")); s.style.opacity = i===k ? 1 : .5; s.title = opts[i] + " " + (p*100).toFixed(1) + "%"; bars.append(s); });
+    const ol = document.createElement("div"); ol.className = "opts";
+    opts.forEach((o,i) => { const s = document.createElement("span"); s.textContent = o + " " + (q.p[i]*100).toFixed(0) + "%"; if (i===k) s.style.color = css("--signal"); ol.append(s); });
+    d.append(top, bars, ol); box.append(d);
+  });
+}
+async function select(i){
+  cur = i; const ex = DATA.examples[i];
+  [...$("tabs").children].forEach((b,j) => b.setAttribute("aria-pressed", j===i ? "true" : "false"));
+  $("meta").innerHTML = "";
+  const src = ex.source === "placeholder" ? t("src_ph") : ex.source;
+  [ex.lang.toUpperCase(), ex.duration_s.toFixed(1)+" s", src].forEach(s => { const e = document.createElement("span"); e.textContent = s; $("meta").append(e); });
+  $("tx").textContent = "“" + ex.transcript + "”";
+  $("ph").hidden = !DATA.placeholder;
+  const au = $("aud"), na = $("noaudio");
+  au.hidden = true; na.hidden = false; au.removeAttribute("src");
+  drawWave(ex, null); renderQs(ex);
+  const P = DATA.pass || {};
+  $("pass").innerHTML = "";
+  [[t("pass_q"), ex.questions.length], [t("pass_f"), 1], [t("pass_d"), P.decode_steps ?? 0], [t("pass_l"), (ex.forward_ms ?? P.forward_ms ?? "–") + " ms"], [t("pass_e"), P.engine || ""]]
+    .forEach(([k,v]) => { const s = document.createElement("span"); s.append(k + " "); const b = document.createElement("b"); b.textContent = v; s.append(b); $("pass").append(s); });
+  if (!DATA.placeholder){
+    const peaks = await realPeaks(ex);
+    if (cur !== i) return;
+    if (peaks){ au.src = ex.audio; au.hidden = false; na.hidden = true; drawWave(ex, peaks); }
+  }
+}
+function buildTabs(){
+  const box = $("tabs"); box.innerHTML = "";
+  DATA.examples.forEach((ex,i) => { const b = document.createElement("button"); b.type = "button"; b.id = "tab-"+ex.id; b.textContent = LANG === "zh" ? (ex.label_zh || ex.label) : ex.label; b.addEventListener("click", () => select(i)); box.append(b); });
+  if (DATA.examples.length) select(Math.min(cur, DATA.examples.length-1));
+}
+
+// ---------- figures (drawn at the real container width so text stays 12px) ----------
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent, text){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; parent && parent.append(e); return e; }
+function prep(id){ const s = $(id); s.innerHTML = ""; const w = Math.max(280, s.parentElement.clientWidth - 36); return [s, w]; }
+function marker(s){ const d = el("defs",{},s), m = el("marker",{id:"ah",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},d); el("path",{d:"M0,0 L10,5 L0,10 z",fill:css("--ink-2")},m); }
+
+function arch(){
+  const [s, w] = prep("arch"); marker(s);
+  const box = (x,y,bw,bh,a,b,kind) => {
+    el("rect",{x,y,width:bw,height:bh,rx:4,fill:kind ? css("--signal-soft") : css("--panel"),stroke:kind ? css("--signal") : css("--rule"),"stroke-width":1.2},s);
+    el("text",{x:x+bw/2,y:y+bh/2+(b?-3:4),"text-anchor":"middle","font-size":12.5,fill:css("--ink")},s,a);
+    if (b) el("text",{x:x+bw/2,y:y+bh/2+14,"text-anchor":"middle","font-size":11,fill:css("--ink-2")},s,b);
+  };
+  const arrow = (x1,y1,x2,y2,dash) => el("line",{x1,y1,x2,y2,stroke:css("--ink-2"),"stroke-width":1.2,"stroke-dasharray":dash?"4 4":"none","marker-end":"url(#ah)"},s);
+  if (w >= 640){
+    const k = w/900, X = v => v*k, H = 250;
+    s.setAttribute("viewBox", `0 0 ${w} ${H}`);
+    box(X(10),40,X(90),56,t("a_audio"),t("a_audio2"));
+    box(X(135),40,X(150),56,t("a_enc"),t("a_enc2"));
+    box(X(320),20,X(190),56,t("a_fus"),t("a_fus2"),1);
+    box(X(320),100,X(190),40,t("a_last"));
+    box(X(545),40,X(150),56,t("a_proj"),t("a_proj2"),1);
+    box(X(545),160,X(150),56,t("a_llm"),t("a_llm2"));
+    box(X(135),160,X(340),56,t("a_q"),t("a_q2"));
+    box(X(730),160,X(160),56,t("a_out"),t("a_out2"));
+    arrow(X(100),68,X(135)-2,68); arrow(X(285),60,X(320)-2,50); arrow(X(285),78,X(320)-2,118,true); arrow(X(510),48,X(545)-2,62); arrow(X(510),120,X(545)-2,80,true);
+    arrow(X(620),96,X(620),158); arrow(X(475),188,X(545)-2,188); arrow(X(695),188,X(730)-2,188);
+    el("text",{x:X(10),y:242,"font-size":11,fill:css("--ink-2")},s,t("a_note"));
+  } else {
+    const bw = w - 20, x = 10, rows = [[t("a_audio"),t("a_audio2")],[t("a_enc"),t("a_enc2")]];
+    let y = 6; const bh = 46, gap = 22;
+    rows.forEach((r,i) => { box(x,y,bw,bh,r[0],r[1]); arrow(w/2,y+bh,w/2,y+bh+gap-2); y += bh+gap; });
+    box(x,y,bw,bh+6,t("a_fus"),t("a_fus2"),1); y += bh+6+10;
+    box(x+30,y,bw-30,34,t("a_last"),""); el("line",{x1:x+12,y1:y-10,x2:x+12,y2:y+17,stroke:css("--ink-2"),"stroke-dasharray":"4 4"},s); arrow(x+12,y+17,x+28,y+17,true); el("text",{x:x+2,y:y-1,"font-size":10.5,fill:css("--ink-2")},s,t("a_or"));
+    arrow(w/2,y+34,w/2,y+34+gap-2); y += 34+gap;
+    box(x,y,bw,bh,t("a_proj"),t("a_proj2"),1); arrow(w/2,y+bh,w/2,y+bh+gap-2); y += bh+gap;
+    box(x,y,bw,bh,t("a_q"),t("a_q2")); arrow(w/2,y+bh,w/2,y+bh+gap-2); y += bh+gap;
+    box(x,y,bw,bh,t("a_llm"),t("a_llm2")); arrow(w/2,y+bh,w/2,y+bh+gap-2); y += bh+gap;
+    box(x,y,bw,bh,t("a_out"),t("a_out2")); y += bh+18;
+    // wrap the note into lines that fit the width
+    const note = t("a_note"), per = Math.max(16, Math.floor(bw / (LANG === "zh" ? 11 : 6.4)));
+    const parts = []; let rest = note;
+    while (rest.length){ let cut = Math.min(per, rest.length); if (cut < rest.length){ const sp = rest.lastIndexOf(" ", cut); if (sp > per*0.5) cut = sp; } parts.push(rest.slice(0,cut).trim()); rest = rest.slice(cut); }
+    parts.forEach((ln,i) => el("text",{x,y:y+i*15,"font-size":10.5,fill:css("--ink-2")},s,ln));
+    s.setAttribute("viewBox", `0 0 ${w} ${y+parts.length*15}`);
+  }
+}
+function latChart(){
+  const [s, w] = prep("latchart");
+  const rows = [[t("r_nc"),411,1567,0],[t("r_nr"),0,0,92],[t("r_cc"),411,1598,0],[t("r_cr"),0,0,144]];
+  const narrow = w < 560, L = narrow ? 0 : 170, R = 78, W = w - L - R, max = 2100, bh = 22;
+  const rowH = narrow ? 50 : 40, y0 = 6;
+  const X = v => L + W*v/max;
+  const bottom = y0 + rows.length*rowH;
+  (narrow ? [0,1000,2000] : [0,500,1000,1500,2000]).forEach(v => { el("line",{x1:X(v),y1:y0,x2:X(v),y2:bottom,stroke:css("--grid")},s); el("text",{x:X(v),y:bottom+16,"text-anchor":v===0?"start":"middle","font-size":11,fill:css("--ink-2")},s,v+" ms"); });
+  rows.forEach((r,i) => {
+    const y = y0 + i*rowH + (narrow ? 18 : (rowH-bh)/2);
+    el("text",{x:narrow ? 0 : L-10,y:narrow ? y-5 : y+bh/2+4,"text-anchor":narrow?"start":"end","font-size":12,fill:css("--ink")},s,r[0]);
+    let x = X(0);
+    if (r[1]){ const bw = W*r[1]/max; el("rect",{x,y,width:bw,height:bh,fill:css("--slow-soft"),stroke:css("--slow")},s); x += bw; }
+    if (r[2]){ const bw = W*r[2]/max; el("rect",{x,y,width:bw,height:bh,fill:css("--slow")},s); x += bw; el("text",{x:x+6,y:y+bh/2+4,"font-size":12,fill:css("--ink")},s,(r[1]+r[2]).toLocaleString()+" ms"); }
+    if (r[3]){ const bw = Math.max(3, W*r[3]/max); el("rect",{x,y,width:bw,height:bh,fill:css("--signal")},s); el("text",{x:x+bw+6,y:y+bh/2+4,"font-size":12,fill:css("--signal")},s,r[3]+" ms"); }
+  });
+  s.setAttribute("viewBox", `0 0 ${w} ${bottom+22}`);
+}
+function preChart(){
+  const [s, w] = prep("prechart");
+  const groups = [[t("g0"),[7560,3108,1597]],[t("g1"),[37920,"notrun",5106]],[t("g2"),[111500,"oom",5482]]];
+  const cols = [css("--slow"), css("--ink-2"), css("--signal")];
+  const narrow = w < 560, L = narrow ? 0 : 150, R = 64, W = w - L - R, lo = Math.log10(1000), hi = Math.log10(150000);
+  const X = v => L + W*(Math.log10(v)-lo)/(hi-lo);
+  const gh = narrow ? 92 : 78, bh = 15;
+  const bottom = 6 + groups.length*gh;
+  [1000,10000,100000].forEach(v => { el("line",{x1:X(v),y1:4,x2:X(v),y2:bottom,stroke:css("--grid")},s); el("text",{x:X(v),y:bottom+16,"text-anchor":v===1000?"start":"middle","font-size":11,fill:css("--ink-2")},s,(v/1000)+" s"); });
+  groups.forEach((g,i) => {
+    const y = 6 + i*gh + (narrow ? 18 : 6);
+    el("text",{x:narrow ? 0 : L-10,y:narrow ? y-6 : y+26,"text-anchor":narrow?"start":"end","font-size":12,fill:css("--ink")},s,g[0]);
+    g[1].forEach((v,j) => {
+      const yy = y + j*(bh+5);
+      if (typeof v === "number"){ el("rect",{x:X(1000),y:yy,width:Math.max(2,X(v)-X(1000)),height:bh,fill:cols[j],opacity:j===1?.6:1},s); el("text",{x:X(v)+6,y:yy+12,"font-size":11.5,fill:j===2?css("--signal"):css("--ink-2")},s,(v/1000).toFixed(1)+" s"); }
+      else el("text",{x:X(1000)+2,y:yy+12,"font-size":11,fill:css(v==="oom"?"--warn":"--ink-2")},s,t(v));
+    });
+  });
+  s.setAttribute("viewBox", `0 0 ${w} ${bottom+22}`);
+}
+function ticks(){
+  const g = $("ticks"); g.innerHTML = ""; const r = rng(42); const cols = window.matchMedia("(max-width:760px)").matches ? 24 : 48;
+  for (let row = 0; row < 8; row++) for (let c = 0; c < cols; c++){ const sp = document.createElement("span"); const v = r(); sp.className = v < .12 ? "ev" : (v < .5 ? "on" : ""); g.append(sp); }
+}
+$("copybib").addEventListener("click", async () => {
+  const b = $("copybib");
+  try { await navigator.clipboard.writeText($("bib").textContent); b.textContent = t("copied"); }
+  catch(e){ const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents($("bib")); sel.removeAllRanges(); sel.addRange(rg); b.textContent = t("selected"); }
+  setTimeout(() => { b.textContent = t("copy"); }, 2000);
+});
+
+function drawAll(){ arch(); latChart(); preChart(); ticks(); if (DATA.examples.length) drawWave(DATA.examples[cur], peaksCache[DATA.examples[cur].id] || null); }
+let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", drawAll);
+new MutationObserver(drawAll).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+window.addEventListener("hashchange", () => { const h = location.hash.replace("#",""); if (h === "zh" || h === "en") applyLang(h); });
+
+applyLang(pickLang());
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+// On GitHub Pages, examples.json (generated from the released checkpoint) replaces the embedded preview data.
+fetch("examples.json", {cache:"no-cache"}).then(r => r.ok ? r.json() : null).then(d => { if (d && d.examples && d.examples.length){ DATA = d; cur = 0; buildTabs(); } }).catch(() => {});
 })();
 </script>
 </body></html>

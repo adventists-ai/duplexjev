@@ -12,7 +12,7 @@ examples_config.json:
   {"clips": [{"id": "ex1", "label": "EN · pause mid-request", "lang": "en",
               "audio": "/path/to/clip.wav", "transcript": "...",
               "source": "LibriSpeech test-clean (CC-BY-4.0)"}, ...],
-   "questions": {"en": [{"q": "...", "options": ["...", "..."]}, ...], "zh": [...]}}   # optional; defaults below
+   "questions": [{"en": ["question", [options]], "zh": ["问题", [选项]]}, ...]}   # optional; defaults below
 
 Only use clips whose license allows redistribution (LibriSpeech CC-BY-4.0, Common Voice CC0, AISHELL-1 Apache-2.0,
 our own recordings with consent). Never use production call audio or ODSQA audio.
@@ -29,28 +29,21 @@ sys.path.insert(0, os.path.join(HERE, "..", "readout"))
 import run_bench as RB  # noqa: E402  (load_model, build_prompt)
 
 LETTERS = "ABCDEFGH"
-DEFAULT_Q = {
-    "en": [
-        {"q": "Has the user finished the turn?", "options": ["finished", "not finished"]},
-        {"q": "What does the user want?", "options": ["climate", "media", "navigation", "phone", "vehicle info", "chit-chat"]},
-        {"q": "Which filler fits?", "options": ["“Sure —”", "“One moment.”", "“Got it.”", "(stay silent)"]},
-        {"q": "Speaker gender", "options": ["female", "male"]},
-        {"q": "Language", "options": ["English", "Chinese", "other"]},
-        {"q": "Urgency (1–5)", "options": ["1", "2", "3", "4", "5"]},
-        {"q": "Sentiment", "options": ["positive", "neutral", "negative"]},
-        {"q": "Needs a human agent?", "options": ["yes", "no"]},
-    ],
-    "zh": [
-        {"q": "用户这句话说完了吗？", "options": ["说完了", "没说完"], "q_en": "Has the user finished the turn?", "options_en": ["finished", "not finished"]},
-        {"q": "用户想做什么？", "options": ["空调", "媒体", "导航", "电话", "车辆信息", "闲聊"], "q_en": "What does the user want?", "options_en": ["climate", "media", "navigation", "phone", "vehicle info", "chit-chat"]},
-        {"q": "先说哪句垫话？", "options": ["“好的，”", "“稍等，”", "“马上为您查找，”", "（不说话）"], "q_en": "Which filler fits?"},
-        {"q": "说话人的性别", "options": ["女性", "男性"], "q_en": "Speaker gender", "options_en": ["female", "male"]},
-        {"q": "说的是什么语言？", "options": ["英语", "中文", "其他"], "q_en": "Language", "options_en": ["English", "Chinese", "other"]},
-        {"q": "紧急程度（1–5）", "options": ["1", "2", "3", "4", "5"], "q_en": "Urgency (1–5)"},
-        {"q": "情绪倾向", "options": ["正面", "中性", "负面"], "q_en": "Sentiment", "options_en": ["positive", "neutral", "negative"]},
-        {"q": "需要转人工吗？", "options": ["需要", "不需要"], "q_en": "Needs a human agent?", "options_en": ["yes", "no"]},
-    ],
-}
+# Each question: text shown/asked in English and Chinese. The model is asked in the clip's language;
+# the page shows the question in the reader's UI language.
+DEFAULT_Q = [
+    {"en": ("Has the user finished the turn?", ["finished", "not finished"]),
+     "zh": ("用户这句话说完了吗？", ["说完了", "没说完"])},
+    {"en": ("What does the user want?", ["climate", "media", "navigation", "phone", "vehicle info", "chit-chat"]),
+     "zh": ("用户想做什么？", ["空调", "媒体", "导航", "电话", "车辆信息", "闲聊"])},
+    {"en": ("Which filler fits?", ["“Sure —”", "“One moment —”", "“On it, searching now —”", "(stay silent)"]),
+     "zh": ("先说哪句垫话？", ["“好的，”", "“稍等，”", "“马上为您查找，”", "（不说话）"])},
+    {"en": ("Speaker gender", ["female", "male"]), "zh": ("说话人性别", ["女性", "男性"])},
+    {"en": ("Language", ["English", "Chinese", "other"]), "zh": ("语言", ["英语", "中文", "其他"])},
+    {"en": ("Urgency (1–5)", ["1", "2", "3", "4", "5"]), "zh": ("紧急程度（1–5）", ["1", "2", "3", "4", "5"])},
+    {"en": ("Sentiment", ["positive", "neutral", "negative"]), "zh": ("情绪", ["正面", "中性", "负面"])},
+    {"en": ("Needs a human agent?", ["yes", "no"]), "zh": ("需要转人工吗？", ["需要", "不需要"])},
+]
 TEMPLATE = {
     "en": "<|audio|>\n\nQuestion: {q}\n\nOptions:\n{opts}\n\nAnswer with only the letter of the correct option.",
     "zh": "<|audio|>\n\n问题：{q}\n\n选项：\n{opts}\n\n请只回答正确选项的字母。",
@@ -125,7 +118,7 @@ def main():
     examples, lat = [], []
     for n, c in enumerate(cfg["clips"]):
         a = load16(c["audio"])
-        qs = Q[c["lang"]]
+        qs = [{"q": q[c["lang"]][0], "options": q[c["lang"]][1]} for q in Q]
         answer_all(model, processor, tok, a, c["lang"], qs, args.device, n)  # warm-up
         ps, ms = answer_all(model, processor, tok, a, c["lang"], qs, args.device, n)
         lat.append(ms)
@@ -133,9 +126,10 @@ def main():
         sf.write(os.path.join(args.out, dst), a, 16000, subtype="PCM_16")
         examples.append({
             "id": c["id"], "label": c["label"], "lang": c["lang"], "source": c["source"],
-            "transcript": c["transcript"], "audio": dst, "duration_s": round(len(a) / 16000, 2), "seed": n + 1,
-            "questions": [{"q": q.get("q_en", q["q"]), "options": q.get("options_en", q["options"]), "p": p}
-                          for q, p in zip(qs, ps)],
+            "transcript": c["transcript"], "label_zh": c.get("label_zh", c["label"]), "audio": dst, "duration_s": round(len(a) / 16000, 2), "seed": n + 1,
+            "questions": [{"q_en": Q[k]["en"][0], "q_zh": Q[k]["zh"][0],
+                           "options_en": Q[k]["en"][1], "options_zh": Q[k]["zh"][1], "p": p}
+                          for k, p in enumerate(ps)],
             "forward_ms": round(ms, 1),
         })
         print(c["id"], round(ms, 1), "ms", flush=True)

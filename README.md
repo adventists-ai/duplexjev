@@ -7,7 +7,7 @@ is read as a **single-token, closed-set distribution** — no ASR decoding, no t
 over one call or across calls, share one forward pass.
 
 📄 Paper: *Batched Speech Decisions Without Decoding: A Modular Decision Sidecar for Full-Duplex Spoken Agents*
-(ICASSP 2027 submission) — arXiv: _coming soon_ · 🌐 Demo: https://adventists-ai.github.io/duplexjev/ ·
+(ICASSP 2027 submission) — arXiv: _coming soon_ · 🌐 Demo: https://adventists-ai.github.io/duplexjev/ (中文: https://adventists-ai.github.io/duplexjev/#zh) ·
 🤗 Weights: _coming soon_
 
 > Status: research release in preparation. `research/` contains the exact code used for the paper; a cleaned,
