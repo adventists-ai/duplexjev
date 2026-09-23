@@ -58,10 +58,10 @@
 
 | 模型 | ASR 编码器（冻结） | 大模型（冻结） | 编码器读出 | 可训练参数 | 下载 |
 |---|---|---|---|---:|---|
-| DuplexJev-A | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | 交叉注意力融合（h18 / h14 / h9） | 43.1 M | 🤗 即将发布 |
-| DuplexJev-B | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | 最后一层（h18） | 39.9 M | 🤗 即将发布 |
+| DuplexJev-A | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | 交叉注意力融合（h18 / h14 / h9） | 43.1 M | 🤗 `DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B` (即将发布) |
+| DuplexJev-B | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | 最后一层（h18） | 39.9 M | 🤗 `DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B` (即将发布) |
 
-编码器和大模型请从原仓库下载，再加载适配器。
+编码器和大模型请从原仓库下载，再加载适配器。适配器仓库统一命名为 `DuplexJev-<版本>-<ASR 编码器>-<大模型>`，以后接其他模型对时也按此命名。
 
 ## 4. 快速上手
 

@@ -64,10 +64,11 @@ encoders or LLMs, including other sizes of the same family; supporting another p
 
 | model | ASR encoder (frozen) | LLM (frozen) | encoder read-out | trainable params | download |
 |---|---|---|---|---:|---|
-| DuplexJev-A | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | cross-attention fusion (h18 / h14 / h9) | 43.1 M | 🤗 coming soon |
-| DuplexJev-B | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | last layer (h18) | 39.9 M | 🤗 coming soon |
+| DuplexJev-A | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | cross-attention fusion (h18 / h14 / h9) | 43.1 M | 🤗 `DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B` (coming soon) |
+| DuplexJev-B | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | last layer (h18) | 39.9 M | 🤗 `DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B` (coming soon) |
 
-Download the encoder and the LLM from their original repositories and load the adapter on top.
+Download the encoder and the LLM from their original repositories and load the adapter on top. Adapter repositories
+are named `DuplexJev-<variant>-<ASR encoder>-<LLM>`, so adapters for other model pairs can be added later.
 
 ## 4. Quick start
 
