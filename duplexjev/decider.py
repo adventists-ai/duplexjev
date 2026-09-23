@@ -96,8 +96,9 @@ class Decider:
         """Load a speech checkpoint (Ultravox format: encoder + connector, pointing to its frozen LLM).
 
         ``device="auto"`` shards the model over all visible GPUs (needs ``accelerate``).
-        ``text_model`` / ``audio_model`` override the LLM and encoder a speech checkpoint points to (e.g. a local
-        copy of Qwen3-32B). Remaining kwargs go to ``from_pretrained`` of the model.
+        ``text_model`` / ``audio_model`` point the checkpoint at a local copy of *the same* LLM or encoder it was
+        trained with (e.g. ``/data/models/Qwen3-32B``). They are not a way to swap models: the connector only works
+        with its own encoder and LLM. Remaining kwargs go to ``from_pretrained`` of the model.
         """
         import transformers
 

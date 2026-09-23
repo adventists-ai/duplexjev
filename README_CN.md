@@ -105,6 +105,29 @@ duplexjev serve --model fixie-ai/ultravox-v0_6-qwen-3-32b --tick-ms 160
 
 命令行：`duplexjev decide --model M call.wav --q "turn|说完了吗？|说完了,没说完" --lang zh`。
 
+### 选择模型
+
+`Decider.from_pretrained(...)`（命令行 `--model`）接收 **Ultravox 格式语音模型**的 Hugging Face 仓库名或本地路径。一个语音模型 = ASR 编码器 + 为它训练的连接器，并在配置里写明所接的冻结大模型。所以只需指定一个名字：编码器跟着模型走，大模型按配置里的名字自动获取。
+
+```python
+d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")                      # 全部自动下载
+d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b",
+                            text_model="/data/models/Qwen3-32B")                        # 复用本地的大模型
+d = Decider.from_pretrained("/data/models/my-checkpoint", device="auto")                # 本地路径，分片到多卡
+```
+
+| 模型 | 编码器（已包含） | 冻结大模型 | 状态 |
+|---|---|---|---|
+| `fixie-ai/ultravox-v0_6-qwen-3-32b` | Whisper-large-v3-turbo | Qwen3-32B | 已实测（qa100 0.89） |
+| `fixie-ai/ultravox-v0_6-gemma-3-27b` | Whisper-large-v3-turbo | Gemma-3-27B（需同意许可） | 格式相同，尚未实测 |
+| `adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B` | Qwen3-ASR-0.6B + 交叉注意力融合 | Qwen3-32B | 即将发布 |
+| `adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B` | Qwen3-ASR-0.6B（最后一层） | Qwen3-32B | 即将发布 |
+
+- **ASR 编码器不是单独的选项。** 连接器只对训练它时用的编码器有效。`audio_model=` / `text_model=` 只用来指向**同一个**编码器或大模型的本地副本（离线机器、共享模型目录）；换成别的编码器或大模型不会报错，但结果没有意义。
+- 只用编码器的隐状态，不做任何转写。
+- `device="cuda:0"`（默认：第一张 GPU、bf16），或 `device="auto"` 把大模型分片到多张卡。32B 大模型在 bf16 下需要一张 80GB 的卡。
+- Hugging Face 通用环境变量都适用：`HF_TOKEN`（需授权的模型）、`HF_HOME`（缓存位置）、`HF_ENDPOINT`（镜像）、`HF_HUB_OFFLINE=1`（只用本地缓存）。
+
 包的保证（`tests/` 有单元测试；已在 A800 上用 Qwen3-32B 和 Ultravox v0.6 实测）：
 
 - **0 步解码。** 答案取下一个 token 在选项字母上的 softmax；选项用打乱的字母标注（`n_perm` 可对多种顺序取平均）。
