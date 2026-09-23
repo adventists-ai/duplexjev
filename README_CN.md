@@ -47,7 +47,7 @@
 
 ## 2. 最新动态
 
-- **2026-09** —— 论文投稿 ICASSP 2027；发布 `duplexjev` 包（批量判断器、节拍服务）、研究代码、延迟基准和项目主页。
+- **2026-09** —— 论文投稿 ICASSP 2027；在 PyPI 发布 [`duplexjev`](https://pypi.org/project/duplexjev/) 包（批量判断器、节拍服务）、研究代码、延迟基准和项目主页。
 - **2026-10-10（计划）** —— Speech-to-Decision 商用 API 上线。
 - **2026-10-15（计划）** —— 开源推理管线与模型权重。
 
@@ -66,7 +66,7 @@
 ## 4. 快速上手
 
 ```bash
-pip install "duplexjev[all] @ git+https://github.com/adventists-ai/duplexjev.git"
+pip install "duplexjev[all]"      # PyPI；只用文本模型可 pip install duplexjev
 ```
 
 **任意开源大模型，输入转写文字**（不需要语音模型）：

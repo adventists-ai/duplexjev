@@ -52,7 +52,7 @@ state + N typed questions ──► frozen LLM (Qwen3-32B), ONE forward pass
 
 ## 2. News
 
-- **2026-09** — Paper submitted to ICASSP 2027. Released the `duplexjev` package (batched decider, tick server), research code, latency benchmarks and project page.
+- **2026-09** — Paper submitted to ICASSP 2027. Released the [`duplexjev`](https://pypi.org/project/duplexjev/) package on PyPI (batched decider, tick server), research code, latency benchmarks and project page.
 - **2026-10-10 (planned)** — Speech-to-Decision commercial API.
 - **2026-10-15 (planned)** — Open-source inference pipeline and model weights.
 
@@ -73,7 +73,7 @@ are named `DuplexJev-<variant>-<ASR encoder>-<LLM>`, so adapters for other model
 ## 4. Quick start
 
 ```bash
-pip install "duplexjev[all] @ git+https://github.com/adventists-ai/duplexjev.git"
+pip install "duplexjev[all]"      # PyPI; or: pip install duplexjev  (text models only)
 ```
 
 **Any open LLM, transcripts in** (no speech model needed):
