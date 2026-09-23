@@ -5,14 +5,14 @@ Licensed under the Apache License, Version 2.0 (see LICENSE), except where noted
 
 Third-party components
 - Ultravox (https://github.com/fixie-ai/ultravox), MIT License, Copyright (c) 2023 Fixie.ai.
-  Training code in research/data_pipeline/ patches and extends Ultravox; the projector design follows Ultravox.
-- Qwen3 / Qwen3-ASR (https://github.com/QwenLM), Apache License 2.0. research/encoder/ is derived from the
+  Training code in training/ patches and extends Ultravox; the projector design follows Ultravox.
+- Qwen3 / Qwen3-ASR (https://github.com/QwenLM), Apache License 2.0. duplexjev/encoder/ is derived from the
   Qwen3-ASR encoder implementation.
 - Model weights released with this project contain only the trained fusion and projector parameters; the frozen
   Qwen3-ASR-0.6B encoder and Qwen3-32B LLM must be obtained from their original sources under their licenses.
 
 Datasets
-- qa100 (data/qa100): created by the authors, released under CC-BY-4.0. Audio synthesised with VoxCPM2.
+- qa100 (https://huggingface.co/datasets/adventists-ai/qa100): created by the authors, released under CC-BY-4.0. Audio synthesised with VoxCPM2.
 - Training data (Ultravox v0.6 mixture: WenetSpeech, GigaSpeech, Common Voice 17, People's Speech, LibriSpeech,
   Multilingual LibriSpeech, CoVoST 2, MUSAN) is NOT redistributed; see each dataset's license.
 - ZJU audio-gender-benchmark (https://github.com/Vsky-morigen/audio-gender-benchmark) is used for evaluation only and
