@@ -53,12 +53,15 @@
 
 ## 3. 模型下载
 
-| 模型 | 编码器读出 | 可训练参数 | 大模型 | 下载 |
-|---|---|---:|---|---|
-| DuplexJev-A | 交叉注意力融合（h18 / h14 / h9） | 43.1 M | Qwen3-32B（冻结） | 🤗 即将发布 |
-| DuplexJev-B | 最后一层（h18） | 39.9 M | Qwen3-32B（冻结） | 🤗 即将发布 |
+每个权重都是**专门连接一对模型的适配器**：只包含训练好的投影器（A 版另含融合模块），用来把下表中冻结的 ASR 编码器
+接到冻结的大模型上。换成别的编码器或大模型（包括同系列的其他尺寸）都不能用，需要重新训练适配器。
 
-发布的权重只包含投影器（及融合模块）；编码器和大模型从原仓库加载（[Qwen3-ASR-0.6B](https://huggingface.co/Qwen)、[Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B)）。
+| 模型 | ASR 编码器（冻结） | 大模型（冻结） | 编码器读出 | 可训练参数 | 下载 |
+|---|---|---|---|---:|---|
+| DuplexJev-A | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | 交叉注意力融合（h18 / h14 / h9） | 43.1 M | 🤗 即将发布 |
+| DuplexJev-B | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | 最后一层（h18） | 39.9 M | 🤗 即将发布 |
+
+编码器和大模型请从原仓库下载，再加载适配器。
 
 ## 4. 快速上手
 

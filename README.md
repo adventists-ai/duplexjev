@@ -58,13 +58,16 @@ state + N typed questions ──► frozen LLM (Qwen3-32B), ONE forward pass
 
 ## 3. Model download
 
-| model | encoder read-out | trainable params | LLM | download |
-|---|---|---:|---|---|
-| DuplexJev-A | cross-attention fusion (h18 / h14 / h9) | 43.1 M | Qwen3-32B (frozen) | 🤗 coming soon |
-| DuplexJev-B | last layer (h18) | 39.9 M | Qwen3-32B (frozen) | 🤗 coming soon |
+Each checkpoint is an **adapter for one specific pair of models**: it contains only the trained projector (and, for A,
+the fusion block) that connects the frozen ASR encoder below to the frozen LLM below. It does not work with other
+encoders or LLMs, including other sizes of the same family; supporting another pair means training a new adapter.
 
-Released checkpoints contain the projector (and fusion block); the encoder and LLM are loaded from their original
-repositories ([Qwen3-ASR-0.6B](https://huggingface.co/Qwen), [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B)).
+| model | ASR encoder (frozen) | LLM (frozen) | encoder read-out | trainable params | download |
+|---|---|---|---|---:|---|
+| DuplexJev-A | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | cross-attention fusion (h18 / h14 / h9) | 43.1 M | 🤗 coming soon |
+| DuplexJev-B | [Qwen3-ASR-0.6B](https://huggingface.co/Qwen/Qwen3-ASR-0.6B) | [Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B) | last layer (h18) | 39.9 M | 🤗 coming soon |
+
+Download the encoder and the LLM from their original repositories and load the adapter on top.
 
 ## 4. Quick start
 
