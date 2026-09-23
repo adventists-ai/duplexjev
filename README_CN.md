@@ -66,45 +66,54 @@
 ## 4. 快速上手
 
 ```bash
-pip install "duplexjev[all]"      # PyPI；只用文本模型可 pip install duplexjev
+pip install "duplexjev[speech]"      # 需要 HTTP 服务再加 [all]
 ```
 
-**任意开源大模型，输入转写文字**（不需要语音模型）：
+**一段音频、几组选项**（默认用法）：
 
 ```python
 from duplexjev import Decider, Question
 
-d = Decider.from_pretrained("Qwen/Qwen3-8B")
-qs = [Question("turn", "用户这句话说完了吗？", ["说完了", "没说完"], lang="zh"),
-      Question("intent", "用户想做什么？", ["空调", "媒体", "导航", "电话"], lang="zh")]
-d.decide(["帮我把空调打开", "导航到"], qs)
-# [{'turn': {'answer': '说完了', 'confidence': 0.97, 'probs': {...}}, 'intent': {...}}, {...}]
+d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")   # DuplexJev 适配器同样加载
+groups = [Question("turn", "用户这句话说完了吗？", ["说完了", "没说完"], lang="zh"),
+          Question("filler", "先说哪句垫话？", ["好的，", "稍等，", "（不说话）"], lang="zh"),
+          Question("gender", "说话人性别", ["女性", "男性"], lang="zh")]
+
+d.decide("call_017.wav", groups)
+# {'turn': {'answer': '说完了', 'confidence': 0.97, 'probs': {...}}, 'filler': {...}, 'gender': {...}}
 ```
 
-**语音模型，直接输入音频**（Ultravox 格式；DuplexJev 适配器同样加载）：
+**多段音频、多组选项**（高级用法）：每组选项用 `audio=<编号>` 指定它针对哪段音频，也可以是编号列表，`"*"` 表示所有音频。全部在一次批量前向中完成。
 
 ```python
-d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")
-d.decide(["call_017.wav", "call_018.wav"], qs)          # 所有通话、所有问题一次前向
+d.decide_batch(
+    {"car1": "a.wav", "car2": "b.wav", "car3": "c.wav"},
+    [Question("turn", "用户这句话说完了吗？", ["说完了", "没说完"], lang="zh", audio="*"),
+     Question("gender", "说话人性别", ["女性", "男性"], lang="zh", audio=["car2", "car3"]),
+     Question("human", "需要转人工吗？", ["需要", "不需要"], lang="zh", audio="car1")],
+    context={"car1": "司机已经两次要求打电话回家。"})
+# {'car1': {'turn': ..., 'human': ...}, 'car2': {'turn': ..., 'gender': ...}, 'car3': {...}}
 ```
 
 **批量服务：** 同一个节拍内到达的所有请求合成一次前向完成。
 
 ```bash
 duplexjev serve --model fixie-ai/ultravox-v0_6-qwen-3-32b --tick-ms 160
-curl -s localhost:8000/v1/decide -H 'content-type: application/json' \
-  -d '{"text": "打电话给", "lang": "zh", "questions": [{"id": "turn", "text": "说完了吗？", "options": ["说完了", "没说完"], "lang": "zh"}]}'
+# POST /v1/decide        {"audio_b64": ..., "questions": [...]}
+# POST /v1/decide_batch  {"audios": {"car1": ..., "car2": ...}, "questions": [{..., "audio": "car1"}]}
 ```
+
+命令行：`duplexjev decide --model M call.wav --q "turn|说完了吗？|说完了,没说完" --lang zh`。
 
 包的保证（`tests/` 有单元测试；已在 A800 上用 Qwen3-32B 和 Ultravox v0.6 实测）：
 
 - **0 步解码。** 答案取下一个 token 在选项字母上的 softmax；选项用打乱的字母标注（`n_perm` 可对多种顺序取平均）。
-- **精确的前缀共享**（默认 `mode="packed"`）：每个条目的上下文和音频只编码一次，所有问题打包进同一行、用块对角掩码隔开。Qwen3-32B 在 fp32 下，打包与逐题运行的概率差最大 2e-5；bf16 下平均差 0.001–0.002，100 题中答案最多改变 1 题。
-- **批次无关。** 一个条目的答案不受同批其他条目影响（fp32 最大差 1e-5）。语音场景下这需要把每段音频对齐到整数个音频 token，包里已处理（否则 Ultravox 批量推理时，短音频最后一个音频 token 会混入填充）。bf16 下 GPU 内核随批形状变化，单独运行与合批运行在 100 题中有 1 题答案不同（文本和语音都是）。
-- **准确率核对。** 经本包跑 qa100：Ultravox v0.6（音频）0.88–0.90，Qwen3-32B（转写文字）0.92。
+- **精确的前缀共享**（默认 `mode="packed"`）：每个条目的上下文和音频只编码一次，所有问题打包进同一行、用块对角掩码隔开。打包引擎在 fp32 下用 Qwen3-32B 核对，与逐题运行的概率差最大 2e-5；bf16 下平均差 0.001–0.002，100 题中答案最多改变 1 题。
+- **批次无关。** 一个条目的答案不受同批其他条目影响（fp32 最大差 1e-5）。语音场景下这需要把每段音频对齐到整数个音频 token，包里已处理（否则 Ultravox 批量推理时，短音频最后一个音频 token 会混入填充）。bf16 下 GPU 内核随批形状变化，单独运行与合批运行在 100 题中有 1 题答案不同。
+- **准确率核对。** 经本包跑 qa100：Ultravox v0.6 为 0.88–0.90。
 - **当前速度。** 纯 PyTorch、单张 A800、bf16：64 路通话每路 8 个问题，一次 9 秒（每路约 140 ms）；服务端 48 个并发请求在一个节拍内答完。论文里的延迟数字用的是 vLLM 引擎；包的 vLLM 后端在路线图上。
 
-语音模型需要 transformers 4.51–4.55（安装 `speech` 扩展会自动满足）；纯文本模型也支持更新的版本。
+Ultravox 格式的语音模型需要 transformers 4.51–4.55，安装 `speech` 扩展会自动满足。
 
 更多见 [`examples/`](examples)：节拍批量计时、服务端客户端、语音快速上手。
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 import hashlib
 import random
 from dataclasses import dataclass, field
-from typing import Sequence
+from typing import Any, Sequence
 
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -31,12 +31,15 @@ class Question:
         text: the question as the model should read it.
         options: 2–26 answer options; the result is a probability for each.
         lang: prompt language for the fixed words (``"en"`` or ``"zh"``).
+        audio: for ``Decider.decide_batch``: the clip id this group is about, a list of ids, or ``"*"`` for all
+            clips. Ignored by ``Decider.decide`` (one clip).
     """
 
     id: str
     text: str
     options: Sequence[str]
     lang: str = "en"
+    audio: Any = None
     _options: tuple = field(init=False, repr=False, compare=False)
 
     def __post_init__(self):
@@ -51,15 +54,24 @@ class Question:
             raise ValueError(f"Question {self.id!r}: options must be distinct")
         if self.lang not in TEMPLATES:
             raise ValueError(f"Question {self.id!r}: lang must be one of {sorted(TEMPLATES)}")
+        if isinstance(self.audio, list):
+            object.__setattr__(self, "audio", tuple(self.audio))
         object.__setattr__(self, "_options", opts)
         object.__setattr__(self, "options", opts)
 
     @classmethod
     def from_dict(cls, d: dict) -> "Question":
-        return cls(id=d["id"], text=d["text"], options=d["options"], lang=d.get("lang", "en"))
+        return cls(id=d["id"], text=d["text"], options=d["options"], lang=d.get("lang", "en"), audio=d.get("audio"))
 
     def to_dict(self) -> dict:
-        return {"id": self.id, "text": self.text, "options": list(self.options), "lang": self.lang}
+        d = {"id": self.id, "text": self.text, "options": list(self.options), "lang": self.lang}
+        if self.audio is not None:
+            d["audio"] = list(self.audio) if isinstance(self.audio, tuple) else self.audio
+        return d
+
+    def for_audio(self, audio) -> "Question":
+        """A copy of this option group bound to another clip id."""
+        return Question(self.id, self.text, self.options, self.lang, audio)
 
     # ------------------------------------------------------------------ rendering
     def permutation(self, seed: int = 0) -> list[int]:
@@ -85,11 +97,9 @@ class Question:
         return LETTERS[: len(self.options)]
 
 
-def as_questions(qs) -> list[Question]:
-    out = []
-    for q in qs:
-        out.append(q if isinstance(q, Question) else Question.from_dict(q))
+def as_questions(qs, unique: bool = True) -> list[Question]:
+    out = [q if isinstance(q, Question) else Question.from_dict(q) for q in qs]
     ids = [q.id for q in out]
-    if len(set(ids)) != len(ids):
+    if unique and len(set(ids)) != len(ids):
         raise ValueError(f"duplicate question ids: {ids}")
     return out

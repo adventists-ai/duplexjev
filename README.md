@@ -73,45 +73,55 @@ are named `DuplexJev-<variant>-<ASR encoder>-<LLM>`, so adapters for other model
 ## 4. Quick start
 
 ```bash
-pip install "duplexjev[all]"      # PyPI; or: pip install duplexjev  (text models only)
+pip install "duplexjev[speech]"      # add [all] for the HTTP server
 ```
 
-**Any open LLM, transcripts in** (no speech model needed):
+**One clip, several option groups** (the default):
 
 ```python
 from duplexjev import Decider, Question
 
-d = Decider.from_pretrained("Qwen/Qwen3-8B")
-qs = [Question("turn", "Has the user finished the turn?", ["finished", "not finished"]),
-      Question("intent", "What does the user want?", ["climate", "media", "navigation", "phone"])]
-d.decide(["Turn on the air conditioning", "Navigate to the"], qs)
-# [{'turn': {'answer': 'finished', 'confidence': 0.97, 'probs': {...}}, 'intent': {...}}, {...}]
+d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")   # DuplexJev adapters load the same way
+groups = [Question("turn", "Has the user finished the turn?", ["finished", "not finished"]),
+          Question("filler", "Which filler fits?", ["Sure —", "One moment —", "(stay silent)"]),
+          Question("gender", "Speaker gender", ["female", "male"])]
+
+d.decide("call_017.wav", groups)
+# {'turn': {'answer': 'finished', 'confidence': 0.97, 'probs': {...}}, 'filler': {...}, 'gender': {...}}
 ```
 
-**Speech checkpoints, audio in** (Ultravox format; the DuplexJev adapters load the same way):
+**Many clips, many option groups** (advanced): each group names the clip(s) it is about with `audio=<id>`, a list
+of ids, or `"*"` for every clip. Everything runs in one batched pass.
 
 ```python
-d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")
-d.decide(["call_017.wav", "call_018.wav"], qs)          # one pass for all calls and all questions
+d.decide_batch(
+    {"car1": "a.wav", "car2": "b.wav", "car3": "c.wav"},
+    [Question("turn", "Has the user finished the turn?", ["finished", "not finished"], audio="*"),
+     Question("gender", "Speaker gender", ["female", "male"], audio=["car2", "car3"]),
+     Question("human", "Does the user need a human agent?", ["yes", "no"], audio="car1")],
+    context={"car1": "Driver asked to call home twice."})
+# {'car1': {'turn': ..., 'human': ...}, 'car2': {'turn': ..., 'gender': ...}, 'car3': {...}}
 ```
 
 **Batched server:** every request that arrives within one tick is answered in one pass.
 
 ```bash
 duplexjev serve --model fixie-ai/ultravox-v0_6-qwen-3-32b --tick-ms 160
-curl -s localhost:8000/v1/decide -H 'content-type: application/json' \
-  -d '{"text": "Call my", "questions": [{"id": "turn", "text": "Has the user finished?", "options": ["finished", "not finished"]}]}'
+# POST /v1/decide        {"audio_b64": ..., "questions": [...]}
+# POST /v1/decide_batch  {"audios": {"car1": ..., "car2": ...}, "questions": [{..., "audio": "car1"}]}
 ```
+
+Command line: `duplexjev decide --model M call.wav --q "turn|Has the user finished?|finished,not finished"`.
 
 What the package guarantees (unit tests in `tests/`, checked on Qwen3-32B and Ultravox v0.6 on an A800):
 
 - **0 decode steps.** Each answer is the next-token softmax over its option letters; options appear under permuted letters (`n_perm` averages several orders).
-- **Exact prefix sharing** (`mode="packed"`, default): the context and audio of an item are encoded once and all its questions are packed into one row under a block-diagonal mask. In fp32 on Qwen3-32B, packed and one-row-per-question differ by at most 2e-5; in bf16 the mean difference is 0.001–0.002, with at most 1/100 answers changed.
-- **Batch invariance.** An item's answers do not depend on which other items share the pass (fp32: max difference 1e-5). For speech this requires aligning every clip to whole audio tokens, which the package does (batched Ultravox inference otherwise leaks padding into the last audio token of shorter clips). In bf16, GPU kernels depend on batch shape, so running an item alone vs. in a batch changed 1/100 answers (text and speech).
-- **Checked accuracy.** qa100 through the package: 0.88–0.90 with Ultravox v0.6 (audio), 0.92 with Qwen3-32B (transcript).
+- **Exact prefix sharing** (`mode="packed"`, default): the context and audio of an item are encoded once and all its questions are packed into one row under a block-diagonal mask. The packing engine, checked in fp32 on Qwen3-32B, matches one-row-per-question to within 2e-5; in bf16 the mean difference is 0.001–0.002, with at most 1/100 answers changed.
+- **Batch invariance.** An item's answers do not depend on which other items share the pass (fp32: max difference 1e-5). For speech this requires aligning every clip to whole audio tokens, which the package does (batched Ultravox inference otherwise leaks padding into the last audio token of shorter clips). In bf16, GPU kernels depend on batch shape, so running an item alone vs. in a batch changed 1/100 answers.
+- **Checked accuracy.** qa100 through the package: 0.88–0.90 with Ultravox v0.6.
 - **Speed (current).** Plain PyTorch, one A800, bf16: 8 questions for 64 calls in 9 s (about 140 ms per call); 48 concurrent server requests are answered in one tick. The paper's latency numbers use a vLLM engine; a vLLM backend for the package is on the roadmap.
 
-Speech checkpoints need transformers 4.51–4.55 (installed by the `speech` extra); text models also work with newer versions.
+Speech checkpoints in Ultravox format need transformers 4.51–4.55, which the `speech` extra installs.
 
 More in [`examples/`](examples): tick-batch timing, server client, speech quick start.
 

@@ -1,4 +1,8 @@
-"""Batched typed decisions from one forward pass, with exact prefix sharing.
+"""Typed decisions about speech, answered from one forward pass with exact prefix sharing.
+
+Input is audio plus one or more Jev-style option groups (``Question``); output is a probability for every option.
+``Decider.decide`` answers the option groups for one clip; ``Decider.decide_batch`` answers many option groups about
+many clips at once, each group naming the clip(s) it is about.
 
 Two layouts give the same answers (up to floating-point noise):
 
@@ -25,8 +29,8 @@ SAMPLE_RATE = 16000
 _SENTINEL = "⁣QUESTION⁣"
 
 PROMPTS = {
-    "en": {"context": "Context:\n{c}", "transcript": "The user said: {t}", "audio": "The user said: <|audio|>"},
-    "zh": {"context": "上下文：\n{c}", "transcript": "用户说：{t}", "audio": "用户说：<|audio|>"},
+    "en": {"context": "Context:\n{c}", "audio": "The user said: <|audio|>"},
+    "zh": {"context": "上下文：\n{c}", "audio": "用户说：<|audio|>"},
 }
 
 
@@ -53,32 +57,23 @@ def load_audio(x: Any) -> np.ndarray:
     return a
 
 
-def as_item(x: Any) -> dict:
-    """An item is a dict with any of: ``audio``, ``text`` (transcript), ``context``, ``questions``, ``lang``."""
-    if isinstance(x, dict):
-        return x
-    if isinstance(x, str):
-        return {"text": x}
-    return {"audio": x}
-
-
 # ---------------------------------------------------------------------------------------------------------- engine
 class Decider:
-    """Answer typed closed-set questions about speech (or text) with zero decode steps.
+    """Answer Jev-style option groups about speech with zero decode steps.
 
-    Create with :meth:`from_pretrained`. The same object serves text-only LLMs (inputs are transcripts) and
-    Ultravox-format speech checkpoints, including the DuplexJev adapters.
+    Create with :meth:`from_pretrained` from a speech checkpoint in Ultravox format: the DuplexJev adapters
+    (ASR encoder + trained connector + frozen LLM) or the released Ultravox models.
     """
 
-    def __init__(self, model, tokenizer, processor=None, *, device=None, is_audio: bool = False):
+    def __init__(self, model, processor, *, device=None):
         self.model = model.eval()
-        self.tok = tokenizer
         self.processor = processor
-        self.is_audio = is_audio
+        self.tok = processor.tokenizer
+        tokenizer = self.tok
         if device is None or str(device) == "auto":  # sharded model: inputs go where the embeddings live
-            device = model.get_input_embeddings().weight.device if not is_audio else model.language_model.get_input_embeddings().weight.device
+            device = model.language_model.get_input_embeddings().weight.device
         self.device = torch.device(device)
-        self.lm = model.language_model if is_audio else model
+        self.lm = model.language_model
         self.base = getattr(self.lm, self.lm.base_model_prefix)
         self.head = self.lm.get_output_embeddings()
         self.pad_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else tokenizer.eos_token_id
@@ -98,7 +93,7 @@ class Decider:
         audio_model: str | None = None,
         **kwargs,
     ) -> "Decider":
-        """Load a text LLM (any causal LM on the Hugging Face hub) or an Ultravox-format speech checkpoint.
+        """Load a speech checkpoint (Ultravox format: encoder + connector, pointing to its frozen LLM).
 
         ``device="auto"`` shards the model over all visible GPUs (needs ``accelerate``).
         ``text_model`` / ``audio_model`` override the LLM and encoder a speech checkpoint points to (e.g. a local
@@ -113,7 +108,13 @@ class Decider:
             dtype = torch.bfloat16 if str(device).startswith("cuda") or device == "auto" else torch.float32
         dmap = "auto" if device == "auto" else {"": device}
         cfg = transformers.AutoConfig.from_pretrained(name_or_path, trust_remote_code=True)
-        if getattr(cfg, "model_type", "") == "ultravox":
+        if getattr(cfg, "model_type", "") != "ultravox":
+            raise ValueError(
+                f"{name_or_path!r} is not a speech checkpoint. duplexjev answers questions about audio and needs an "
+                "encoder + connector checkpoint in Ultravox format, e.g. adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B "
+                "or fixie-ai/ultravox-v0_6-qwen-3-32b."
+            )
+        if True:
             if dkw == "dtype":
                 import warnings
 
@@ -140,13 +141,7 @@ class Decider:
                 processor.audio_processor = transformers.WhisperProcessor(
                     feature_extractor=ap, tokenizer=processor.tokenizer
                 )
-            return cls(model, processor.tokenizer, processor, device=None if device == "auto" else device, is_audio=True)
-        tok = transformers.AutoTokenizer.from_pretrained(name_or_path, **{k: v for k, v in kwargs.items() if k == "revision"})
-        if device == "auto":
-            model = transformers.AutoModelForCausalLM.from_pretrained(name_or_path, device_map="auto", **{dkw: dtype}, **kwargs)
-        else:
-            model = transformers.AutoModelForCausalLM.from_pretrained(name_or_path, **{dkw: dtype}, **kwargs).to(device)
-        return cls(model, tok, device=None if device == "auto" else device, is_audio=False)
+            return cls(model, processor, device=None if device == "auto" else device)
 
     # ------------------------------------------------------------------ prompt pieces
     def _head_tail(self, context: str | None, content: str, lang: str) -> tuple[str, str]:
@@ -192,29 +187,12 @@ class Decider:
         return np.concatenate([np.zeros(r, dtype=np.float32), a]) if r else a
 
     def _encode_prefix(self, item: dict, lang: str) -> dict:
-        audio = item.get("audio")
-        text = item.get("text")
-        if audio is not None and not self.is_audio:
-            raise ValueError("this model is text-only; pass `text` (a transcript) instead of `audio`")
-        if audio is not None:
-            content = PROMPTS[lang]["audio"]
-            if text:
-                content = PROMPTS[lang]["transcript"].format(t=text) + "\n" + content
-        elif text is not None:
-            content = PROMPTS[lang]["transcript"].format(t=text)
-        else:
-            raise ValueError("each item needs `audio` or `text`")
-        head, tail = self._head_tail(item.get("context"), content, lang)
-        if audio is not None:
-            p = self.processor(text=head, audio=self._align(load_audio(audio)), sampling_rate=SAMPLE_RATE, return_tensors="pt")
-            ids = p["input_ids"][0].tolist()
-            aud = {k: p[k] for k in ("audio_values", "audio_lens", "audio_token_len", "audio_token_start_idx", "audio_batch_size") if k in p}
-            if "audio_batch_size" not in aud:
-                aud["audio_batch_size"] = torch.tensor([p["audio_values"].shape[0]])
-        else:
-            ids = self.tok(head, add_special_tokens=False)["input_ids"]
-            aud = None
-        return {"ids": ids, "audio": aud, "tail": tail}
+        head, tail = self._head_tail(item.get("context"), PROMPTS[lang]["audio"], lang)
+        p = self.processor(text=head, audio=self._align(load_audio(item["audio"])), sampling_rate=SAMPLE_RATE, return_tensors="pt")
+        aud = {k: p[k] for k in ("audio_values", "audio_lens", "audio_token_len", "audio_token_start_idx", "audio_batch_size") if k in p}
+        if "audio_batch_size" not in aud:
+            aud["audio_batch_size"] = torch.tensor([p["audio_values"].shape[0]])
+        return {"ids": p["input_ids"][0].tolist(), "audio": aud, "tail": tail}
 
     def _suffixes(self, qs: list[Question], tail: str, n_perm: int, seed: int):
         """Token ids of every (question, permutation) suffix, with the letter ids to read."""
@@ -228,7 +206,7 @@ class Decider:
         return out
 
     # ------------------------------------------------------------------ collation
-    def _collate(self, rows: list[tuple[list[int], dict | None]]) -> dict:
+    def _collate(self, rows: list[tuple[list[int], dict]]) -> dict:
         """Left-pad token rows; stack audio (right-padded) and shift audio start indices by the left padding."""
         L = max(len(r[0]) for r in rows)
         ids = torch.full((len(rows), L), self.pad_id, dtype=torch.long)
@@ -237,11 +215,9 @@ class Decider:
             ids[i, L - len(r):] = torch.tensor(r)
             mask[i, L - len(r):] = 1
         batch = {"input_ids": ids, "attention_mask": mask}
-        if any(a is not None for _, a in rows):
+        if True:
             vals, lens, tlen, start, bs = [], [], [], [], []
             for r, a in rows:
-                if a is None:
-                    raise ValueError("cannot mix items with and without audio in one call")
                 shift = L - len(r)
                 vals += list(a["audio_values"])
                 lens.append(a["audio_lens"])
@@ -268,46 +244,104 @@ class Decider:
         return z.float()
 
     # ------------------------------------------------------------------ public API
-    @torch.no_grad()
     def decide(
         self,
-        items: Iterable[Any],
-        questions: Sequence[Question | dict] | None = None,
+        audio: Any,
+        questions: Question | dict | Sequence[Question | dict],
         *,
+        context: str | None = None,
+        lang: str | None = None,
+        **options,
+    ) -> dict:
+        """Answer one or more option groups about one audio clip.
+
+        Args:
+            audio: a file path, a 16 kHz float array, or an ``(array, sample_rate)`` tuple.
+            questions: one ``Question`` (option group) or a list of them.
+            context: optional dialogue context or state, shared by all questions.
+            lang: language of the fixed prompt words (``"en"``/``"zh"``); defaults to the first question's.
+            **options: ``mode``, ``n_perm``, ``seed`` (see :meth:`decide_batch`).
+
+        Returns:
+            ``{question_id: {"answer": option, "confidence": p, "probs": {option: p}}}``.
+        """
+        qs = [questions] if isinstance(questions, (Question, dict)) else list(questions)
+        qs = [q.for_audio(None) if isinstance(q, Question) else q for q in qs]
+        item = {"audio": audio, "questions": qs, "context": context, "lang": lang}
+        return self._decide_items([item], **options)[0]
+
+    def decide_batch(
+        self,
+        audios: dict | Sequence[Any],
+        questions: Sequence[Question | dict],
+        *,
+        context: dict | Sequence[str | None] | None = None,
+        lang: str | None = None,
         mode: str = "packed",
         n_perm: int = 1,
         seed: int = 0,
-        lang: str | None = None,
         max_items: int | None = None,
         max_tokens: int | None = None,
-    ) -> list[dict]:
-        """Answer every question about every item in one batched pass.
+    ) -> dict:
+        """Answer many option groups about many clips in one batched pass.
+
+        Every option group names the clip(s) it is about with ``Question(..., audio=<id>)``, where ``<id>`` is a key
+        of ``audios`` (or an index if ``audios`` is a list), a list of ids, or ``"*"`` for every clip.
 
         Args:
-            items: audio arrays / file paths, transcript strings, or dicts with ``audio`` and/or ``text``, optional
-                ``context`` and optional per-item ``questions``.
-            questions: questions asked of every item (unless an item brings its own).
+            audios: ``{id: audio}`` or a list of audio (ids are then 0, 1, ...). Audio as in :meth:`decide`.
+            questions: option groups, each with ``audio=`` set.
+            context: optional context per clip (``{id: str}`` or a list aligned with ``audios``).
             mode: ``"packed"`` (prefix sharing, default) or ``"batch"`` (one row per question; reference).
-            n_perm: average over this many option orders (reduces position bias; costs more suffix tokens).
+            n_perm: average over this many option orders (reduces position bias; costs more tokens).
             seed: selects the option orders.
-            lang: language of the fixed prompt words; defaults to each item's ``lang`` or the first question's.
-            max_items: split into forward passes of at most this many items.
-            max_tokens: split so that each pass holds at most this many prompt tokens (prefixes + all suffixes).
-                Bounds activation memory; an item larger than the budget still runs, alone.
+            max_items / max_tokens: split into several forward passes of bounded size.
 
         Returns:
-            one dict per item: ``{question_id: {"answer": option, "confidence": p, "probs": {option: p}}}``.
+            ``{audio_id: {question_id: {"answer", "confidence", "probs"}}}`` for every clip that was asked something.
         """
-        items = [as_item(x) for x in items]
+        amap = dict(audios) if isinstance(audios, dict) else dict(enumerate(audios))
+        if not amap:
+            return {}
+        if context is None:
+            cmap = {}
+        elif isinstance(context, dict):
+            cmap = context
+        else:
+            cmap = dict(zip(amap, context))
+        per = {k: [] for k in amap}
+        for q in as_questions(questions, unique=False):
+            if q.audio is None:
+                raise ValueError(f"question {q.id!r}: set audio=<clip id> (or '*' for all clips) in decide_batch")
+            targets = list(amap) if q.audio == "*" else (q.audio if isinstance(q.audio, (list, tuple)) else [q.audio])
+            for t in targets:
+                if t not in amap:
+                    raise ValueError(f"question {q.id!r} refers to unknown audio {t!r}; known: {list(amap)}")
+                per[t].append(q)
+        items, ids = [], []
+        for k, qs in per.items():
+            if qs:
+                seen = [q.id for q in qs]
+                if len(set(seen)) != len(seen):
+                    raise ValueError(f"audio {k!r}: duplicate question ids {seen}")
+                items.append({"audio": amap[k], "questions": qs, "context": cmap.get(k), "lang": lang})
+                ids.append(k)
+        res = self._decide_items(items, mode=mode, n_perm=n_perm, seed=seed, max_items=max_items, max_tokens=max_tokens)
+        return dict(zip(ids, res))
+
+    @torch.no_grad()
+    def _decide_items(self, items, *, mode="packed", n_perm=1, seed=0, max_items=None, max_tokens=None) -> list[dict]:
         if not items:
             return []
         t0 = time.perf_counter()
         plans = []
         for it in items:
-            qs = as_questions(it.get("questions") or questions or [])
+            qs = as_questions(it.get("questions") or [])
             if not qs:
                 raise ValueError("no questions given")
-            lg = lang or it.get("lang") or qs[0].lang
+            if it.get("audio") is None:
+                raise ValueError("every item needs audio")
+            lg = it.get("lang") or qs[0].lang
             pre = self._encode_prefix(it, lg)
             plans.append({"qs": qs, "pre": pre, "sufs": self._suffixes(qs, pre["tail"], n_perm, seed)})
         t_enc = time.perf_counter()
@@ -315,18 +349,16 @@ class Decider:
             raise ValueError("mode must be 'packed' or 'batch'")
         run = self._run_packed if mode == "packed" else self._run_batch
         n_pass = 0
-        for with_audio in (True, False):  # speech and text-only items go in separate passes
-            group = [p for p in plans if (p["pre"]["audio"] is not None) == with_audio]
-            for chunk in _chunks(group, max_items, max_tokens, packed=mode == "packed"):
-                run(chunk)
-                n_pass += 1
+        for chunk in _chunks(plans, max_items, max_tokens, packed=mode == "packed"):
+            run(chunk)
+            n_pass += 1
         if self.device.type == "cuda":
             torch.cuda.synchronize(self.device)
         t_fwd = time.perf_counter()
         results = [self._collect(p) for p in plans]
         self.last_stats = {
             "mode": mode,
-            "items": len(items),
+            "clips": len(items),
             "questions": sum(len(p["qs"]) for p in plans),
             "prefix_tokens": sum(len(p["pre"]["ids"]) for p in plans),
             "suffix_tokens": sum(len(s["ids"]) for p in plans for s in p["sufs"]),
@@ -344,26 +376,17 @@ class Decider:
                 rows.append((p["pre"]["ids"] + s["ids"], p["pre"]["audio"]))
                 where.append((pi, si))
         batch = self._collate(rows)
-        if self.is_audio:  # Ultravox merges audio inside its own forward; read last-position logits
-            last = self.model(**batch, use_cache=False, logits_to_keep=1).logits[:, -1].float()
-            for r, (pi, si) in enumerate(where):
-                s = plans[pi]["sufs"][si]
-                s["z"] = last[r, torch.tensor(s["letters"], device=last.device)]
-            return
-        h = self.base(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], use_cache=False)
-        h = h.last_hidden_state[:, -1]
+        # Ultravox merges the audio inside its own forward; read the last-position logits
+        last = self.model(**batch, use_cache=False, logits_to_keep=1).logits[:, -1].float()
         for r, (pi, si) in enumerate(where):
             s = plans[pi]["sufs"][si]
-            s["z"] = self._letter_logits(h[r], s["letters"])
+            s["z"] = last[r, torch.tensor(s["letters"], device=last.device)]
 
     def _run_packed(self, plans):
         # 1) prefill all prefixes together (left-padded); keep the KV cache
         batch = self._collate([(p["pre"]["ids"], p["pre"]["audio"]) for p in plans])
         P = batch["input_ids"].shape[1]
-        if self.is_audio:
-            out = self.model(**batch, use_cache=True, logits_to_keep=1)
-        else:
-            out = self.base(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], use_cache=True)
+        out = self.model(**batch, use_cache=True, logits_to_keep=1)
         cache = out.past_key_values
         # 2) all suffixes of an item in one row; block-diagonal causal mask over the suffix part
         B = len(plans)

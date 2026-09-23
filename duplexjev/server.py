@@ -1,10 +1,12 @@
-"""HTTP server that batches every request arriving within one tick into a single decision pass.
+"""HTTP server that answers every request arriving within one tick in a single decision pass.
 
-    duplexjev serve --model Qwen/Qwen3-8B --tick-ms 160
+    duplexjev serve --model adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B --tick-ms 160
 
-Clients POST to ``/v1/decide``; the server collects all pending requests every ``tick_ms`` milliseconds (e.g. the
-latest audio window of every live call), answers all of their questions in one batched pass, and returns each
-request's own answers. Latency per request is at most one tick of waiting plus one pass.
+* ``POST /v1/decide``        one clip + option groups           -> ``{"answers": {question_id: ...}}``
+* ``POST /v1/decide_batch``  many clips + option groups bound to clip ids -> ``{"answers": {clip_id: {...}}}``
+
+Every ``tick_ms`` the server takes all pending requests (e.g. the latest audio window of every live call), runs
+them as one batched pass, and returns each request its own answers. A request waits at most one tick plus one pass.
 """
 from __future__ import annotations
 
@@ -13,9 +15,10 @@ import base64
 import io
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from .decider import Decider
+from .question import Question
 
 
 def _decode_audio(b64: str):
@@ -26,14 +29,14 @@ def _decode_audio(b64: str):
 
 
 class TickBatcher:
-    """Collect requests and run them together once per tick on a single worker thread."""
+    """Collect requests and run all of their clips together once per tick, on a single worker thread."""
 
-    def __init__(self, decider: Decider, tick_ms: float = 160.0, max_items: Optional[int] = None, mode: str = "packed"):
+    def __init__(self, decider: Decider, tick_ms: float = 160.0, max_items: Optional[int] = None,
+                 max_tokens: Optional[int] = None, mode: str = "packed"):
         self.d = decider
         self.tick = tick_ms / 1000.0
-        self.max_items = max_items
-        self.mode = mode
-        self.pending: list[tuple[dict, asyncio.Future, float]] = []
+        self.kw = {"mode": mode, "max_items": max_items, "max_tokens": max_tokens}
+        self.pending: list[tuple[list, asyncio.Future, float]] = []
         self.pool = ThreadPoolExecutor(max_workers=1)
         self.ticks = 0
         self._task: Optional[asyncio.Task] = None
@@ -41,9 +44,10 @@ class TickBatcher:
     def start(self):
         self._task = asyncio.get_running_loop().create_task(self._loop())
 
-    async def submit(self, item: dict) -> dict:
+    async def submit(self, items: list[dict]) -> dict:
+        """Queue one request (a list of clip items); resolves to its answers plus tick info."""
         fut = asyncio.get_running_loop().create_future()
-        self.pending.append((item, fut, time.perf_counter()))
+        self.pending.append((items, fut, time.perf_counter()))
         return await fut
 
     async def _loop(self):
@@ -57,21 +61,18 @@ class TickBatcher:
             batch, self.pending = self.pending, []
             self.ticks += 1
             tick_id, t0 = self.ticks, time.perf_counter()
+            flat = [it for items, _, _ in batch for it in items]
             try:
-                res = await loop.run_in_executor(
-                    self.pool, lambda: self.d.decide([b[0] for b in batch], mode=self.mode, max_items=self.max_items)
-                )
+                res = await loop.run_in_executor(self.pool, lambda: self.d._decide_items(flat, **self.kw))
                 stats = dict(self.d.last_stats)
-                for (item, fut, t_in), r in zip(batch, res):
+                pass_ms = round((time.perf_counter() - t0) * 1000, 1)
+                i = 0
+                for items, fut, t_in in batch:
+                    part, i = res[i:i + len(items)], i + len(items)
                     if not fut.done():
-                        fut.set_result({
-                            "answers": r,
-                            "tick": tick_id,
-                            "batch_items": len(batch),
-                            "wait_ms": round((t0 - t_in) * 1000, 1),
-                            "pass_ms": round((time.perf_counter() - t0) * 1000, 1),
-                            "pass": stats,
-                        })
+                        fut.set_result({"answers": part, "tick": tick_id, "requests_in_tick": len(batch),
+                                        "clips_in_pass": len(flat), "wait_ms": round((t0 - t_in) * 1000, 1),
+                                        "pass_ms": pass_ms, "pass": stats})
             except Exception as e:  # report the error to every request of this tick
                 for _, fut, _ in batch:
                     if not fut.done():
@@ -80,7 +81,7 @@ class TickBatcher:
                 nxt = loop.time()
 
 
-def create_app(decider: Decider, tick_ms: float = 160.0, max_items: Optional[int] = None):
+def create_app(decider: Decider, tick_ms: float = 160.0, max_items: Optional[int] = None, max_tokens: Optional[int] = None):
     from fastapi import FastAPI, HTTPException
     from pydantic import BaseModel
 
@@ -89,16 +90,22 @@ def create_app(decider: Decider, tick_ms: float = 160.0, max_items: Optional[int
         text: str
         options: List[str]
         lang: str = "en"
+        audio: Optional[Union[str, int, List[Union[str, int]]]] = None
 
     class DecideIn(BaseModel):
+        audio_b64: str                   # WAV/FLAC bytes, base64
         questions: List[QuestionIn]
-        audio_b64: Optional[str] = None  # WAV/FLAC bytes, base64
-        text: Optional[str] = None       # transcript (text-only models, or extra context for speech models)
         context: Optional[str] = None
         lang: Optional[str] = None
 
-    app = FastAPI(title="DuplexJev decider", version="0.1.0")
-    batcher = TickBatcher(decider, tick_ms=tick_ms, max_items=max_items)
+    class DecideBatchIn(BaseModel):
+        audios: Dict[str, str]           # clip id -> WAV/FLAC bytes, base64
+        questions: List[QuestionIn]      # each with audio=<clip id>, [ids] or "*"
+        context: Optional[Dict[str, str]] = None
+        lang: Optional[str] = None
+
+    app = FastAPI(title="DuplexJev decider", version="0.2.0")
+    batcher = TickBatcher(decider, tick_ms=tick_ms, max_items=max_items, max_tokens=max_tokens)
 
     @app.on_event("startup")
     async def _start():
@@ -106,26 +113,39 @@ def create_app(decider: Decider, tick_ms: float = 160.0, max_items: Optional[int
 
     @app.get("/health")
     async def health() -> dict[str, Any]:
-        return {"ok": True, "speech": decider.is_audio, "tick_ms": tick_ms, "ticks": batcher.ticks}
+        return {"ok": True, "tick_ms": tick_ms, "ticks": batcher.ticks}
 
     @app.post("/v1/decide")
     async def decide(req: DecideIn) -> dict[str, Any]:
-        item: dict[str, Any] = {"questions": [q.model_dump() for q in req.questions]}
-        if req.audio_b64:
-            if not decider.is_audio:
-                raise HTTPException(400, "this server runs a text-only model; send `text`")
-            item["audio"] = _decode_audio(req.audio_b64)
-        if req.text is not None:
-            item["text"] = req.text
-        if "audio" not in item and "text" not in item:
-            raise HTTPException(400, "send `audio_b64` or `text`")
-        if req.context:
-            item["context"] = req.context
-        if req.lang:
-            item["lang"] = req.lang
+        qs = [Question(q.id, q.text, q.options, q.lang) for q in req.questions]
+        item = {"audio": _decode_audio(req.audio_b64), "questions": qs, "context": req.context, "lang": req.lang}
         try:
-            return await batcher.submit(item)
+            out = await batcher.submit([item])
         except ValueError as e:
             raise HTTPException(400, str(e))
+        out["answers"] = out["answers"][0]
+        return out
+
+    @app.post("/v1/decide_batch")
+    async def decide_batch(req: DecideBatchIn) -> dict[str, Any]:
+        ctx = req.context or {}
+        per: dict[str, list] = {k: [] for k in req.audios}
+        for q in req.questions:
+            if q.audio is None:
+                raise HTTPException(400, f"question {q.id!r}: set audio to a clip id, a list of ids, or '*'")
+            targets = list(req.audios) if q.audio == "*" else (q.audio if isinstance(q.audio, list) else [q.audio])
+            for t in map(str, targets):
+                if t not in per:
+                    raise HTTPException(400, f"question {q.id!r} refers to unknown audio {t!r}")
+                per[t].append(Question(q.id, q.text, q.options, q.lang))
+        ids = [k for k, v in per.items() if v]
+        items = [{"audio": _decode_audio(req.audios[k]), "questions": per[k], "context": ctx.get(k), "lang": req.lang}
+                 for k in ids]
+        try:
+            out = await batcher.submit(items)
+        except ValueError as e:
+            raise HTTPException(400, str(e))
+        out["answers"] = dict(zip(ids, out["answers"]))
+        return out
 
     return app

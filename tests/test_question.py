@@ -27,3 +27,10 @@ def test_render_lists_every_option_under_a_letter():
 def test_invalid_questions_are_rejected(kw):
     with pytest.raises(ValueError):
         Question(**kw)
+
+
+def test_audio_binding_round_trip():
+    q = Question("gender", "Speaker gender", ["female", "male"], audio=["car1", "car2"])
+    assert q.audio == ("car1", "car2")
+    assert Question.from_dict(q.to_dict()) == q
+    assert q.for_audio("*").audio == "*" and q.for_audio(None).audio is None

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "duplexjev"
-version = "0.1.0"
-description = "Batched typed speech decisions without decoding: one forward pass answers many closed-set questions about many calls."
+version = "0.2.0"
+description = "Jev-style typed decisions about speech with zero decode steps: one forward pass answers many option groups about many clips."
 readme = "PYPI.md"
 license = {text = "Apache-2.0"}
 authors = [{name = "Adventists.ai"}]
