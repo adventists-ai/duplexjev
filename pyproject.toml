@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "duplexjev"
+version = "0.1.0"
+description = "Batched typed speech decisions without decoding: one forward pass answers many closed-set questions about many calls."
+readme = "PYPI.md"
+license = {text = "Apache-2.0"}
+authors = [{name = "Adventists.ai"}]
+requires-python = ">=3.9"
+dependencies = [
+  "torch>=2.1",
+  "transformers>=4.51,<4.58",
+  "numpy",
+  "soundfile",
+]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Multimedia :: Sound/Audio :: Speech",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+speech = ["accelerate", "peft", "librosa"]
+server = ["fastapi", "uvicorn", "pydantic>=2"]
+all = ["accelerate", "peft", "librosa", "fastapi", "uvicorn", "pydantic>=2"]
+dev = ["pytest", "httpx"]
+
+[project.scripts]
+duplexjev = "duplexjev.cli:main"
+
+[project.urls]
+Homepage = "https://adventists-ai.github.io/duplexjev/"
+Repository = "https://github.com/adventists-ai/duplexjev"
+
+[tool.setuptools.packages.find]
+include = ["duplexjev", "duplexjev.*"]
+exclude = ["duplexjev.research*"]

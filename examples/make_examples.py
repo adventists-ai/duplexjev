@@ -25,7 +25,7 @@ import torch
 import torch.nn.functional as F
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, "..", "duplexjev"))
+sys.path.insert(0, os.path.join(HERE, "..", "duplexjev", "research"))
 import run_bench as RB  # noqa: E402  (load_model, build_prompt)
 
 LETTERS = "ABCDEFGH"

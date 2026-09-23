@@ -47,7 +47,7 @@
 
 ## 2. 最新动态
 
-- **2026-09** —— 论文投稿 ICASSP 2027；发布研究代码、延迟基准和项目主页。
+- **2026-09** —— 论文投稿 ICASSP 2027；发布 `duplexjev` 包（批量判断器、节拍服务）、研究代码、延迟基准和项目主页。
 - **2026-10-10（计划）** —— Speech-to-Decision 商用 API 上线。
 - **2026-10-15（计划）** —— 开源推理管线与模型权重。
 
@@ -65,22 +65,44 @@
 
 ## 4. 快速上手
 
-可安装的包和推理示例将随权重一起发布。一个判断请求长这样：
-
-```text
-<|audio|>
-
-问题：用户这句话说完了吗？
-
-选项：
-A. 没说完
-B. 说完了
-
-请只回答正确选项的字母。
+```bash
+pip install "duplexjev[all] @ git+https://github.com/adventists-ai/duplexjev.git"
 ```
 
-答案 = 提示词最后一个位置上 `softmax(logits[last, {A, B}])`；同一段音频上的 N 个问题在一次打包前向中全部答完。
-研究版实现见 [`duplexjev/`](duplexjev)。
+**任意开源大模型，输入转写文字**（不需要语音模型）：
+
+```python
+from duplexjev import Decider, Question
+
+d = Decider.from_pretrained("Qwen/Qwen3-8B")
+qs = [Question("turn", "用户这句话说完了吗？", ["说完了", "没说完"], lang="zh"),
+      Question("intent", "用户想做什么？", ["空调", "媒体", "导航", "电话"], lang="zh")]
+d.decide(["帮我把空调打开", "导航到"], qs)
+# [{'turn': {'answer': '说完了', 'confidence': 0.97, 'probs': {...}}, 'intent': {...}}, {...}]
+```
+
+**语音模型，直接输入音频**（Ultravox 格式；DuplexJev 适配器同样加载）：
+
+```python
+d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")
+d.decide(["call_017.wav", "call_018.wav"], qs)          # 所有通话、所有问题一次前向
+```
+
+**批量服务：** 同一个节拍内到达的所有请求合成一次前向完成。
+
+```bash
+duplexjev serve --model fixie-ai/ultravox-v0_6-qwen-3-32b --tick-ms 160
+curl -s localhost:8000/v1/decide -H 'content-type: application/json' \
+  -d '{"text": "打电话给", "lang": "zh", "questions": [{"id": "turn", "text": "说完了吗？", "options": ["说完了", "没说完"], "lang": "zh"}]}'
+```
+
+包的保证（均有 `tests/` 覆盖）：
+
+- **0 步解码。** 答案取下一个 token 在选项字母上的 softmax；选项用打乱的字母标注（`n_perm` 可对多种顺序取平均）。
+- **精确的前缀共享**（默认 `mode="packed"`）：每个条目的上下文和音频只编码一次，所有问题打包进同一行、用块对角掩码隔开；结果与逐题运行一致（仅浮点误差）。
+- **批次无关。** 一个条目的答案不受同批其他条目影响。语音场景下这需要把每段音频对齐到整数个音频 token，包里已处理（否则 Ultravox 批量推理时，短音频最后一个音频 token 会混入填充）。
+
+更多见 [`examples/`](examples)：节拍批量计时、服务端客户端、语音快速上手。
 
 ## 5. 评测结果
 
@@ -114,14 +136,16 @@ CoVoST 2、People's Speech、LibriSpeech、MLS、MUSAN），切成 100 个互不
 
 | 路径 | 内容 |
 |---|---|
-| [`duplexjev/`](duplexjev) | 读出、问题契约、字母渲染、带融合的编码器（研究代码） |
-| [`examples/`](examples) | 用权重生成项目主页示例 |
+| [`duplexjev/`](duplexjev) | 可安装的包：`Decider`、`Question`、命令行与节拍批量服务 |
+| [`duplexjev/research/`](duplexjev/research) | 论文代码：读出、问题契约、带融合的编码器 |
+| [`tests/`](tests) | 一致性与批次无关性测试 |
+| [`examples/`](examples) | 快速上手、节拍批量计时、服务端客户端 |
 | [`evaluation/`](evaluation) | 评测脚本，以及各评测集的获取方式 |
 | [`training/`](training) | Ultravox 配置与补丁、数据配方、100 包切分、续写生成 |
 | [`benchmarks/`](benchmarks) | 延迟、SLO 容量与前缀共享实验 |
 | [`docs/`](docs) | 项目主页 |
 
-研究代码里仍有我们集群上的路径，见 [docs/PATHS.md](docs/PATHS.md)。
+论文代码里仍有我们集群上的路径，见 [docs/PATHS.md](docs/PATHS.md)。
 
 ## 8. 许可证
 

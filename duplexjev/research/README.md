@@ -1,4 +1,4 @@
-# duplexjev (research code)
+# duplexjev/research (paper code)
 
 | file | purpose |
 |---|---|
@@ -10,5 +10,5 @@
 | `encoder/` | Qwen3-ASR-0.6B encoder with the cross-attention fusion (variant A) and configs for A and B |
 | `test_contract.py` | unit tests for the contract |
 
-This is the code used in the paper; it will be replaced by an installable package with a stable API when the
-weights are released. See [docs/PATHS.md](../docs/PATHS.md).
+This is the code used in the paper, kept for reproducibility. The installable package is [`duplexjev`](..)
+(`Decider`, `Question`). See [docs/PATHS.md](../../docs/PATHS.md).

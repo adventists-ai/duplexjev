@@ -1,10 +1,11 @@
 # Examples
 
-`make_examples.py` answers a fixed set of questions for a few audio clips with a released checkpoint, in one batched
-forward pass per clip, and writes `docs/examples.json` for the [project page](https://adventists-ai.github.io/duplexjev/).
+| file | what it shows |
+|---|---|
+| `quickstart_text.py` | typed decisions over transcripts with any open LLM |
+| `quickstart_speech.py` | decisions straight from audio with a speech checkpoint (Ultravox format, DuplexJev adapters) |
+| `tick_batch.py` | one tick of a batched loop: N calls x Q questions in one pass, with timing |
+| `server_client.py` | many concurrent requests to `duplexjev serve`, answered per tick |
+| `make_examples.py` | generate the project-page examples (`docs/examples.json`) from a checkpoint |
 
-```bash
-python make_examples.py --ckpt <checkpoint> --clips examples_config.example.json --out ../docs
-```
-
-Use only clips whose license allows redistribution. A minimal inference example will be added with the weights.
+Use only audio whose license allows redistribution when publishing examples.

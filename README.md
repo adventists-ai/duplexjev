@@ -52,7 +52,7 @@ state + N typed questions ──► frozen LLM (Qwen3-32B), ONE forward pass
 
 ## 2. News
 
-- **2026-09** — Paper submitted to ICASSP 2027; research code, latency benchmarks and project page released.
+- **2026-09** — Paper submitted to ICASSP 2027. Released the `duplexjev` package (batched decider, tick server), research code, latency benchmarks and project page.
 - **2026-10-10 (planned)** — Speech-to-Decision commercial API.
 - **2026-10-15 (planned)** — Open-source inference pipeline and model weights.
 
@@ -72,22 +72,44 @@ are named `DuplexJev-<variant>-<ASR encoder>-<LLM>`, so adapters for other model
 
 ## 4. Quick start
 
-An installable package and inference example will ship with the weights. A decision request looks like this:
-
-```text
-<|audio|>
-
-Question: Has the user finished the turn?
-
-Options:
-A. not finished
-B. finished
-
-Answer with only the letter of the correct option.
+```bash
+pip install "duplexjev[all] @ git+https://github.com/adventists-ai/duplexjev.git"
 ```
 
-The answer is `softmax(logits[last, {A, B}])` at the last prompt position; N such questions over the same audio are
-answered in one packed forward pass. See [`duplexjev/`](duplexjev) for the research implementation.
+**Any open LLM, transcripts in** (no speech model needed):
+
+```python
+from duplexjev import Decider, Question
+
+d = Decider.from_pretrained("Qwen/Qwen3-8B")
+qs = [Question("turn", "Has the user finished the turn?", ["finished", "not finished"]),
+      Question("intent", "What does the user want?", ["climate", "media", "navigation", "phone"])]
+d.decide(["Turn on the air conditioning", "Navigate to the"], qs)
+# [{'turn': {'answer': 'finished', 'confidence': 0.97, 'probs': {...}}, 'intent': {...}}, {...}]
+```
+
+**Speech checkpoints, audio in** (Ultravox format; the DuplexJev adapters load the same way):
+
+```python
+d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")
+d.decide(["call_017.wav", "call_018.wav"], qs)          # one pass for all calls and all questions
+```
+
+**Batched server:** every request that arrives within one tick is answered in one pass.
+
+```bash
+duplexjev serve --model fixie-ai/ultravox-v0_6-qwen-3-32b --tick-ms 160
+curl -s localhost:8000/v1/decide -H 'content-type: application/json' \
+  -d '{"text": "Call my", "questions": [{"id": "turn", "text": "Has the user finished?", "options": ["finished", "not finished"]}]}'
+```
+
+What the package guarantees (covered by `tests/`):
+
+- **0 decode steps.** Each answer is the next-token softmax over its option letters; options appear under permuted letters (`n_perm` averages several orders).
+- **Exact prefix sharing** (`mode="packed"`, default): the context and audio of an item are encoded once and all its questions are packed into one row under a block-diagonal mask; answers equal one-row-per-question runs up to float noise.
+- **Batch invariance.** An item's answers do not depend on which other items share the pass. For speech this requires aligning every clip to whole audio tokens, which the package does (batched Ultravox inference otherwise leaks padding into the last audio token of shorter clips).
+
+More in [`examples/`](examples): tick-batch timing, server client, speech quick start.
 
 ## 5. Evaluation results
 
@@ -123,14 +145,16 @@ official ratio. Recipe, data links and scripts: [`training/`](training).
 
 | path | contents |
 |---|---|
-| [`duplexjev/`](duplexjev) | readout, question contract, letter rendering, encoder with fusion (research code) |
-| [`examples/`](examples) | generate the project-page examples from a checkpoint |
+| [`duplexjev/`](duplexjev) | the installable package: `Decider`, `Question`, CLI and tick-batched server |
+| [`duplexjev/research/`](duplexjev/research) | paper code: readout, question contract, encoder with fusion |
+| [`tests/`](tests) | equivalence and batch-invariance tests |
+| [`examples/`](examples) | quick starts, tick-batch timing, server client |
 | [`evaluation/`](evaluation) | benchmark runners and where to get each benchmark |
 | [`training/`](training) | Ultravox configs and patches, data recipe, 100-pack split, continuation generation |
 | [`benchmarks/`](benchmarks) | latency, SLO capacity and prefix-sharing experiments |
 | [`docs/`](docs) | project page |
 
-The research code still contains paths from our cluster; see [docs/PATHS.md](docs/PATHS.md).
+The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/PATHS.md).
 
 ## 8. License
 
