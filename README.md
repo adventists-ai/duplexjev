@@ -1,4 +1,23 @@
-# DuplexJev — Batched Speech Decisions Without Decoding
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner_dark.svg">
+    <img src="docs/assets/banner_light.svg" alt="DuplexJev — batched speech decisions without decoding" width="880">
+  </picture>
+</p>
+
+<p align="center">
+  <b>English</b> &nbsp;|&nbsp; <a href="README_CN.md">中文</a>
+</p>
+
+<p align="center">
+  🌐 <a href="https://adventists-ai.github.io/duplexjev/">Project page</a> &nbsp;|&nbsp;
+  📄 Paper (arXiv, coming soon) &nbsp;|&nbsp;
+  🤗 Weights (coming soon) &nbsp;|&nbsp;
+  📊 <a href="data/qa100">qa100 test set</a> &nbsp;|&nbsp;
+  📝 <a href="#citation">Citation</a>
+</p>
+
+---
 
 **DuplexJev** turns a frozen speech LLM into a *typed decision engine* for full-duplex spoken agents
 (product name: **Speech-to-Decision**). Hidden states of an off-the-shelf ASR encoder are projected into a
@@ -6,12 +25,17 @@ frozen LLM, and every runtime-declared question (*is the turn complete? which fi
 is read as a **single-token, closed-set distribution** — no ASR decoding, no text decoding. Many questions,
 over one call or across calls, share one forward pass.
 
-📄 Paper: *Batched Speech Decisions Without Decoding: A Modular Decision Sidecar for Full-Duplex Spoken Agents*
-(ICASSP 2027 submission) — arXiv: _coming soon_ · 🌐 Demo: https://adventists-ai.github.io/duplexjev/ (中文: https://adventists-ai.github.io/duplexjev/#zh) ·
-🤗 Weights: _coming soon_
-
-> Status: research release in preparation. `research/` contains the exact code used for the paper; a cleaned,
+> **Paper:** *Batched Speech Decisions Without Decoding: A Modular Decision Sidecar for Full-Duplex Spoken Agents*
+> (ICASSP 2027 submission).
+> **Status:** research release in preparation — `research/` contains the exact code used for the paper; a cleaned,
 > installable package and model weights will follow.
+
+## Highlights
+
+- **0 decode steps.** Ten decisions about an utterance in **92 ms** on one H200, vs **~2.0 s** for ASR → LLM JSON on the same engine.
+- **Capacity under a conversational budget.** Within 0.5 s the cascade serves no events at all; the readout serves 17–20 events/s per GPU.
+- **Long contexts stop multiplying.** Exact prefix sharing: 7× cheaper for 100 questions over a 1.5k-token context, 20× for 50 questions over 5k.
+- **Modular.** Any ASR encoder + a small projector + any frozen LLM; a cross-attention fusion of intermediate encoder layers carries paralinguistics.
 
 ## How it works
 
@@ -60,6 +84,7 @@ Accuracy tables (qa100, ZJU audio-gender-benchmark, ZJU main-language) will be a
 | `research/eval/` | qa100 / gender / ZJU benchmark runner |
 | `research/data_pipeline/` | 100-pack split of the Ultravox v0.6 mixture, verification, Qwen3-32B continuation store |
 | `research/train_configs/` | training configs for variants A and B (stack factor 2) |
+| `research/demo/` | generate the project-page examples from a released checkpoint |
 | `data/qa100/` | **qa100** bilingual spoken multiple-choice test set (CC-BY-4.0) |
 | `docs/` | demo page (GitHub Pages) |
 
