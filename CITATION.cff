@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use DuplexJev or qa100, please cite it as below."
+title: "DuplexJev: Batched Speech Decisions Without Decoding"
+type: software
+license: Apache-2.0
+authors:
+  - family-names: Jin
+    given-names: Jie
+    orcid: "https://orcid.org/0009-0001-2636-2099"
+    affiliation: "Adventists.ai"
+  - family-names: Ma
+    given-names: Ziyin
+    orcid: "https://orcid.org/0009-0006-2129-3860"
+    affiliation: "Zhejiang University"
+  - family-names: Yin
+    given-names: Min
+    orcid: "https://orcid.org/0009-0006-0042-9861"
+    affiliation: "Zhejiang University"
+  - family-names: Chen
+    given-names: Jinyu
+    orcid: "https://orcid.org/0009-0002-0819-1481"
+    affiliation: "University of Virginia"
+  - family-names: Pang
+    given-names: Zhikun
+    orcid: "https://orcid.org/0009-0001-1014-2323"
+    affiliation: "Adventists.ai"
+  - family-names: Zhang
+    given-names: Xiaowen
+    orcid: "https://orcid.org/0009-0000-6380-6341"
+    affiliation: "Adventists.ai"
+repository-code: "https://github.com/adventists-ai/duplexjev"
+url: "https://adventists-ai.github.io/duplexjev/"

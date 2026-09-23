@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.audio_cache/
+results/
+*.safetensors
+*.pt
+.DS_Store

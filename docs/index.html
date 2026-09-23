@@ -1,0 +1,415 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DuplexJev</title>
+<meta name="description" content="DuplexJev: batched speech decisions without decoding — a modular decision sidecar for full-duplex spoken agents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --ground:#F4F6F8; --panel:#FFFFFF; --ink:#16202B; --ink-2:#4A5866; --rule:#D5DCE3;
+  --signal:#0B7A64; --signal-soft:#D6EEE8; --slow:#B7791F; --slow-soft:#F5E7CF; --warn:#A33B2B;
+  --grid:#E4E9EE;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1419; --panel:#151D24; --ink:#E4EAF0; --ink-2:#9AA8B5; --rule:#2A3640;
+    --signal:#3CC4A2; --signal-soft:#123A33; --slow:#E0A548; --slow-soft:#3A2D16; --warn:#E07A68; --grid:#22303A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1419; --panel:#151D24; --ink:#E4EAF0; --ink-2:#9AA8B5; --rule:#2A3640;
+  --signal:#3CC4A2; --signal-soft:#123A33; --slow:#E0A548; --slow-soft:#3A2D16; --warn:#E07A68; --grid:#22303A;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:40px 64px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:26px;font-weight:600;margin-block:0 12px}
+h3{font-size:18px;font-weight:600}
+p{margin:0 0 12px;max-width:68ch}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--signal)}
+.authors{font-family:var(--display);font-size:17px;margin-top:14px;color:var(--ink)}
+.authors sup{font-size:11px;color:var(--ink-2)}
+.affil{font-size:14px;color:var(--ink-2);margin-top:4px;line-height:1.5}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.links a,.links span{font-family:var(--mono);font-size:13px;padding:6px 12px;border:1px solid var(--rule);border-radius:4px;color:var(--ink);text-decoration:none;background:var(--panel)}
+.links a:hover,.links a:focus-visible{border-color:var(--signal);color:var(--signal);outline:none}
+.links span{color:var(--ink-2)}
+.lede{font-size:19px;margin-top:22px}
+section{margin-top:56px}
+.note{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.badge{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:2px 8px;border-radius:3px;background:var(--slow-soft);color:var(--slow);vertical-align:middle}
+/* demo */
+.demo{background:var(--panel);border:1px solid var(--rule);border-radius:6px;margin-top:24px}
+.demo-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--rule)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{font-family:var(--mono);font-size:13px;padding:6px 10px;border:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:4px;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:var(--panel)}
+.tabs button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.demo-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:0}
+.clip{padding:16px;border-right:1px solid var(--rule)}
+.clip canvas{width:100%;height:120px;display:block}
+.clip .meta{font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-top:8px;display:flex;flex-wrap:wrap;gap:4px 14px}
+.clip .tx{font-size:16px;margin-top:10px}
+.clip audio{width:100%;margin-top:10px}
+.qs{padding:8px 16px 16px}
+.q{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;padding:10px 0;border-bottom:1px solid var(--grid)}
+.q:last-child{border-bottom:0}
+.q-top{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.q-top b{font-weight:600}
+.q-ans{font-family:var(--mono);font-size:13px;color:var(--signal);white-space:nowrap}
+.bars{display:flex;height:10px;border-radius:2px;overflow:hidden;background:var(--grid)}
+.bars i{display:block;height:100%}
+.opts{font-family:var(--mono);font-size:11px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:2px 10px}
+.pass{font-family:var(--mono);font-size:12px;color:var(--ink-2);padding:10px 16px;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:6px 18px}
+.pass b{color:var(--ink);font-weight:500}
+/* figures */
+.fig{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px;margin-top:18px}
+.fig-cap{font-size:14px;color:var(--ink-2);margin-top:10px;max-width:none}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+svg text{font-family:var(--mono)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+th{font-family:var(--display);font-weight:600;font-size:13px;color:var(--ink-2);border-bottom:1px solid var(--rule)}
+td.good{color:var(--signal);font-weight:600}
+td.none{color:var(--warn)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:12px;color:var(--ink-2);margin-bottom:8px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+ul.plain{padding-left:18px;margin:0;max-width:68ch}
+ul.plain li{margin-bottom:6px}
+pre{font-family:var(--mono);font-size:12.5px;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;overflow-x:auto;line-height:1.5;margin:0}
+.copyrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.copyrow button{font-family:var(--mono);font-size:12px;padding:5px 10px;border:1px solid var(--rule);background:var(--panel);color:var(--ink);border-radius:4px;cursor:pointer}
+.copyrow button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2)}
+.tick-grid{display:grid;grid-template-columns:repeat(48,minmax(0,1fr));gap:2px;margin-top:10px}
+.tick-grid span{aspect-ratio:1;border-radius:2px;background:var(--grid);max-width:100%}
+.tick-grid span.on{background:var(--signal)}
+.tick-grid span.ev{background:var(--slow)}
+@media (max-width:760px){
+  .demo-body{grid-template-columns:minmax(0,1fr)}
+  .clip{border-right:0;border-bottom:1px solid var(--rule)}
+  .two{grid-template-columns:minmax(0,1fr)}
+  .tick-grid{grid-template-columns:repeat(24,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">ICASSP 2027 submission · Speech-to-Decision</div>
+    <h1 style="margin-top:10px">Batched Speech Decisions Without Decoding</h1>
+    <p class="note" style="margin-top:8px;font-size:14px">DuplexJev — a modular decision sidecar for full-duplex spoken agents</p>
+    <div class="authors">Jie Jin<sup>1,★</sup>, Ziyin Ma<sup>2</sup>, Min Yin<sup>3</sup>, Jinyu Chen<sup>4</sup>, Zhikun Pang<sup>1</sup>, Xiaowen Zhang<sup>1</sup></div>
+    <div class="affil"><sup>1</sup>Adventists.ai, Melbourne · <sup>2</sup>College of CS&amp;T, Zhejiang University · <sup>3</sup>Future Design Lab, Innovation Center of Yangtze River Delta, Zhejiang University · <sup>4</sup>University of Virginia · <sup>★</sup>jiejin@adventists.ai</div>
+    <nav class="links" aria-label="Resources">
+      <span>Paper · arXiv soon</span>
+      <a href="https://github.com/adventists-ai/duplexjev">Code</a>
+      <span>Weights · soon</span>
+      <a href="https://github.com/adventists-ai/duplexjev/tree/main/data/qa100">qa100 test set</a>
+      <a href="#cite">Cite</a>
+    </nav>
+    <p class="lede">A full-duplex voice agent must keep answering small, closed questions — <em>has the user finished? which filler fits? which step of the flow is this?</em> DuplexJev reads every such question as one constrained token from a frozen speech LLM. No ASR decoding, no text decoding, and many questions — over one call or across calls — share a single forward pass.</p>
+  </header>
+
+  <section id="demo" aria-labelledby="demo-h">
+    <h2 id="demo-h">One utterance, one pass, many answers</h2>
+    <p>Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked).</p>
+    <div class="demo">
+      <div class="demo-head">
+        <div class="tabs" id="tabs" role="group" aria-label="Example clips"></div>
+        <span id="ph" class="badge" hidden>Placeholder values — replaced by released-checkpoint outputs</span>
+      </div>
+      <div class="demo-body">
+        <div class="clip">
+          <canvas id="wave" aria-label="Waveform with audio-token boundaries" role="img"></canvas>
+          <div class="meta" id="meta"></div>
+          <div class="tx" id="tx"></div>
+          <audio id="aud" controls preload="none"></audio>
+        </div>
+        <div class="qs" id="qs"></div>
+      </div>
+      <div class="pass" id="pass"></div>
+    </div>
+  </section>
+
+  <section id="how" aria-labelledby="how-h">
+    <h2 id="how-h">How it works</h2>
+    <div class="fig scroll">
+      <svg id="arch" viewBox="0 0 900 250" width="100%" style="min-width:640px" role="img" aria-label="Architecture: frozen ASR encoder, fusion and projector, frozen LLM, single-token readout"></svg>
+    </div>
+    <div class="two" style="margin-top:18px">
+      <div>
+        <h3>Typed single-token readout</h3>
+        <p style="margin-top:6px">Each question lists its options under letters in a random order. The answer is the LLM's next-token distribution restricted to those letters — always a valid option, with a confidence score for free.</p>
+      </div>
+      <div>
+        <h3>Prefix sharing</h3>
+        <p style="margin-top:6px">The shared prefix (dialogue context and audio) is encoded once; all questions are packed into one row under a block-diagonal mask. Memory grows with the questions, not with copies of the context.</p>
+      </div>
+      <div>
+        <h3>Paralinguistics through fusion</h3>
+        <p style="margin-top:6px">Variant A lets the final encoder layer attend to layers 14 and 9, where speaker and prosody cues survive. The fusion starts at zero, so A begins identical to the last-layer variant B.</p>
+      </div>
+      <div>
+        <h3>Swap the parts</h3>
+        <p style="margin-top:6px">Encoder and LLM stay frozen; only a 40&nbsp;M-parameter projector (plus 3&nbsp;M for fusion) is trained. Any open ASR encoder and any LLM that accepts input embeddings will do.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="latency" aria-labelledby="lat-h">
+    <h2 id="lat-h">Ten decisions: 92 ms instead of two seconds</h2>
+    <p>Same GPU (1× H200), same frozen Qwen3-32B, same vLLM engine. The cascade transcribes, then generates the ten answers as JSON; the readout answers them as single tokens.</p>
+    <div class="fig">
+      <div class="legend"><span><i class="sw" style="background:var(--slow)"></i>LLM generation</span><span><i class="sw" style="background:var(--slow-soft);outline:1px solid var(--slow)"></i>ASR decoding</span><span><i class="sw" style="background:var(--signal)"></i>single-token readout</span></div>
+      <svg id="latchart" viewBox="0 0 900 220" width="100%" role="img" aria-label="Per-event latency bars"></svg>
+      <p class="fig-cap">Median over 30 real utterances (2–12 s), ten questions per event. “Context” adds a 1,471-token dialogue context — the median input of the tool-need check in our deployed in-car assistant.</p>
+    </div>
+    <div class="fig scroll">
+      <table aria-label="Events per second within a latency budget">
+        <thead><tr><th>context</th><th>method</th><th>decode steps</th><th>≤ 0.25 s</th><th>≤ 0.5 s</th><th>≤ 2 s</th><th>saturated</th></tr></thead>
+        <tbody>
+          <tr><td>none</td><td>ASR → JSON</td><td>12.5 + 86</td><td class="none">0</td><td class="none">0</td><td>16.9</td><td>311</td></tr>
+          <tr><td>none</td><td>readout</td><td>0</td><td class="good">17.3</td><td class="good">20.4</td><td class="good">33.5</td><td>335</td></tr>
+          <tr><td>1.5k</td><td>ASR → JSON</td><td>12.5 + 87</td><td class="none">0</td><td class="none">0</td><td>8.4</td><td>251</td></tr>
+          <tr><td>1.5k</td><td>readout</td><td>0</td><td class="good">9.7</td><td class="good">12.0</td><td class="good">18.4</td><td>227</td></tr>
+        </tbody>
+      </table>
+      <p class="fig-cap">Events per second one GPU can serve while every event finishes within the budget; last column: decisions per second at full saturation. At a conversational budget the cascade serves nothing; at saturation the two are on par — the gain is latency and capacity under a budget, not raw throughput.</p>
+    </div>
+  </section>
+
+  <section id="prefix" aria-labelledby="pre-h">
+    <h2 id="pre-h">Long contexts stop multiplying</h2>
+    <div class="fig">
+      <svg id="prechart" viewBox="0 0 900 250" width="100%" role="img" aria-label="Prefix sharing cost versus sequential calls, log scale"></svg>
+      <p class="fig-cap">Wall time for N questions over one utterance (plain PyTorch, eager attention; ratios are what matter). Shared and one-by-one answers agree on 195/200 and 198/200 items for the two variants and 40/40 with 0.5–5k-token contexts; remaining differences are near-ties at bf16 precision.</p>
+    </div>
+  </section>
+
+  <section id="tick" aria-labelledby="tick-h">
+    <h2 id="tick-h">One clock for every call</h2>
+    <p>Because a decision is a single step, a server can gather the latest audio of every active call on a fixed tick and answer all of them in one batch — something a cascade cannot do, since each transcription needs its own sequence of decode steps. Below, each column is a tick and each row a call; amber marks a pause where a decision is due.</p>
+    <div class="fig">
+      <div class="tick-grid" id="ticks" aria-hidden="true"></div>
+      <p class="fig-cap">Illustration. In our deployment, consecutive user turns in a session are a median 9.9 s apart, so decision events are sparse and batch well.</p>
+    </div>
+  </section>
+
+  <section id="results" aria-labelledby="res-h">
+    <h2 id="res-h">Understanding and paralinguistics</h2>
+    <p>With a well-aligned speech path, reading the answer as one constrained token costs almost nothing against reading the transcript: 89 vs 91 on qa100 (Ultravox v0.6 Whisper path, Qwen3-32B). Results for our released speech paths — qa100, the ZJU gender benchmark and the ZJU main-language benchmark with real speech — will appear here with the final checkpoints. <span class="badge">pending</span></p>
+  </section>
+
+  <section id="limits" aria-labelledby="lim-h">
+    <h2 id="lim-h">Limitations</h2>
+    <ul class="plain">
+      <li>Turn-taking from audio is not solved yet: current speech paths stay near the prior on Easy-Turn, while the same readout reaches 84.9% from the transcript.</li>
+      <li>qa100 is synthetic speech; real-speech understanding is measured on the ZJU main-language benchmark.</li>
+      <li>Confidence gates abstention but does not reveal a missing skill: a path that cannot hear gender is still confident.</li>
+      <li>Gender labels are corpus-provided and binary; the classifier is a probe of information flow, not a tool for identifying people.</li>
+    </ul>
+  </section>
+
+  <section id="cite" aria-labelledby="cite-h">
+    <div class="copyrow"><h2 id="cite-h" style="margin:0">Cite</h2><button type="button" id="copybib">Copy BibTeX</button></div>
+<pre id="bib">@misc{jin2026duplexjev,
+  title  = {Batched Speech Decisions Without Decoding: A Modular Decision Sidecar for Full-Duplex Spoken Agents},
+  author = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Pang, Zhikun and Zhang, Xiaowen},
+  year   = {2026},
+  note   = {ICASSP 2027 submission}
+}</pre>
+  </section>
+
+  <footer>Code and weights: Apache-2.0 · qa100: CC-BY-4.0 · Built on Ultravox, Qwen3 and Qwen3-ASR.</footer>
+</div>
+
+<script type="application/json" id="examples-data">
+{"placeholder":true,"note":"Layout preview. Values are illustrative placeholders, to be regenerated by research/demo/make_examples.py from the released checkpoint.","examples":[
+ {"id":"ex1","label":"EN · pause mid-request","lang":"en","source":"placeholder clip","transcript":"Could you turn the air conditioning down a little and, um —","audio":"audio/ex1.wav","duration_s":3.4,"seed":3,
+  "questions":[
+   {"q":"Has the user finished the turn?","options":["finished","not finished"],"p":[0.18,0.82]},
+   {"q":"What does the user want?","options":["climate","media","navigation","phone","vehicle info","chit-chat"],"p":[0.86,0.02,0.03,0.02,0.04,0.03]},
+   {"q":"Which filler fits?","options":["“Sure —”","“One moment.”","“Got it.”","(stay silent)"],"p":[0.11,0.07,0.12,0.70]},
+   {"q":"Speaker gender","options":["female","male"],"p":[0.21,0.79]},
+   {"q":"Language","options":["English","Chinese","other"],"p":[0.97,0.02,0.01]},
+   {"q":"Urgency (1–5)","options":["1","2","3","4","5"],"p":[0.30,0.45,0.18,0.05,0.02]},
+   {"q":"Sentiment","options":["positive","neutral","negative"],"p":[0.14,0.78,0.08]},
+   {"q":"Needs a human agent?","options":["yes","no"],"p":[0.03,0.97]}]},
+ {"id":"ex2","label":"ZH · complete request","lang":"zh","source":"placeholder clip","transcript":"帮我导航到最近的充电站。","audio":"audio/ex2.wav","duration_s":2.6,"seed":7,
+  "questions":[
+   {"q":"Has the user finished the turn?","options":["finished","not finished"],"p":[0.93,0.07]},
+   {"q":"What does the user want?","options":["climate","media","navigation","phone","vehicle info","chit-chat"],"p":[0.02,0.01,0.91,0.01,0.04,0.01]},
+   {"q":"Which filler fits?","options":["“好的，”","“稍等，”","“马上为您查找，”","(stay silent)"],"p":[0.19,0.08,0.66,0.07]},
+   {"q":"Speaker gender","options":["female","male"],"p":[0.84,0.16]},
+   {"q":"Language","options":["English","Chinese","other"],"p":[0.01,0.98,0.01]},
+   {"q":"Urgency (1–5)","options":["1","2","3","4","5"],"p":[0.10,0.28,0.40,0.17,0.05]},
+   {"q":"Sentiment","options":["positive","neutral","negative"],"p":[0.08,0.86,0.06]},
+   {"q":"Needs a human agent?","options":["yes","no"],"p":[0.02,0.98]}]},
+ {"id":"ex3","label":"EN · frustrated caller","lang":"en","source":"placeholder clip","transcript":"This is the third time I'm calling about the same bill.","audio":"audio/ex3.wav","duration_s":3.1,"seed":11,
+  "questions":[
+   {"q":"Has the user finished the turn?","options":["finished","not finished"],"p":[0.71,0.29]},
+   {"q":"What does the user want?","options":["billing","technical","account","cancel","other","chit-chat"],"p":[0.83,0.03,0.06,0.05,0.02,0.01]},
+   {"q":"Which filler fits?","options":["“I'm sorry about that —”","“One moment.”","“Got it.”","(stay silent)"],"p":[0.74,0.10,0.09,0.07]},
+   {"q":"Speaker gender","options":["female","male"],"p":[0.66,0.34]},
+   {"q":"Language","options":["English","Chinese","other"],"p":[0.96,0.02,0.02]},
+   {"q":"Urgency (1–5)","options":["1","2","3","4","5"],"p":[0.02,0.06,0.22,0.46,0.24]},
+   {"q":"Sentiment","options":["positive","neutral","negative"],"p":[0.02,0.17,0.81]},
+   {"q":"Needs a human agent?","options":["yes","no"],"p":[0.58,0.42]}]}
+],"pass":{"forward_ms":92,"decode_steps":0,"engine":"vLLM, 1× H200, Qwen3-32B"}}
+</script>
+
+<script>
+(function(){
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const $ = id => document.getElementById(id);
+  let DATA = JSON.parse($("examples-data").textContent);
+  let cur = 0;
+
+  function rng(seed){ let s = seed>>>0 || 1; return () => (s = (s*1664525 + 1013904223)>>>0) / 4294967296; }
+  function drawWave(ex){
+    const c = $("wave"), dpr = window.devicePixelRatio || 1;
+    const w = c.clientWidth, h = c.clientHeight;
+    c.width = w*dpr; c.height = h*dpr;
+    const g = c.getContext("2d"); g.scale(dpr,dpr); g.clearRect(0,0,w,h);
+    const r = rng(ex.seed || 1), N = Math.max(60, Math.floor(w/3)), top = 18, mid = (h - top - 22)/2;
+    // token boundaries: 160 ms
+    const tokens = Math.ceil(ex.duration_s / 0.16);
+    g.strokeStyle = css("--grid"); g.lineWidth = 1;
+    for(let i=0;i<=tokens;i++){ const x = Math.round(i*w/tokens)+.5; g.beginPath(); g.moveTo(x,h-14); g.lineTo(x,h-4); g.stroke(); }
+    g.fillStyle = css("--ink-2"); g.font = "11px " + css("--mono");
+    g.fillText(tokens + " audio tokens · " + ex.duration_s.toFixed(1) + " s", 0, 11);
+    // envelope-shaped bars (illustrative when no real waveform is loaded)
+    g.fillStyle = css("--signal");
+    let env = 0;
+    for(let i=0;i<N;i++){
+      const t = i/N; const syll = Math.abs(Math.sin(t*Math.PI*ex.duration_s*2.2));
+      env = 0.7*env + 0.3*(0.25 + 0.75*syll*(0.6+0.4*r()));
+      const tail = t > 0.9 ? (1-t)/0.1 : 1;
+      const a = Math.max(1, env*tail*(mid-2));
+      g.fillRect(i*w/N, top+mid-a, Math.max(1, w/N-1), 2*a);
+    }
+  }
+  function renderQs(ex){
+    const pal = [css("--signal"), css("--ink-2"), css("--slow"), css("--rule"), css("--grid"), css("--ink")];
+    $("qs").innerHTML = "";
+    ex.questions.forEach(q => {
+      const k = q.p.indexOf(Math.max(...q.p));
+      const d = document.createElement("div"); d.className = "q";
+      const top = document.createElement("div"); top.className = "q-top";
+      const t = document.createElement("span"); t.innerHTML = "<b></b>"; t.firstChild.textContent = q.q;
+      const a = document.createElement("span"); a.className = "q-ans"; a.textContent = q.options[k] + "  " + (q.p[k]*100).toFixed(0) + "%";
+      top.append(t, a);
+      const bars = document.createElement("div"); bars.className = "bars";
+      q.p.forEach((p,i) => { const s = document.createElement("i"); s.style.width = (p*100)+"%"; s.style.background = i===k ? css("--signal") : (i%2 ? css("--rule") : css("--ink-2")); s.style.opacity = i===k ? 1 : .55; s.title = q.options[i] + " " + (p*100).toFixed(1)+"%"; bars.append(s); });
+      const opts = document.createElement("div"); opts.className = "opts";
+      q.options.forEach((o,i) => { const s = document.createElement("span"); s.textContent = o + " " + (q.p[i]*100).toFixed(0) + "%"; if(i===k) s.style.color = css("--signal"); opts.append(s); });
+      d.append(top, bars, opts); $("qs").append(d);
+    });
+  }
+  function select(i){
+    cur = i; const ex = DATA.examples[i];
+    [...$("tabs").children].forEach((b,j) => b.setAttribute("aria-pressed", j===i ? "true" : "false"));
+    $("meta").innerHTML = ""; [ex.lang.toUpperCase(), ex.duration_s.toFixed(1)+" s", ex.source].forEach(s => { const e = document.createElement("span"); e.textContent = s; $("meta").append(e); });
+    $("tx").textContent = "“" + ex.transcript + "”";
+    const au = $("aud"); au.hidden = false; au.src = ex.audio; au.onerror = () => { au.hidden = true; };
+    drawWave(ex); renderQs(ex);
+    const P = DATA.pass || {};
+    $("pass").innerHTML = "";
+    [["questions", ex.questions.length], ["forward passes", 1], ["decode steps", P.decode_steps ?? 0], ["event latency", (P.forward_ms ?? "–") + " ms"], ["engine", P.engine || ""]].forEach(([k,v]) => { const s = document.createElement("span"); s.innerHTML = k + " <b></b>"; s.lastChild.textContent = v; $("pass").append(s); });
+  }
+  function buildTabs(){
+    $("tabs").innerHTML = "";
+    DATA.examples.forEach((ex,i) => { const b = document.createElement("button"); b.type = "button"; b.id = "tab-"+ex.id; b.textContent = ex.label; b.addEventListener("click", () => select(i)); $("tabs").append(b); });
+    $("ph").hidden = !DATA.placeholder;
+    select(0);
+  }
+
+  // --- static figures ---
+  const NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, parent, text){ const e = document.createElementNS(NS, tag); for(const k in attrs) e.setAttribute(k, attrs[k]); if(text!==undefined) e.textContent = text; parent && parent.append(e); return e; }
+  function arch(){
+    const s = $("arch"); s.innerHTML = "";
+    const box = (x,y,w,h,label,sub,kind) => {
+      const fill = kind==="train" ? css("--signal-soft") : css("--panel");
+      const stroke = kind==="train" ? css("--signal") : css("--rule");
+      el("rect",{x,y,width:w,height:h,rx:4,fill,stroke,"stroke-width":1.2},s);
+      el("text",{x:x+w/2,y:y+h/2-(sub?4:-4),"text-anchor":"middle","font-size":13,fill:css("--ink")},s,label);
+      if(sub) el("text",{x:x+w/2,y:y+h/2+14,"text-anchor":"middle","font-size":11,fill:css("--ink-2")},s,sub);
+    };
+    const arrow = (x1,y1,x2,y2,dash) => { el("line",{x1,y1,x2,y2,stroke:css("--ink-2"),"stroke-width":1.2,"stroke-dasharray":dash?"4 4":"none","marker-end":"url(#ah)"},s); };
+    const defs = el("defs",{},s); const m = el("marker",{id:"ah",viewBox:"0 0 10 10",refX:9,refY:5,markerWidth:7,markerHeight:7,orient:"auto-start-reverse"},defs); el("path",{d:"M0,0 L10,5 L0,10 z",fill:css("--ink-2")},m);
+    box(10,40,90,56,"audio","user speech");
+    box(135,40,150,56,"ASR encoder","frozen · 12.5 Hz");
+    box(320,20,190,56,"A: cross-attn fusion","Q=h18 · K=h14 · V=h9","train");
+    box(320,100,190,40,"B: last layer h18","");
+    box(545,40,150,56,"projector","stack 2 → 6.25 tok/s","train");
+    box(545,160,150,56,"frozen LLM","Qwen3-32B · 1 pass");
+    box(135,160,340,56,"state + N typed questions","options under permuted letters");
+    box(730,160,160,56,"p(option | q) × N","0 decode steps");
+    arrow(100,68,133,68); arrow(285,60,318,50); arrow(285,78,318,118,true); arrow(510,48,543,62); arrow(510,120,543,80,true);
+    arrow(620,96,620,158); arrow(475,188,543,188); arrow(695,188,728,188);
+    el("text",{x:10,y:240,"font-size":11,fill:css("--ink-2")},s,"shaded: trained (43.1 M for A, 39.9 M for B) · everything else frozen");
+  }
+  function latChart(){
+    const s = $("latchart"); s.innerHTML = "";
+    const rows = [["no context · cascade",411,1567,0],["no context · readout",0,0,92],["1.5k context · cascade",411,1598,0],["1.5k context · readout",0,0,144]];
+    const L = 190, W = 900-L-70, max = 2100, y0 = 14, bh = 30, gap = 18;
+    for(let t=0;t<=2000;t+=500){ const x = L + W*t/max; el("line",{x1:x,y1:y0-4,x2:x,y2:y0+rows.length*(bh+gap)-gap+4,stroke:css("--grid")},s); el("text",{x,y:y0+rows.length*(bh+gap)+10,"text-anchor":"middle","font-size":11,fill:css("--ink-2")},s,t+" ms"); }
+    rows.forEach((r,i) => {
+      const y = y0 + i*(bh+gap);
+      el("text",{x:L-10,y:y+bh/2+4,"text-anchor":"end","font-size":12,fill:css("--ink")},s,r[0]);
+      let x = L;
+      if(r[1]){ const w = W*r[1]/max; el("rect",{x,y,width:w,height:bh,fill:css("--slow-soft"),stroke:css("--slow")},s); x += w; }
+      if(r[2]){ const w = W*r[2]/max; el("rect",{x,y,width:w,height:bh,fill:css("--slow")},s); x += w; el("text",{x:x+6,y:y+bh/2+4,"font-size":12,fill:css("--ink")},s,(r[1]+r[2]).toLocaleString()+" ms"); }
+      if(r[3]){ const w = Math.max(3, W*r[3]/max); el("rect",{x,y,width:w,height:bh,fill:css("--signal")},s); el("text",{x:x+w+6,y:y+bh/2+4,"font-size":12,fill:css("--signal")},s,r[3]+" ms"); }
+    });
+  }
+  function preChart(){
+    const s = $("prechart"); s.innerHTML = "";
+    const groups = [["no context, N=100",[7560,3108,1597]],["1.5k context, N=100",[37920,null,5106]],["5k context, N=50",[111500,"OOM",5482]]];
+    const labels = ["sequential","batch-repeat","shared"], cols = [css("--slow"), css("--ink-2"), css("--signal")];
+    const L = 160, W = 900-L-110, lo = Math.log10(1000), hi = Math.log10(200000);
+    const X = v => L + W*(Math.log10(v)-lo)/(hi-lo);
+    [1000,10000,100000].forEach(t => { const x = X(t); el("line",{x1:x,y1:6,x2:x,y2:222,stroke:css("--grid")},s); el("text",{x,y:238,"text-anchor":"middle","font-size":11,fill:css("--ink-2")},s,(t/1000)+" s"); });
+    groups.forEach((g,i) => {
+      const y = 10 + i*74;
+      el("text",{x:L-10,y:y+30,"text-anchor":"end","font-size":12,fill:css("--ink")},s,g[0]);
+      g[1].forEach((v,j) => {
+        const yy = y + j*21;
+        if(typeof v === "number"){ el("rect",{x:L,y:yy,width:Math.max(2,X(v)-L),height:16,fill:cols[j],opacity:j===1?.6:1},s); el("text",{x:X(v)+6,y:yy+12,"font-size":11,fill:j===2?css("--signal"):css("--ink-2")},s,labels[j]+" "+(v/1000).toFixed(1)+" s"); }
+        else el("text",{x:L+4,y:yy+12,"font-size":11,fill:css(v==="OOM"?"--warn":"--ink-2")},s,labels[j]+" — "+(v==="OOM"?"out of memory":"not run (> 60k tokens)"));
+      });
+    });
+  }
+  function ticks(){
+    const g = $("ticks"); g.innerHTML = ""; const r = rng(42); const cols = window.matchMedia("(max-width:760px)").matches ? 24 : 48;
+    for(let row=0; row<8; row++) for(let c=0;c<cols;c++){ const s = document.createElement("span"); const v = r(); s.className = v < .12 ? "ev" : (v < .5 ? "on" : ""); g.append(s); }
+  }
+  $("copybib").addEventListener("click", async () => {
+    const b = $("copybib");
+    try { await navigator.clipboard.writeText($("bib").textContent); b.textContent = "Copied"; }
+    catch(e){ const sel = window.getSelection(), rg = document.createRange(); rg.selectNodeContents($("bib")); sel.removeAllRanges(); sel.addRange(rg); b.textContent = "Selected — press Ctrl/Cmd+C"; }
+    setTimeout(() => b.textContent = "Copy BibTeX", 2000);
+  });
+
+  function drawAll(){ arch(); latChart(); preChart(); ticks(); if(DATA.examples.length) select(cur); }
+  buildTabs(); drawAll();
+  window.addEventListener("resize", () => drawWave(DATA.examples[cur]));
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", drawAll);
+  new MutationObserver(drawAll).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+  // on GitHub Pages, examples.json (generated from the released checkpoint) overrides the embedded preview data
+  fetch("examples.json").then(r => r.ok ? r.json() : null).then(d => { if(d && d.examples && d.examples.length){ DATA = d; cur = 0; buildTabs(); } }).catch(() => {});
+})();
+</script>
+</body></html>

@@ -1,0 +1,29 @@
+{
+  "activation_dropout": 0,
+  "activation_function": "gelu",
+  "architectures": [
+    "Qwen3ASREncoder"
+  ],
+  "attention_dropout": 0,
+  "conv_chunksize": 500,
+  "d_model": 896,
+  "downsample_hidden_size": 480,
+  "dropout": 0,
+  "encoder_attention_heads": 14,
+  "encoder_ffn_dim": 3584,
+  "encoder_layers": 18,
+  "initializer_range": 0.02,
+  "max_position_embeddings": 13,
+  "model_type": "qwen3_asr_encoder_portable",
+  "n_window": 50,
+  "n_window_infer": 800,
+  "num_key_value_heads": 14,
+  "num_mel_bins": 128,
+  "output_dim": 1024,
+  "scale_embedding": false,
+  "transformers_version": "5.17.0",
+  "auto_map": {
+    "AutoConfig": "configuration_qwen3_asr_encoder.Qwen3ASREncoderConfig",
+    "AutoModel": "modeling_qwen3_asr_encoder.Qwen3ASREncoder"
+  }
+}

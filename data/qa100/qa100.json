@@ -1,0 +1,2342 @@
+{
+ "kind": "qa100-clean",
+ "n": 100,
+ "composition": {
+  "zh-logic": 25,
+  "zh-fact": 25,
+  "en-logic": 25,
+  "en-fact": 25
+ },
+ "gold_hist": {
+  "A": 25,
+  "B": 25,
+  "C": 25,
+  "D": 25
+ },
+ "note": "语音只念 question；options 以文字给出。第一个原始选项为正确答案，已轮转到 A-D。",
+ "items": [
+  {
+   "id": "qa-zh-logic-000",
+   "lang": "zh",
+   "category": "logic",
+   "question": "小明比小红高，小红比小刚高，三个人里谁最矮？",
+   "options": {
+    "A": "小刚",
+    "B": "小红",
+    "C": "小明",
+    "D": "三个人一样高"
+   },
+   "gold": "A",
+   "gold_text": "小刚",
+   "audio": "audio/qa-zh-logic-000.wav",
+   "t_ms": 5280,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "小明比小红高，小红比小刚高，三个人里谁最矮？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-001",
+   "lang": "zh",
+   "category": "logic",
+   "question": "今天是星期三，再过三天是星期几？",
+   "options": {
+    "A": "星期日",
+    "B": "星期六",
+    "C": "星期一",
+    "D": "星期五"
+   },
+   "gold": "B",
+   "gold_text": "星期六",
+   "audio": "audio/qa-zh-logic-001.wav",
+   "t_ms": 3200,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "今天是星期三，再过三天是星期几？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-002",
+   "lang": "zh",
+   "category": "logic",
+   "question": "先算三加五，再把结果乘以二，最后得到多少？",
+   "options": {
+    "A": "十一",
+    "B": "十三",
+    "C": "十六",
+    "D": "十"
+   },
+   "gold": "C",
+   "gold_text": "十六",
+   "audio": "audio/qa-zh-logic-002.wav",
+   "t_ms": 5120,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "先算三加五，再把结果乘以二，最后得到多少？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-003",
+   "lang": "zh",
+   "category": "logic",
+   "question": "所有的猫都是动物，咪咪是一只猫，那么咪咪是什么？",
+   "options": {
+    "A": "机器",
+    "B": "不能确定",
+    "C": "植物",
+    "D": "动物"
+   },
+   "gold": "D",
+   "gold_text": "动物",
+   "audio": "audio/qa-zh-logic-003.wav",
+   "t_ms": 5440,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "所有的猫都是动物。咪咪是一只猫，那么咪咪是什么？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-004",
+   "lang": "zh",
+   "category": "logic",
+   "question": "如果下雨，地面就会湿。今天地面是干的，那么今天下雨了吗？",
+   "options": {
+    "A": "没有下雨",
+    "B": "下雨了",
+    "C": "下了大雨",
+    "D": "无法判断"
+   },
+   "gold": "A",
+   "gold_text": "没有下雨",
+   "audio": "audio/qa-zh-logic-004.wav",
+   "t_ms": 5280,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "如果下雨，地面就会湿。今天地面是干的，那么今天下雨了吗？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-005",
+   "lang": "zh",
+   "category": "logic",
+   "question": "十二个苹果平均分给四个人，每人分到几个？",
+   "options": {
+    "A": "六个",
+    "B": "三个",
+    "C": "两个",
+    "D": "四个"
+   },
+   "gold": "B",
+   "gold_text": "三个",
+   "audio": "audio/qa-zh-logic-005.wav",
+   "t_ms": 4480,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "十二个苹果平均分给四个人，每人分到几个？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-006",
+   "lang": "zh",
+   "category": "logic",
+   "question": "二、四、六、八，下一个数是多少？",
+   "options": {
+    "A": "九",
+    "B": "十六",
+    "C": "十",
+    "D": "十二"
+   },
+   "gold": "C",
+   "gold_text": "十",
+   "audio": "audio/qa-zh-logic-006.wav",
+   "t_ms": 4000,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "二四六八，下一个数是多少？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-007",
+   "lang": "zh",
+   "category": "logic",
+   "question": "小李早上八点出门，走了四十五分钟到公司，他几点到公司？",
+   "options": {
+    "A": "九点一刻",
+    "B": "九点整",
+    "C": "八点半",
+    "D": "八点四十五分"
+   },
+   "gold": "D",
+   "gold_text": "八点四十五分",
+   "audio": "audio/qa-zh-logic-007.wav",
+   "t_ms": 6080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "小李早上八点出门，走了四十五分钟到公司。他几点到公司？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-008",
+   "lang": "zh",
+   "category": "logic",
+   "question": "一张桌子有四条腿，三张桌子一共有几条腿？",
+   "options": {
+    "A": "十二条",
+    "B": "十条",
+    "C": "十六条",
+    "D": "七条"
+   },
+   "gold": "A",
+   "gold_text": "十二条",
+   "audio": "audio/qa-zh-logic-008.wav",
+   "t_ms": 4960,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一张桌子有四条腿，三张桌子一共有几条腿？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-009",
+   "lang": "zh",
+   "category": "logic",
+   "question": "妈妈的妈妈应该叫什么？",
+   "options": {
+    "A": "阿姨",
+    "B": "外婆",
+    "C": "姑姑",
+    "D": "奶奶"
+   },
+   "gold": "B",
+   "gold_text": "外婆",
+   "audio": "audio/qa-zh-logic-009.wav",
+   "t_ms": 4000,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "妈妈的妈妈应该叫什么？",
+    "exact": true,
+    "resynth": true,
+    "try": 1
+   }
+  },
+  {
+   "id": "qa-zh-logic-010",
+   "lang": "zh",
+   "category": "logic",
+   "question": "张三站在李四左边，李四站在王五左边，谁站在最右边？",
+   "options": {
+    "A": "李四",
+    "B": "无法判断",
+    "C": "王五",
+    "D": "张三"
+   },
+   "gold": "C",
+   "gold_text": "王五",
+   "audio": "audio/qa-zh-logic-010.wav",
+   "t_ms": 5440,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "张三站在李四左边，李四站在王五左边，谁站在最右边？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-011",
+   "lang": "zh",
+   "category": "logic",
+   "question": "我有十块钱，买了一支三块钱的笔，还剩多少钱？",
+   "options": {
+    "A": "六块",
+    "B": "十三块",
+    "C": "八块",
+    "D": "七块"
+   },
+   "gold": "D",
+   "gold_text": "七块",
+   "audio": "audio/qa-zh-logic-011.wav",
+   "t_ms": 2880,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "我有十块钱，买了一支三块钱的笔，还剩多少钱？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-012",
+   "lang": "zh",
+   "category": "logic",
+   "question": "甲比乙大两岁，乙今年十岁，甲今年几岁？",
+   "options": {
+    "A": "十二岁",
+    "B": "二十岁",
+    "C": "十岁",
+    "D": "八岁"
+   },
+   "gold": "A",
+   "gold_text": "十二岁",
+   "audio": "audio/qa-zh-logic-012.wav",
+   "t_ms": 6880,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "甲比乙大两岁，乙今年十岁，甲今年几岁？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-013",
+   "lang": "zh",
+   "category": "logic",
+   "question": "如果明天是星期一，那么昨天是星期几？",
+   "options": {
+    "A": "星期二",
+    "B": "星期六",
+    "C": "星期五",
+    "D": "星期日"
+   },
+   "gold": "B",
+   "gold_text": "星期六",
+   "audio": "audio/qa-zh-logic-013.wav",
+   "t_ms": 7200,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "如果明天是星期一，那么昨天是星期几？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-014",
+   "lang": "zh",
+   "category": "logic",
+   "question": "一百减去三十七等于多少？",
+   "options": {
+    "A": "七十三",
+    "B": "五十三",
+    "C": "六十三",
+    "D": "六十七"
+   },
+   "gold": "C",
+   "gold_text": "六十三",
+   "audio": "audio/qa-zh-logic-014.wav",
+   "t_ms": 2720,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一百减去三十七等于多少？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-015",
+   "lang": "zh",
+   "category": "logic",
+   "question": "冰箱里有五个鸡蛋，吃掉两个，又买了六个，现在一共有几个？",
+   "options": {
+    "A": "三个",
+    "B": "十三个",
+    "C": "十一个",
+    "D": "九个"
+   },
+   "gold": "D",
+   "gold_text": "九个",
+   "audio": "audio/qa-zh-logic-015.wav",
+   "t_ms": 6400,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "冰箱里有五个鸡蛋，吃掉两个，又买了六个，现在一共有几个？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-016",
+   "lang": "zh",
+   "category": "logic",
+   "question": "一根直的绳子，不折叠，剪三刀，能剪成几段？",
+   "options": {
+    "A": "四段",
+    "B": "五段",
+    "C": "三段",
+    "D": "六段"
+   },
+   "gold": "A",
+   "gold_text": "四段",
+   "audio": "audio/qa-zh-logic-016.wav",
+   "t_ms": 4480,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一根直的绳子不折叠，剪三刀能剪成几段？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-017",
+   "lang": "zh",
+   "category": "logic",
+   "question": "一辆车每小时开六十公里，开了三个小时，一共开了多少公里？",
+   "options": {
+    "A": "一百二十公里",
+    "B": "一百八十公里",
+    "C": "两百公里",
+    "D": "六十三公里"
+   },
+   "gold": "B",
+   "gold_text": "一百八十公里",
+   "audio": "audio/qa-zh-logic-017.wav",
+   "t_ms": 3520,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一辆车每小时开六十公里，开了三个小时，一共开了多少公里？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-018",
+   "lang": "zh",
+   "category": "logic",
+   "question": "小猫、小狗和小鸟里，哪一个会飞？",
+   "options": {
+    "A": "小狗",
+    "B": "小猫",
+    "C": "小鸟",
+    "D": "都不会飞"
+   },
+   "gold": "C",
+   "gold_text": "小鸟",
+   "audio": "audio/qa-zh-logic-018.wav",
+   "t_ms": 4160,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "小猫、小狗和小鸟里，哪一个会飞？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-019",
+   "lang": "zh",
+   "category": "logic",
+   "question": "所有学生都戴着帽子，小王没有戴帽子，小王是不是学生？",
+   "options": {
+    "A": "一定是老师",
+    "B": "无法判断",
+    "C": "是学生",
+    "D": "不是学生"
+   },
+   "gold": "D",
+   "gold_text": "不是学生",
+   "audio": "audio/qa-zh-logic-019.wav",
+   "t_ms": 5920,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "所有学生都戴着帽子，小王没有戴帽子，小王是不是学生？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-020",
+   "lang": "zh",
+   "category": "logic",
+   "question": "七的两倍再减去四，结果是多少？",
+   "options": {
+    "A": "十",
+    "B": "十四",
+    "C": "三",
+    "D": "十八"
+   },
+   "gold": "A",
+   "gold_text": "十",
+   "audio": "audio/qa-zh-logic-020.wav",
+   "t_ms": 2720,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "七的两倍再减去四，结果是多少？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-021",
+   "lang": "zh",
+   "category": "logic",
+   "question": "一个班有二十个男生和十五个女生，一共有多少人？",
+   "options": {
+    "A": "四十人",
+    "B": "三十五人",
+    "C": "二十五人",
+    "D": "三十人"
+   },
+   "gold": "B",
+   "gold_text": "三十五人",
+   "audio": "audio/qa-zh-logic-021.wav",
+   "t_ms": 5120,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一个班有二十个男生和十五个女生，一共有多少人？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-022",
+   "lang": "zh",
+   "category": "logic",
+   "question": "时针指着三，分针指着十二，现在是几点？",
+   "options": {
+    "A": "十二点",
+    "B": "三点半",
+    "C": "三点整",
+    "D": "十二点十五分"
+   },
+   "gold": "C",
+   "gold_text": "三点整",
+   "audio": "audio/qa-zh-logic-022.wav",
+   "t_ms": 4000,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "时针指着三分，针指着十二，现在是几点？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-023",
+   "lang": "zh",
+   "category": "logic",
+   "question": "哥哥比我大三岁，五年以后哥哥比我大几岁？",
+   "options": {
+    "A": "八岁",
+    "B": "五岁",
+    "C": "两岁",
+    "D": "三岁"
+   },
+   "gold": "D",
+   "gold_text": "三岁",
+   "audio": "audio/qa-zh-logic-023.wav",
+   "t_ms": 3680,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "哥哥比我大三岁，五年以后哥哥比我大几岁？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-logic-024",
+   "lang": "zh",
+   "category": "logic",
+   "question": "一个正方形被一条对角线分开，会得到几个三角形？",
+   "options": {
+    "A": "两个",
+    "B": "三个",
+    "C": "四个",
+    "D": "一个"
+   },
+   "gold": "A",
+   "gold_text": "两个",
+   "audio": "audio/qa-zh-logic-024.wav",
+   "t_ms": 4800,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一个正方形被一条对角线分开，会得到几个三角形？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-025",
+   "lang": "zh",
+   "category": "fact",
+   "question": "中国的首都是哪座城市？",
+   "options": {
+    "A": "上海",
+    "B": "北京",
+    "C": "南京",
+    "D": "广州"
+   },
+   "gold": "B",
+   "gold_text": "北京",
+   "audio": "audio/qa-zh-fact-025.wav",
+   "t_ms": 2720,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "中国的首都是哪座城市？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-026",
+   "lang": "zh",
+   "category": "fact",
+   "question": "在标准大气压下，水烧到多少摄氏度会沸腾？",
+   "options": {
+    "A": "五十度",
+    "B": "零度",
+    "C": "一百度",
+    "D": "两百度"
+   },
+   "gold": "C",
+   "gold_text": "一百度",
+   "audio": "audio/qa-zh-fact-026.wav",
+   "t_ms": 4320,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "在标准大气压下，水烧到多少摄氏度会沸腾？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-027",
+   "lang": "zh",
+   "category": "fact",
+   "question": "太阳从哪个方向升起？",
+   "options": {
+    "A": "北方",
+    "B": "南方",
+    "C": "西方",
+    "D": "东方"
+   },
+   "gold": "D",
+   "gold_text": "东方",
+   "audio": "audio/qa-zh-fact-027.wav",
+   "t_ms": 2880,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "太阳从哪个方向升起？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-028",
+   "lang": "zh",
+   "category": "fact",
+   "question": "一天有多少个小时？",
+   "options": {
+    "A": "二十四个",
+    "B": "三十六个",
+    "C": "四十八个",
+    "D": "十二个"
+   },
+   "gold": "A",
+   "gold_text": "二十四个",
+   "audio": "audio/qa-zh-fact-028.wav",
+   "t_ms": 1440,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一天有多少个小时？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-029",
+   "lang": "zh",
+   "category": "fact",
+   "question": "大熊猫最主要的食物是什么？",
+   "options": {
+    "A": "苹果",
+    "B": "竹子",
+    "C": "牛肉",
+    "D": "鱼"
+   },
+   "gold": "B",
+   "gold_text": "竹子",
+   "audio": "audio/qa-zh-fact-029.wav",
+   "t_ms": 2400,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "大熊猫最主要的食物是什么？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-030",
+   "lang": "zh",
+   "category": "fact",
+   "question": "地球围绕着什么转？",
+   "options": {
+    "A": "木星",
+    "B": "火星",
+    "C": "太阳",
+    "D": "月亮"
+   },
+   "gold": "C",
+   "gold_text": "太阳",
+   "audio": "audio/qa-zh-fact-030.wav",
+   "t_ms": 2080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "地球围绕着什么转？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-031",
+   "lang": "zh",
+   "category": "fact",
+   "question": "人体最大的器官是什么？",
+   "options": {
+    "A": "肝脏",
+    "B": "心脏",
+    "C": "大脑",
+    "D": "皮肤"
+   },
+   "gold": "D",
+   "gold_text": "皮肤",
+   "audio": "audio/qa-zh-fact-031.wav",
+   "t_ms": 2720,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "人体最大的器官是什么？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-032",
+   "lang": "zh",
+   "category": "fact",
+   "question": "彩虹通常有几种颜色？",
+   "options": {
+    "A": "七种",
+    "B": "十种",
+    "C": "五种",
+    "D": "三种"
+   },
+   "gold": "A",
+   "gold_text": "七种",
+   "audio": "audio/qa-zh-fact-032.wav",
+   "t_ms": 2560,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "彩虹通常有几种颜色？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-033",
+   "lang": "zh",
+   "category": "fact",
+   "question": "《红楼梦》的作者是谁？",
+   "options": {
+    "A": "施耐庵",
+    "B": "曹雪芹",
+    "C": "吴承恩",
+    "D": "罗贯中"
+   },
+   "gold": "B",
+   "gold_text": "曹雪芹",
+   "audio": "audio/qa-zh-fact-033.wav",
+   "t_ms": 3360,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "《红楼梦》的作者是谁？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-034",
+   "lang": "zh",
+   "category": "fact",
+   "question": "世界上面积最大的海洋是哪一个？",
+   "options": {
+    "A": "印度洋",
+    "B": "大西洋",
+    "C": "太平洋",
+    "D": "北冰洋"
+   },
+   "gold": "C",
+   "gold_text": "太平洋",
+   "audio": "audio/qa-zh-fact-034.wav",
+   "t_ms": 4000,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "世界上面积最大的海洋是哪一个？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-035",
+   "lang": "zh",
+   "category": "fact",
+   "question": "植物进行光合作用时会释放出哪种气体？",
+   "options": {
+    "A": "氮气",
+    "B": "氢气",
+    "C": "二氧化碳",
+    "D": "氧气"
+   },
+   "gold": "D",
+   "gold_text": "氧气",
+   "audio": "audio/qa-zh-fact-035.wav",
+   "t_ms": 4160,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "植物进行光合作用时，会释放出哪种气体？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-036",
+   "lang": "zh",
+   "category": "fact",
+   "question": "一年有几个季节？",
+   "options": {
+    "A": "四个",
+    "B": "五个",
+    "C": "三个",
+    "D": "六个"
+   },
+   "gold": "A",
+   "gold_text": "四个",
+   "audio": "audio/qa-zh-fact-036.wav",
+   "t_ms": 1760,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "一年有几个季节？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-037",
+   "lang": "zh",
+   "category": "fact",
+   "question": "春节是农历的哪一天？",
+   "options": {
+    "A": "五月初五",
+    "B": "正月初一",
+    "C": "八月十五",
+    "D": "腊月初八"
+   },
+   "gold": "B",
+   "gold_text": "正月初一",
+   "audio": "audio/qa-zh-fact-037.wav",
+   "t_ms": 1600,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "春节是农历的哪一天？",
+    "exact": true,
+    "resynth": true,
+    "try": 1
+   }
+  },
+  {
+   "id": "qa-zh-fact-038",
+   "lang": "zh",
+   "category": "fact",
+   "question": "端午节人们通常吃什么？",
+   "options": {
+    "A": "元宵",
+    "B": "汤圆",
+    "C": "粽子",
+    "D": "月饼"
+   },
+   "gold": "C",
+   "gold_text": "粽子",
+   "audio": "audio/qa-zh-fact-038.wav",
+   "t_ms": 2560,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "端午节人们通常吃什么？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-039",
+   "lang": "zh",
+   "category": "fact",
+   "question": "光和声音相比，哪个传播得更快？",
+   "options": {
+    "A": "声音更快",
+    "B": "无法比较",
+    "C": "一样快",
+    "D": "光更快"
+   },
+   "gold": "D",
+   "gold_text": "光更快",
+   "audio": "audio/qa-zh-fact-039.wav",
+   "t_ms": 2400,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "光和声音相比，哪个传播得更快？",
+    "exact": true,
+    "resynth": true,
+    "try": 3
+   }
+  },
+  {
+   "id": "qa-zh-fact-040",
+   "lang": "zh",
+   "category": "fact",
+   "question": "珠穆朗玛峰是世界上最高的什么？",
+   "options": {
+    "A": "山峰",
+    "B": "湖泊",
+    "C": "河流",
+    "D": "沙漠"
+   },
+   "gold": "A",
+   "gold_text": "山峰",
+   "audio": "audio/qa-zh-fact-040.wav",
+   "t_ms": 3680,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "珠穆朗玛峰是世界上最高的什么？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-041",
+   "lang": "zh",
+   "category": "fact",
+   "question": "冰是水的哪种状态？",
+   "options": {
+    "A": "气态",
+    "B": "固态",
+    "C": "液态",
+    "D": "等离子态"
+   },
+   "gold": "B",
+   "gold_text": "固态",
+   "audio": "audio/qa-zh-fact-041.wav",
+   "t_ms": 1760,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "冰是水的哪种状态？",
+    "exact": true,
+    "resynth": true,
+    "try": 1
+   }
+  },
+  {
+   "id": "qa-zh-fact-042",
+   "lang": "zh",
+   "category": "fact",
+   "question": "长江最后流入哪片海？",
+   "options": {
+    "A": "渤海",
+    "B": "南海",
+    "C": "东海",
+    "D": "黄海"
+   },
+   "gold": "C",
+   "gold_text": "东海",
+   "audio": "audio/qa-zh-fact-042.wav",
+   "t_ms": 3520,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "长江最后流入哪片海？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-043",
+   "lang": "zh",
+   "category": "fact",
+   "question": "企鹅主要生活在地球的哪个地区？",
+   "options": {
+    "A": "沙漠",
+    "B": "赤道",
+    "C": "北极",
+    "D": "南极"
+   },
+   "gold": "D",
+   "gold_text": "南极",
+   "audio": "audio/qa-zh-fact-043.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "企鹅主要生活在地球的哪个地区？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-044",
+   "lang": "zh",
+   "category": "fact",
+   "question": "奥运会一般每隔几年举办一次？",
+   "options": {
+    "A": "四年",
+    "B": "一年",
+    "C": "五年",
+    "D": "两年"
+   },
+   "gold": "A",
+   "gold_text": "四年",
+   "audio": "audio/qa-zh-fact-044.wav",
+   "t_ms": 3520,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "奥运会一般每隔几年举办一次。",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-045",
+   "lang": "zh",
+   "category": "fact",
+   "question": "蜜蜂会酿造什么？",
+   "options": {
+    "A": "丝绸",
+    "B": "蜂蜜",
+    "C": "棉花",
+    "D": "牛奶"
+   },
+   "gold": "B",
+   "gold_text": "蜂蜜",
+   "audio": "audio/qa-zh-fact-045.wav",
+   "t_ms": 1600,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "蜜蜂会酿造什么？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-046",
+   "lang": "zh",
+   "category": "fact",
+   "question": "中国人口最多的民族是哪个？",
+   "options": {
+    "A": "回族",
+    "B": "蒙古族",
+    "C": "汉族",
+    "D": "藏族"
+   },
+   "gold": "C",
+   "gold_text": "汉族",
+   "audio": "audio/qa-zh-fact-046.wav",
+   "t_ms": 1920,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "中国人口最多的民族是哪个？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-047",
+   "lang": "zh",
+   "category": "fact",
+   "question": "月亮自己会发光吗？",
+   "options": {
+    "A": "只在晚上发光",
+    "B": "只在满月时发光",
+    "C": "会，它自己发光",
+    "D": "不会，它反射太阳光"
+   },
+   "gold": "D",
+   "gold_text": "不会，它反射太阳光",
+   "audio": "audio/qa-zh-fact-047.wav",
+   "t_ms": 2080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "月亮自己会发光吗？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-048",
+   "lang": "zh",
+   "category": "fact",
+   "question": "中秋节人们通常吃什么？",
+   "options": {
+    "A": "月饼",
+    "B": "粽子",
+    "C": "汤圆",
+    "D": "腊八粥"
+   },
+   "gold": "A",
+   "gold_text": "月饼",
+   "audio": "audio/qa-zh-fact-048.wav",
+   "t_ms": 3360,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "中秋节，人们通常吃什么？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-zh-fact-049",
+   "lang": "zh",
+   "category": "fact",
+   "question": "地球上哪种动物的脖子最长？",
+   "options": {
+    "A": "骆驼",
+    "B": "长颈鹿",
+    "C": "马",
+    "D": "大象"
+   },
+   "gold": "B",
+   "gold_text": "长颈鹿",
+   "audio": "audio/qa-zh-fact-049.wav",
+   "t_ms": 3360,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "地球上哪种动物的脖子最长？",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-050",
+   "lang": "en",
+   "category": "logic",
+   "question": "Tom is taller than Sam, and Sam is taller than Joe. Who is the shortest?",
+   "options": {
+    "A": "They are the same height",
+    "B": "Tom",
+    "C": "Joe",
+    "D": "Sam"
+   },
+   "gold": "C",
+   "gold_text": "Joe",
+   "audio": "audio/qa-en-logic-050.wav",
+   "t_ms": 5920,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Tom is taller than Sam, and Sam is taller than Joe. Who is the shortest?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-051",
+   "lang": "en",
+   "category": "logic",
+   "question": "If today is Friday, what day will it be in two days?",
+   "options": {
+    "A": "Thursday",
+    "B": "Saturday",
+    "C": "Monday",
+    "D": "Sunday"
+   },
+   "gold": "D",
+   "gold_text": "Sunday",
+   "audio": "audio/qa-en-logic-051.wav",
+   "t_ms": 4160,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "If today is Friday, what day will it be in two days?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-052",
+   "lang": "en",
+   "category": "logic",
+   "question": "What is seven plus eight?",
+   "options": {
+    "A": "Fifteen",
+    "B": "Sixteen",
+    "C": "Fourteen",
+    "D": "Thirteen"
+   },
+   "gold": "A",
+   "gold_text": "Fifteen",
+   "audio": "audio/qa-en-logic-052.wav",
+   "t_ms": 1440,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is seven plus eight?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-053",
+   "lang": "en",
+   "category": "logic",
+   "question": "All roses are flowers, and this plant is a rose. What is this plant?",
+   "options": {
+    "A": "A tree",
+    "B": "A flower",
+    "C": "It cannot be told",
+    "D": "A vegetable"
+   },
+   "gold": "B",
+   "gold_text": "A flower",
+   "audio": "audio/qa-en-logic-053.wav",
+   "t_ms": 6080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "All roses are flowers, and this plant is a rose. What is this plant?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-054",
+   "lang": "en",
+   "category": "logic",
+   "question": "Twelve eggs are shared equally among three people. How many eggs does each person get?",
+   "options": {
+    "A": "Six",
+    "B": "Three",
+    "C": "Four",
+    "D": "Twelve"
+   },
+   "gold": "C",
+   "gold_text": "Four",
+   "audio": "audio/qa-en-logic-054.wav",
+   "t_ms": 7520,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Twelve eggs are shared equally among three people. How many eggs does each person get?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-055",
+   "lang": "en",
+   "category": "logic",
+   "question": "Five, ten, fifteen, twenty. What number comes next?",
+   "options": {
+    "A": "Twenty-two",
+    "B": "Forty",
+    "C": "Thirty",
+    "D": "Twenty-five"
+   },
+   "gold": "D",
+   "gold_text": "Twenty-five",
+   "audio": "audio/qa-en-logic-055.wav",
+   "t_ms": 5920,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Five, ten, fifteen, twenty. What number comes next?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-056",
+   "lang": "en",
+   "category": "logic",
+   "question": "I had nine apples and gave away four. How many apples do I have left?",
+   "options": {
+    "A": "Five",
+    "B": "Thirteen",
+    "C": "Six",
+    "D": "Four"
+   },
+   "gold": "A",
+   "gold_text": "Five",
+   "audio": "audio/qa-en-logic-056.wav",
+   "t_ms": 8160,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "I had nine apples and gave away four. How many apples do I have left?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-057",
+   "lang": "en",
+   "category": "logic",
+   "question": "It is three o'clock now. What time will it be in four hours?",
+   "options": {
+    "A": "One o'clock",
+    "B": "Seven o'clock",
+    "C": "Eight o'clock",
+    "D": "Six o'clock"
+   },
+   "gold": "B",
+   "gold_text": "Seven o'clock",
+   "audio": "audio/qa-en-logic-057.wav",
+   "t_ms": 4160,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "It is three o'clock now. What time will it be in four hours?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-058",
+   "lang": "en",
+   "category": "logic",
+   "question": "Anna is older than Ben, and Ben is older than Cara. Who is the oldest?",
+   "options": {
+    "A": "It cannot be told",
+    "B": "Ben",
+    "C": "Anna",
+    "D": "Cara"
+   },
+   "gold": "C",
+   "gold_text": "Anna",
+   "audio": "audio/qa-en-logic-058.wav",
+   "t_ms": 7040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Anna is older than Ben, and Ben is older than Kara. Who is the oldest?",
+    "exact": false,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-059",
+   "lang": "en",
+   "category": "logic",
+   "question": "A car has four wheels. How many wheels do five cars have in total?",
+   "options": {
+    "A": "Twenty-five",
+    "B": "Sixteen",
+    "C": "Nine",
+    "D": "Twenty"
+   },
+   "gold": "D",
+   "gold_text": "Twenty",
+   "audio": "audio/qa-en-logic-059.wav",
+   "t_ms": 8480,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "A car has four wheels. How many wheels do five cars have in total?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-060",
+   "lang": "en",
+   "category": "logic",
+   "question": "What is twelve divided by four?",
+   "options": {
+    "A": "Three",
+    "B": "Two",
+    "C": "Eight",
+    "D": "Four"
+   },
+   "gold": "A",
+   "gold_text": "Three",
+   "audio": "audio/qa-en-logic-060.wav",
+   "t_ms": 3200,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is twelve divided by four?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-061",
+   "lang": "en",
+   "category": "logic",
+   "question": "If yesterday was Monday, what day is tomorrow?",
+   "options": {
+    "A": "Sunday",
+    "B": "Wednesday",
+    "C": "Thursday",
+    "D": "Tuesday"
+   },
+   "gold": "B",
+   "gold_text": "Wednesday",
+   "audio": "audio/qa-en-logic-061.wav",
+   "t_ms": 4320,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "If yesterday was Monday, what day is tomorrow?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-062",
+   "lang": "en",
+   "category": "logic",
+   "question": "My father's brother is my what?",
+   "options": {
+    "A": "Grandfather",
+    "B": "Cousin",
+    "C": "Uncle",
+    "D": "Nephew"
+   },
+   "gold": "C",
+   "gold_text": "Uncle",
+   "audio": "audio/qa-en-logic-062.wav",
+   "t_ms": 2080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "My father's brother is my what?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-063",
+   "lang": "en",
+   "category": "logic",
+   "question": "Which is heavier, one kilogram of iron or one kilogram of feathers?",
+   "options": {
+    "A": "The iron",
+    "B": "The feathers",
+    "C": "It cannot be told",
+    "D": "They weigh the same"
+   },
+   "gold": "D",
+   "gold_text": "They weigh the same",
+   "audio": "audio/qa-en-logic-063.wav",
+   "t_ms": 4160,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Which is heavier, one kilogram of iron or one kilogram of feathers?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-064",
+   "lang": "en",
+   "category": "logic",
+   "question": "All birds have feathers, and a penguin is a bird. Does a penguin have feathers?",
+   "options": {
+    "A": "Yes",
+    "B": "No",
+    "C": "Only in winter",
+    "D": "It cannot be told"
+   },
+   "gold": "A",
+   "gold_text": "Yes",
+   "audio": "audio/qa-en-logic-064.wav",
+   "t_ms": 5600,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "All birds have feathers, and a penguin is a bird. Does a penguin have feathers?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-065",
+   "lang": "en",
+   "category": "logic",
+   "question": "How many minutes are there in two hours?",
+   "options": {
+    "A": "Two hundred",
+    "B": "One hundred twenty",
+    "C": "Sixty",
+    "D": "One hundred"
+   },
+   "gold": "B",
+   "gold_text": "One hundred twenty",
+   "audio": "audio/qa-en-logic-065.wav",
+   "t_ms": 2080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "How many minutes are there in two hours?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-066",
+   "lang": "en",
+   "category": "logic",
+   "question": "What is twenty minus six?",
+   "options": {
+    "A": "Twenty-six",
+    "B": "Sixteen",
+    "C": "Fourteen",
+    "D": "Twelve"
+   },
+   "gold": "C",
+   "gold_text": "Fourteen",
+   "audio": "audio/qa-en-logic-066.wav",
+   "t_ms": 1760,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is twenty minus six?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-067",
+   "lang": "en",
+   "category": "logic",
+   "question": "A train leaves at nine o'clock and the trip takes three hours. When does it arrive?",
+   "options": {
+    "A": "Ten o'clock",
+    "B": "One o'clock",
+    "C": "Eleven o'clock",
+    "D": "Twelve o'clock"
+   },
+   "gold": "D",
+   "gold_text": "Twelve o'clock",
+   "audio": "audio/qa-en-logic-067.wav",
+   "t_ms": 7360,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "A train leaves at nine o'clock, and the trip takes three hours. When does it arrive?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-068",
+   "lang": "en",
+   "category": "logic",
+   "question": "Lisa has three sisters and no brothers. How many girls are there among the children in her family?",
+   "options": {
+    "A": "Four",
+    "B": "Two",
+    "C": "Five",
+    "D": "Three"
+   },
+   "gold": "A",
+   "gold_text": "Four",
+   "audio": "audio/qa-en-logic-068.wav",
+   "t_ms": 4800,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Lisa has three sisters and no brothers. How many girls are there among the children in her family?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-069",
+   "lang": "en",
+   "category": "logic",
+   "question": "A box is inside a bag, and the bag is inside a car. Where is the box?",
+   "options": {
+    "A": "Outside the car",
+    "B": "Inside the car",
+    "C": "On the car roof",
+    "D": "Under the car"
+   },
+   "gold": "B",
+   "gold_text": "Inside the car",
+   "audio": "audio/qa-en-logic-069.wav",
+   "t_ms": 6880,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "A box is inside a bag, and the bag is inside a car. Where is the box?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-070",
+   "lang": "en",
+   "category": "logic",
+   "question": "What is double eleven?",
+   "options": {
+    "A": "Twelve",
+    "B": "One hundred eleven",
+    "C": "Twenty-two",
+    "D": "Twenty-one"
+   },
+   "gold": "C",
+   "gold_text": "Twenty-two",
+   "audio": "audio/qa-en-logic-070.wav",
+   "t_ms": 1440,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is double eleven?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-071",
+   "lang": "en",
+   "category": "logic",
+   "question": "A week has seven days. How many days are there in three weeks?",
+   "options": {
+    "A": "Twenty-eight",
+    "B": "Fourteen",
+    "C": "Ten",
+    "D": "Twenty-one"
+   },
+   "gold": "D",
+   "gold_text": "Twenty-one",
+   "audio": "audio/qa-en-logic-071.wav",
+   "t_ms": 6400,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "A week has seven days. How many days are there in three weeks?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-072",
+   "lang": "en",
+   "category": "logic",
+   "question": "No cats can fly, and Tom is a cat. Can Tom fly?",
+   "options": {
+    "A": "No",
+    "B": "It cannot be told",
+    "C": "Yes",
+    "D": "Sometimes"
+   },
+   "gold": "A",
+   "gold_text": "No",
+   "audio": "audio/qa-en-logic-072.wav",
+   "t_ms": 5920,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "No cats can fly, and Tom is a cat. Can Tom fly?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-073",
+   "lang": "en",
+   "category": "logic",
+   "question": "What is half of fifty?",
+   "options": {
+    "A": "Twenty",
+    "B": "Twenty-five",
+    "C": "One hundred",
+    "D": "Thirty"
+   },
+   "gold": "B",
+   "gold_text": "Twenty-five",
+   "audio": "audio/qa-en-logic-073.wav",
+   "t_ms": 1760,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is half of fifty?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-logic-074",
+   "lang": "en",
+   "category": "logic",
+   "question": "If you are in a race and you pass the person in second place, what place are you in now?",
+   "options": {
+    "A": "Last place",
+    "B": "First place",
+    "C": "Second place",
+    "D": "Third place"
+   },
+   "gold": "C",
+   "gold_text": "Second place",
+   "audio": "audio/qa-en-logic-074.wav",
+   "t_ms": 6080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "If you are in a race and you pass the person in second place, what place are you in now?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-075",
+   "lang": "en",
+   "category": "fact",
+   "question": "What is the capital city of France?",
+   "options": {
+    "A": "Rome",
+    "B": "London",
+    "C": "Berlin",
+    "D": "Paris"
+   },
+   "gold": "D",
+   "gold_text": "Paris",
+   "audio": "audio/qa-en-fact-075.wav",
+   "t_ms": 3360,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is the capital city of France?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-076",
+   "lang": "en",
+   "category": "fact",
+   "question": "At how many degrees Celsius does water freeze?",
+   "options": {
+    "A": "Zero degrees",
+    "B": "Ten degrees",
+    "C": "One hundred degrees",
+    "D": "Fifty degrees"
+   },
+   "gold": "A",
+   "gold_text": "Zero degrees",
+   "audio": "audio/qa-en-fact-076.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "At how many degrees Celsius does water freeze?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-077",
+   "lang": "en",
+   "category": "fact",
+   "question": "Which planet is known as the Red Planet?",
+   "options": {
+    "A": "Jupiter",
+    "B": "Mars",
+    "C": "Venus",
+    "D": "Saturn"
+   },
+   "gold": "B",
+   "gold_text": "Mars",
+   "audio": "audio/qa-en-fact-077.wav",
+   "t_ms": 3680,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Which planet is known as the Red Planet?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-078",
+   "lang": "en",
+   "category": "fact",
+   "question": "How many continents are there on Earth?",
+   "options": {
+    "A": "Nine",
+    "B": "Five",
+    "C": "Seven",
+    "D": "Six"
+   },
+   "gold": "C",
+   "gold_text": "Seven",
+   "audio": "audio/qa-en-fact-078.wav",
+   "t_ms": 2400,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "How many continents are there on Earth?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-079",
+   "lang": "en",
+   "category": "fact",
+   "question": "What is the largest mammal in the world?",
+   "options": {
+    "A": "The giraffe",
+    "B": "The hippopotamus",
+    "C": "The elephant",
+    "D": "The blue whale"
+   },
+   "gold": "D",
+   "gold_text": "The blue whale",
+   "audio": "audio/qa-en-fact-079.wav",
+   "t_ms": 3520,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is the largest mammal in the world?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-080",
+   "lang": "en",
+   "category": "fact",
+   "question": "Who wrote Romeo and Juliet?",
+   "options": {
+    "A": "William Shakespeare",
+    "B": "Charles Dickens",
+    "C": "Jane Austen",
+    "D": "Mark Twain"
+   },
+   "gold": "A",
+   "gold_text": "William Shakespeare",
+   "audio": "audio/qa-en-fact-080.wav",
+   "t_ms": 1600,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Who wrote Romeo and Juliet?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-081",
+   "lang": "en",
+   "category": "fact",
+   "question": "Which gas do people need to breathe in to stay alive?",
+   "options": {
+    "A": "Hydrogen",
+    "B": "Oxygen",
+    "C": "Helium",
+    "D": "Carbon dioxide"
+   },
+   "gold": "B",
+   "gold_text": "Oxygen",
+   "audio": "audio/qa-en-fact-081.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Which gas do people need to breathe in to stay alive?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-082",
+   "lang": "en",
+   "category": "fact",
+   "question": "How many legs does a spider have?",
+   "options": {
+    "A": "Four",
+    "B": "Ten",
+    "C": "Eight",
+    "D": "Six"
+   },
+   "gold": "C",
+   "gold_text": "Eight",
+   "audio": "audio/qa-en-fact-082.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "How many legs does a spider have?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-083",
+   "lang": "en",
+   "category": "fact",
+   "question": "Which ocean lies between Europe and North America?",
+   "options": {
+    "A": "The Pacific Ocean",
+    "B": "The Indian Ocean",
+    "C": "The Arctic Ocean",
+    "D": "The Atlantic Ocean"
+   },
+   "gold": "D",
+   "gold_text": "The Atlantic Ocean",
+   "audio": "audio/qa-en-fact-083.wav",
+   "t_ms": 4000,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Which ocean lies between Europe and North America?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-084",
+   "lang": "en",
+   "category": "fact",
+   "question": "What is the closest star to the Earth?",
+   "options": {
+    "A": "The Sun",
+    "B": "Vega",
+    "C": "Polaris",
+    "D": "Sirius"
+   },
+   "gold": "A",
+   "gold_text": "The Sun",
+   "audio": "audio/qa-en-fact-084.wav",
+   "t_ms": 4000,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is the closest star to the Earth?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-085",
+   "lang": "en",
+   "category": "fact",
+   "question": "What sweet food do bees make?",
+   "options": {
+    "A": "Milk",
+    "B": "Honey",
+    "C": "Sugar cane",
+    "D": "Chocolate"
+   },
+   "gold": "B",
+   "gold_text": "Honey",
+   "audio": "audio/qa-en-fact-085.wav",
+   "t_ms": 1920,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What sweet food do bees make?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-086",
+   "lang": "en",
+   "category": "fact",
+   "question": "What is the tallest animal in the world?",
+   "options": {
+    "A": "The horse",
+    "B": "The camel",
+    "C": "The giraffe",
+    "D": "The elephant"
+   },
+   "gold": "C",
+   "gold_text": "The giraffe",
+   "audio": "audio/qa-en-fact-086.wav",
+   "t_ms": 3200,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is the tallest animal in the world?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-087",
+   "lang": "en",
+   "category": "fact",
+   "question": "How many days are there in a leap year?",
+   "options": {
+    "A": "Three hundred sixty-four",
+    "B": "Three hundred sixty",
+    "C": "Three hundred sixty-five",
+    "D": "Three hundred sixty-six"
+   },
+   "gold": "D",
+   "gold_text": "Three hundred sixty-six",
+   "audio": "audio/qa-en-fact-087.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "How many days are there in a leap year?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-088",
+   "lang": "en",
+   "category": "fact",
+   "question": "In which country do kangaroos live in the wild?",
+   "options": {
+    "A": "Australia",
+    "B": "Brazil",
+    "C": "Canada",
+    "D": "India"
+   },
+   "gold": "A",
+   "gold_text": "Australia",
+   "audio": "audio/qa-en-fact-088.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "In which country do kangaroos live in the wild?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-089",
+   "lang": "en",
+   "category": "fact",
+   "question": "Which musical instrument has black and white keys?",
+   "options": {
+    "A": "The drum",
+    "B": "The piano",
+    "C": "The violin",
+    "D": "The guitar"
+   },
+   "gold": "B",
+   "gold_text": "The piano",
+   "audio": "audio/qa-en-fact-089.wav",
+   "t_ms": 3840,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Which musical instrument has black and white keys?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-090",
+   "lang": "en",
+   "category": "fact",
+   "question": "Who was the first president of the United States?",
+   "options": {
+    "A": "Thomas Jefferson",
+    "B": "John Adams",
+    "C": "George Washington",
+    "D": "Abraham Lincoln"
+   },
+   "gold": "C",
+   "gold_text": "George Washington",
+   "audio": "audio/qa-en-fact-090.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Who was the first president of the United States?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-091",
+   "lang": "en",
+   "category": "fact",
+   "question": "In which country are the Great Pyramids of Giza?",
+   "options": {
+    "A": "Mexico",
+    "B": "China",
+    "C": "Greece",
+    "D": "Egypt"
+   },
+   "gold": "D",
+   "gold_text": "Egypt",
+   "audio": "audio/qa-en-fact-091.wav",
+   "t_ms": 3520,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "In which country are the Great Pyramids of Giza?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-092",
+   "lang": "en",
+   "category": "fact",
+   "question": "What color are most tree leaves in summer?",
+   "options": {
+    "A": "Green",
+    "B": "Purple",
+    "C": "Blue",
+    "D": "White"
+   },
+   "gold": "A",
+   "gold_text": "Green",
+   "audio": "audio/qa-en-fact-092.wav",
+   "t_ms": 3680,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What color are most tree leaves in summer?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-093",
+   "lang": "en",
+   "category": "fact",
+   "question": "How many sides does a triangle have?",
+   "options": {
+    "A": "Six",
+    "B": "Three",
+    "C": "Five",
+    "D": "Four"
+   },
+   "gold": "B",
+   "gold_text": "Three",
+   "audio": "audio/qa-en-fact-093.wav",
+   "t_ms": 2080,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "How many sides does a triangle have?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-094",
+   "lang": "en",
+   "category": "fact",
+   "question": "What is the largest planet in our solar system?",
+   "options": {
+    "A": "Mars",
+    "B": "Mercury",
+    "C": "Jupiter",
+    "D": "Earth"
+   },
+   "gold": "C",
+   "gold_text": "Jupiter",
+   "audio": "audio/qa-en-fact-094.wav",
+   "t_ms": 3200,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is the largest planet in our solar system?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-095",
+   "lang": "en",
+   "category": "fact",
+   "question": "In which season do many trees lose their leaves?",
+   "options": {
+    "A": "Spring",
+    "B": "The rainy season",
+    "C": "Summer",
+    "D": "Autumn"
+   },
+   "gold": "D",
+   "gold_text": "Autumn",
+   "audio": "audio/qa-en-fact-095.wav",
+   "t_ms": 3520,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "In which season do many trees lose their leaves?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-096",
+   "lang": "en",
+   "category": "fact",
+   "question": "Which organ pumps blood through the human body?",
+   "options": {
+    "A": "The heart",
+    "B": "The stomach",
+    "C": "The liver",
+    "D": "The lungs"
+   },
+   "gold": "A",
+   "gold_text": "The heart",
+   "audio": "audio/qa-en-fact-096.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Which organ pumps blood through the human body?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-097",
+   "lang": "en",
+   "category": "fact",
+   "question": "What is the currency of Japan?",
+   "options": {
+    "A": "The won",
+    "B": "The yen",
+    "C": "The dollar",
+    "D": "The euro"
+   },
+   "gold": "B",
+   "gold_text": "The yen",
+   "audio": "audio/qa-en-fact-097.wav",
+   "t_ms": 3040,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What is the currency of Japan?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-098",
+   "lang": "en",
+   "category": "fact",
+   "question": "What do caterpillars turn into?",
+   "options": {
+    "A": "Spiders",
+    "B": "Frogs",
+    "C": "Butterflies",
+    "D": "Beetles"
+   },
+   "gold": "C",
+   "gold_text": "Butterflies",
+   "audio": "audio/qa-en-fact-098.wav",
+   "t_ms": 1920,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "What do caterpillars turn into?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  },
+  {
+   "id": "qa-en-fact-099",
+   "lang": "en",
+   "category": "fact",
+   "question": "Which animal is known as the king of the jungle?",
+   "options": {
+    "A": "The rabbit",
+    "B": "The zebra",
+    "C": "The monkey",
+    "D": "The lion"
+   },
+   "gold": "D",
+   "gold_text": "The lion",
+   "audio": "audio/qa-en-fact-099.wav",
+   "t_ms": 2880,
+   "clean": {
+    "asr": "Qwen3-ASR-1.7B",
+    "hyp": "Which animal is known as the king of the jungle?",
+    "exact": true,
+    "resynth": false,
+    "try": 0
+   }
+  }
+ ],
+ "pack_sha256": "80b5976627a369f5195ad466639394e8debd5b6948ade715cbe6399e35799320",
+ "tts": {
+  "engine": "VoxCPM2",
+  "cfg_value": 2.0,
+  "inference_timesteps": 10,
+  "sample_rate": 48000,
+  "voice": "default (no prompt audio)",
+  "spoken": "question only"
+ },
+ "clean": {
+  "rule": "Qwen3-ASR-1.7B 归一化逐字一致；否则重合成≤4次；仍不一致人工判定",
+  "ok_original": 95,
+  "resynth_fixed": 4,
+  "manual_pass": {
+   "qa-en-logic-058": "Cara→Kara 同音人名拼写，放行"
+  },
+  "dropped": [],
+  "true_tts_failures_fixed": [
+   "qa-zh-fact-037",
+   "qa-zh-fact-041"
+  ]
+ },
+ "audio_sha256": "693e538bb48bdac17fcdf81595e8eec8f9643a55dcbd31fbe35fc6a6cb491888"
+}

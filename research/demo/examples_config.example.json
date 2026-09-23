@@ -1,0 +1,8 @@
+{
+  "_note": "Pick 3-6 clips whose license allows redistribution (LibriSpeech CC-BY-4.0, Common Voice CC0, AISHELL-1 Apache-2.0, or our own recordings with consent). Never production call audio, never ODSQA.",
+  "clips": [
+    {"id": "ex1", "label": "EN · pause mid-request", "lang": "en", "audio": "/path/to/librispeech_clip.flac", "transcript": "exact transcript", "source": "LibriSpeech test-clean (CC-BY-4.0)"},
+    {"id": "ex2", "label": "ZH · complete request", "lang": "zh", "audio": "/path/to/aishell_clip.wav", "transcript": "exact transcript", "source": "AISHELL-1 test (Apache-2.0)"},
+    {"id": "ex3", "label": "EN · frustrated caller", "lang": "en", "audio": "/path/to/common_voice_clip.mp3", "transcript": "exact transcript", "source": "Common Voice 17 (CC0)"}
+  ]
+}
