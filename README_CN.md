@@ -51,6 +51,7 @@ Transcript*（已投 ICASSP 2027）。
 
 ## 2. 最新动态
 
+- **2026-09-25** —— 发布 **8 个小模型连接器**（Qwen3-ASR 编码器配 Qwen3-0.6B / 1.7B / 4B，Whisper-small 配 Qwen3-1.7B），各有内容版和性别 + 情绪版，见[小模型连接器](#小模型连接器端侧规模)。
 - **2026-09-24** —— 在 🤗 [Hugging Face](https://huggingface.co/adventists-ai) 发布 **7 个连接器权重和 2 个编码器仓库**；发布 [`duplexjev` 0.2.1](https://pypi.org/project/duplexjev/0.2.1/)（音频改为在末尾补静音：在开头补会让情绪准确率最多低 6 分；`text_model` / `audio_model` 离线可用）。
 - **2026-09** —— 论文投稿 ICASSP 2027；发布 `duplexjev` 包、研究代码、延迟基准和项目主页。
 - **2026-10-10（计划）** —— Speech-to-Decision 商用 API 上线。
@@ -78,6 +79,21 @@ Transcript*（已投 ICASSP 2027）。
 两者都是 Qwen3-ASR-0.6B 原样的音频编码器，Apache-2.0。
 
 情绪连接器用 ESD 训练，而 ESD 仅限研究使用，所以这三个权重仅供非商业研究使用。
+
+### 小模型连接器（端侧规模）
+
+同一套配方（R1 → R2 → MIX-KD，最后一层连接器 B）用在小的冻结大模型和两种编码器上。下表成绩为 MIX-KD 连接器在论文评测口径下的结果（%）；
+CPU 为一次判断事件（10 个问题、4.5 秒音频）的耗时，fp32、未量化（一张 H200 GPU 上四者都在 40–80 毫秒）。小模型即使读转写，
+知识类问答也不强，适合做短判断和听说话人。模型卡里另列了 `duplexjev` 包的实测数字。
+
+| 编码器 | 大模型 | 内容连接器（Apache-2.0） | + 性别与情绪，MIX-KD（CC BY-NC 4.0） | 可训练 | 总参数 | qa100（语音 / 读转写） | 性别 | 情绪 | CPU 8 线程 |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|
+| Qwen3-ASR-0.6B | Qwen3-0.6B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-0.6B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B) | 9.4 M | 0.8 B | 38 / 45 | 89.4 | 89.2 | 0.9 s |
+| Qwen3-ASR-0.6B | Qwen3-1.7B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | 11.5 M | 1.9 B | 59 / 66 | 84.8 | 89.1 | 2.1 s |
+| Whisper-small | Qwen3-1.7B | 🤗 [DuplexJev-B-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Whisper-small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | 29.4 M | 1.8 B | 48 / 66 | 78.8 | 62.4 | 2.4 s |
+| Qwen3-ASR-0.6B | Qwen3-4B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | 12.6 M | 4.2 B | 72 / 82 | 89.4 | 91.9 | 5.4 s |
+
+用 Qwen3-ASR 编码器时，连 Qwen3-0.6B 听性别和情绪的能力也和 Qwen3-32B 相当（89 / 89 对 90 / 90）。
 
 ## 4. 快速上手
 
@@ -230,7 +246,7 @@ qa100：100 道中英文语音选择题（题干为合成语音）。ZJU-ML：�
 
 ## 8. 许可
 
-代码：Apache-2.0（[LICENSE](LICENSE)）。模型权重：Apache-2.0，但三个含情绪能力的连接器（A-Emotion、B-Emotion、A-Para）为 CC BY-NC 4.0，
+代码：Apache-2.0（[LICENSE](LICENSE)）。模型权重：Apache-2.0，但用情绪数据训练的连接器（A-Emotion、B-Emotion、A-Para 以及所有 `-Para-` 小模型连接器）为 CC BY-NC 4.0，
 因为 ESD 仅限研究使用。qa100：CC-BY-4.0。部分训练语料（如 WenetSpeech、CoVoST 2）仅限非商业使用，商用前请自行核对。
 第三方模型和数据集保留各自的许可，见 [NOTICE](NOTICE)。
 

@@ -57,6 +57,7 @@ state + N typed questions ──► frozen LLM (Qwen3-32B), ONE forward pass
 
 ## 2. News
 
+- **2026-09-25** — Released **8 small connectors** (Qwen3-0.6B / 1.7B / 4B with the Qwen3-ASR encoder, Qwen3-1.7B with Whisper-small), content and gender + emotion versions; see [Small connectors](#small-connectors-edge-sized).
 - **2026-09-24** — Released **7 connectors and 2 encoder repositories** on 🤗 [Hugging Face](https://huggingface.co/adventists-ai) and [`duplexjev` 0.2.1](https://pypi.org/project/duplexjev/0.2.1/) (audio is now padded at the end: padding at the start cost up to 6 points on emotion; `text_model` / `audio_model` work offline).
 - **2026-09** — Paper submitted to ICASSP 2027. Released the `duplexjev` package, research code, latency benchmarks and project page.
 - **2026-10-10 (planned)** — Speech-to-Decision commercial API.
@@ -87,6 +88,22 @@ same weights, plus the fusion-block code). Both are the audio encoder of Qwen3-A
 
 The emotion connectors were trained on ESD, which is licensed for research only, so they are released for
 non-commercial research use.
+
+### Small connectors (edge-sized)
+
+The same recipe (R1 → R2 → MIX-KD, last-layer connector B) on small frozen LLMs and two encoders. Scores are the
+MIX-KD connectors under the paper protocol (%); CPU = one decision event of 10 questions on a 4.5 s clip, fp32,
+not quantized (one H200 GPU: 40–80 ms for all four). Small LLMs answer knowledge questions poorly even from the
+transcript, so use them for short decisions and speaker cues. Model cards list the `duplexjev` numbers too.
+
+| encoder | LLM | content connector (Apache-2.0) | + gender & emotion, MIX-KD (CC BY-NC 4.0) | trainable | total | qa100 (speech / transcript) | gender | emotion | CPU, 8 threads |
+|---|---|---|---|---:|---:|---:|---:|---:|---:|
+| Qwen3-ASR-0.6B | Qwen3-0.6B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-0.6B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B) | 9.4 M | 0.8 B | 38 / 45 | 89.4 | 89.2 | 0.9 s |
+| Qwen3-ASR-0.6B | Qwen3-1.7B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | 11.5 M | 1.9 B | 59 / 66 | 84.8 | 89.1 | 2.1 s |
+| Whisper-small | Qwen3-1.7B | 🤗 [DuplexJev-B-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Whisper-small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | 29.4 M | 1.8 B | 48 / 66 | 78.8 | 62.4 | 2.4 s |
+| Qwen3-ASR-0.6B | Qwen3-4B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | 12.6 M | 4.2 B | 72 / 82 | 89.4 | 91.9 | 5.4 s |
+
+With the Qwen3-ASR encoder, even Qwen3-0.6B hears gender and emotion about as well as Qwen3-32B (89 / 89 vs. 90 / 90).
 
 ## 4. Quick start
 
@@ -252,8 +269,8 @@ The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/P
 
 ## 8. License
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Model weights: Apache-2.0, except the three emotion connectors (A-Emotion,
-B-Emotion, A-Para), which are CC BY-NC 4.0 because ESD is licensed for research only. qa100: CC-BY-4.0.
+Code: Apache-2.0 ([LICENSE](LICENSE)). Model weights: Apache-2.0, except the connectors trained on emotion data (A-Emotion,
+B-Emotion, A-Para and every `-Para-` small connector), which are CC BY-NC 4.0 because ESD is licensed for research only. qa100: CC-BY-4.0.
 Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms; check them before commercial use.
 Third-party models and datasets keep their own licenses; see [NOTICE](NOTICE).
 
