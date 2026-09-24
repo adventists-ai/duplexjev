@@ -128,12 +128,12 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
     </div>
     <h1 data-i18n="title"></h1>
     <p class="sub" data-i18n="subtitle"></p>
-    <div class="authors">Jie Jin<sup>1,★</sup>, Ziyin Ma<sup>2</sup>, Min Yin<sup>3</sup>, Jinyu Chen<sup>4</sup>, Zhikun Pang<sup>1</sup>, Xiaowen Zhang<sup>1</sup></div>
+    <div class="authors">Jie Jin<sup>1,★</sup>, Ziyin Ma<sup>2</sup>, Min Yin<sup>3</sup>, Jinyu Chen<sup>4</sup>, Haigang Song<sup>1</sup>, Zhikun Pang<sup>1</sup>, Xiaowen Zhang<sup>1</sup></div>
     <div class="affil" data-i18n="affil"></div>
     <nav class="links" aria-label="Resources">
       <span data-i18n="l_paper"></span>
       <a href="https://github.com/adventists-ai/duplexjev" data-i18n="l_code"></a>
-      <span data-i18n="l_weights"></span>
+      <a href="https://huggingface.co/adventists-ai" data-i18n="l_weights"></a>
       <a href="https://huggingface.co/datasets/adventists-ai/qa100" data-i18n="l_qa100"></a>
       <a href="#cite" data-i18n="l_cite"></a>
     </nav>
@@ -215,7 +215,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
 
   <section id="results" aria-labelledby="res-h">
     <h2 id="res-h" data-i18n="res_h"></h2>
-    <p><span data-i18n="res_p"></span> <span class="badge" data-i18n="pending"></span></p>
+    <p><span data-i18n="res_p"></span></p>
   </section>
 
   <section id="limits" aria-labelledby="lim-h">
@@ -225,11 +225,11 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
 
   <section id="cite" aria-labelledby="cite-h">
     <div class="copyrow"><h2 id="cite-h" style="margin:0" data-i18n="cite_h"></h2><button type="button" id="copybib" data-i18n="copy"></button></div>
-<pre id="bib">@misc{jin2026duplexjev,
-  title  = {Batched Speech Decisions Without Decoding: A Modular Decision Sidecar for Full-Duplex Spoken Agents},
-  author = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Pang, Zhikun and Zhang, Xiaowen},
-  year   = {2026},
-  note   = {ICASSP 2027 submission}
+<pre id="bib">@inproceedings{jin2027duplexjev,
+  title     = {Batched Speech Decisions Without Decoding: Single-Token Supervision Lets a Frozen {LLM} Hear Beyond the Transcript},
+  author    = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Song, Haigang and Pang, Zhikun and Zhang, Xiaowen},
+  booktitle = {Submitted to IEEE ICASSP},
+  year      = {2027}
 }</pre>
   </section>
 
@@ -278,9 +278,9 @@ const T = {
   doc_title:"DuplexJev",
   eyebrow:"ICASSP 2027 submission · Speech-to-Decision",
   title:"Batched Speech Decisions Without Decoding",
-  subtitle:"DuplexJev — a modular decision sidecar for full-duplex spoken agents",
+  subtitle:"DuplexJev — single-token supervision lets a frozen LLM hear beyond the transcript",
   affil:"<sup>1</sup>Adventists.ai, Melbourne · <sup>2</sup>College of CS&amp;T, Zhejiang University · <sup>3</sup>Future Design Lab, Innovation Center of Yangtze River Delta, Zhejiang University · <sup>4</sup>University of Virginia · <sup>★</sup>jiejin@adventists.ai",
-  l_paper:"Paper · arXiv soon", l_code:"Code", l_weights:"Weights · soon", l_qa100:"qa100 test set", l_cite:"Cite",
+  l_paper:"Paper · arXiv soon", l_code:"Code", l_weights:"Weights", l_qa100:"qa100 test set", l_cite:"Cite",
   lede:"A full-duplex voice agent must keep answering small, closed questions — <em>has the user finished? which filler fits? which step of the flow is this?</em> DuplexJev reads every such question as one constrained token from a frozen speech LLM. No ASR decoding, no text decoding, and many questions — over one call or across calls — share a single forward pass.",
   demo_h:"One utterance, one pass, many answers",
   demo_p:"Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked).",
@@ -293,10 +293,10 @@ const T = {
   h_readout:"Typed single-token readout", p_readout:"Each question lists its options under letters in a random order. The answer is the LLM's next-token distribution restricted to those letters — always a valid option, with a confidence score for free.",
   h_prefix:"Prefix sharing", p_prefix:"The shared prefix (dialogue context and audio) is encoded once; all questions are packed into one row under a block-diagonal mask. Memory grows with the questions, not with copies of the context.",
   h_fusion:"Paralinguistics through fusion", p_fusion:"Variant A lets the final encoder layer attend to layers 14 and 9, where speaker and prosody cues survive. The fusion starts at zero, so A begins identical to the last-layer variant B.",
-  h_swap:"Swap the parts", p_swap:"Encoder and LLM stay frozen; only a 40&nbsp;M-parameter projector (plus 3&nbsp;M for fusion) is trained. Any open ASR encoder and any LLM that accepts input embeddings will do.",
+  h_swap:"Swap the parts", p_swap:"Encoder and LLM stay frozen; only an 18&nbsp;M-parameter projector (plus 3&nbsp;M for fusion) is trained. Any open ASR encoder and any LLM that accepts input embeddings will do.",
   a_audio:"audio", a_audio2:"user speech", a_enc:"ASR encoder", a_enc2:"frozen · 12.5 Hz", a_fus:"A: cross-attn fusion", a_fus2:"Q=h18 · K=h14 · V=h9", a_last:"B: last layer h18",
   a_proj:"projector", a_proj2:"stack 2 → 6.25 tok/s", a_llm:"frozen LLM", a_llm2:"Qwen3-32B · 1 pass", a_q:"state + N typed questions", a_q2:"options under permuted letters",
-  a_out:"p(option | q) × N", a_out2:"0 decode steps", a_or:"or", a_note:"shaded: trained (43.1 M for A, 39.9 M for B) · everything else frozen",
+  a_out:"p(option | q) × N", a_out2:"0 decode steps", a_or:"or", a_note:"shaded: trained (21.1 M for A, 17.8 M for B) · everything else frozen",
   lat_h:"Ten decisions: 92 ms instead of two seconds",
   lat_p:"Same GPU (1× H200), same frozen Qwen3-32B, same vLLM engine. The cascade transcribes, then generates the ten answers as JSON; the readout answers them as single tokens.",
   lg_gen:"LLM generation", lg_asr:"ASR decoding", lg_ro:"single-token readout",
@@ -312,7 +312,7 @@ const T = {
   tick_p:"Because a decision is a single step, a server can gather the latest audio of every active call on a fixed tick and answer all of them in one batch — something a cascade cannot do, since each transcription needs its own sequence of decode steps. Below, each column is a tick and each row a call; amber marks a pause where a decision is due.",
   tick_cap:"Illustration. In our deployment, consecutive user turns in a session are a median 9.9 s apart, so decision events are sparse and batch well.",
   res_h:"Understanding and paralinguistics",
-  res_p:"With a well-aligned speech path, reading the answer as one constrained token costs almost nothing against reading the transcript: 89 vs 91 on qa100 (Ultravox v0.6 Whisper path, Qwen3-32B). Results for our released speech paths — qa100, the ZJU gender benchmark and the ZJU main-language benchmark with real speech — will appear here with the final checkpoints.",
+  res_p:"Reading the answer as one constrained token costs almost nothing against reading the transcript: the last-layer connector (B) scores 90 on qa100, against 91 from the oracle transcript. The speaker is audible too: trained with answer-token supervision under a mixed objective, the cross-attention connector (A-Para) reaches 89.9% on speaker gender and 90.0% on four-way emotion (from 55% and 28%), while qa100 drops by 1 point (83 → 82). All seven released connectors and their scores are listed in the <a href=\"https://github.com/adventists-ai/duplexjev#5-evaluation-results\">README</a> and on <a href=\"https://huggingface.co/adventists-ai\">Hugging Face</a>.",
   pending:"pending",
   lim_h:"Limitations",
   lim1:"Turn-taking from audio is not solved yet: current speech paths stay near the prior on Easy-Turn, while the same readout reaches 84.9% from the transcript.",
@@ -320,16 +320,16 @@ const T = {
   lim3:"Confidence gates abstention but does not reveal a missing skill: a path that cannot hear gender is still confident.",
   lim4:"Gender labels are corpus-provided and binary; the classifier is a probe of information flow, not a tool for identifying people.",
   cite_h:"Cite", copy:"Copy BibTeX", copied:"Copied", selected:"Selected — press Ctrl/Cmd+C",
-  footer:"Code and weights: Apache-2.0 · qa100: CC-BY-4.0 · Built on Ultravox, Qwen3 and Qwen3-ASR.",
+  footer:"Code: Apache-2.0 · Weights: Apache-2.0, emotion connectors CC BY-NC 4.0 · qa100: CC-BY-4.0 · Built on Ultravox, Qwen3 and Qwen3-ASR.",
   audio_tokens:"audio tokens", illus:"illustrative waveform"
  },
  zh: {
   doc_title:"DuplexJev",
   eyebrow:"ICASSP 2027 投稿 · Speech-to-Decision",
   title:"不解码的批量语音判断",
-  subtitle:"DuplexJev —— 面向全双工语音智能体的模块化决策旁路",
+  subtitle:"DuplexJev —— 单 token 监督让冻结的大模型听到转写之外的信息",
   affil:"<sup>1</sup>Adventists.ai（墨尔本）· <sup>2</sup>浙江大学计算机科学与技术学院 · <sup>3</sup>浙江大学长三角智慧绿洲创新中心 Future Design Lab · <sup>4</sup>弗吉尼亚大学 · <sup>★</sup>jiejin@adventists.ai",
-  l_paper:"论文 · arXiv 即将发布", l_code:"代码", l_weights:"权重 · 即将发布", l_qa100:"qa100 测试集", l_cite:"引用",
+  l_paper:"论文 · arXiv 即将发布", l_code:"代码", l_weights:"权重", l_qa100:"qa100 测试集", l_cite:"引用",
   lede:"全双工语音智能体要不停地回答一些小而封闭的问题——<em>用户说完了吗？先说哪句垫话？流程走到哪一步了？</em>DuplexJev 把每个这样的问题都从冻结的语音大模型里读成一个受约束的 token：不做语音转写的解码，不做文本解码；同一通电话、甚至多通电话里的许多问题，共用一次前向计算。",
   demo_h:"一句话，一次前向，许多答案",
   demo_p:"选一段音频。右侧面板显示在同一次前向里回答的每个类型化问题，各自给出在自己选项上的概率。波形下方的刻度标出 160&nbsp;毫秒一段——每段变成大模型的一个音频 token（Qwen3-ASR 12.5&nbsp;Hz，两帧拼一）。",
@@ -342,10 +342,10 @@ const T = {
   h_readout:"类型化单 token 读出", p_readout:"每个问题把选项放在随机排列的字母下，答案就是大模型下一个 token 在这些字母上的分布——永远是合法选项，还顺带得到置信度。",
   h_prefix:"前缀共享", p_prefix:"共享前缀（对话上下文和音频）只编码一次；所有问题打包进同一行，用块对角掩码隔开。显存随问题数增长，而不是随上下文的副本数增长。",
   h_fusion:"用融合带出副语言", p_fusion:"A 版本让编码器最后一层去关注第 14 层和第 9 层，那里还保留着说话人和韵律信息。融合层从零初始化，所以 A 一开始和只用最后一层的 B 版本完全相同。",
-  h_swap:"部件可替换", p_swap:"编码器和大模型都冻结，只训练一个约 4000&nbsp;万参数的投影器（融合层另加约 300&nbsp;万）。任何开源的语音识别编码器、任何接受嵌入输入的大模型都可以接上。",
+  h_swap:"部件可替换", p_swap:"编码器和大模型都冻结，只训练一个约 1800&nbsp;万参数的投影器（融合层另加约 300&nbsp;万）。任何开源的语音识别编码器、任何接受嵌入输入的大模型都可以接上。",
   a_audio:"音频", a_audio2:"用户语音", a_enc:"ASR 编码器", a_enc2:"冻结 · 12.5 Hz", a_fus:"A：交叉注意力融合", a_fus2:"Q=h18 · K=h14 · V=h9", a_last:"B：只用最后一层 h18",
   a_proj:"投影器", a_proj2:"两帧拼一 → 6.25 token/秒", a_llm:"冻结的大模型", a_llm2:"Qwen3-32B · 一次前向", a_q:"状态 + N 个类型化问题", a_q2:"选项放在打乱的字母下",
-  a_out:"p(选项 | 问题) × N", a_out2:"0 步解码", a_or:"或", a_note:"着色部分参与训练（A 4310 万，B 3990 万参数），其余全部冻结",
+  a_out:"p(选项 | 问题) × N", a_out2:"0 步解码", a_or:"或", a_note:"着色部分参与训练（A 2110 万，B 1780 万参数），其余全部冻结",
   lat_h:"十个判断：92 毫秒，而不是两秒",
   lat_p:"同一张 GPU（1× H200）、同一个冻结的 Qwen3-32B、同一个 vLLM 引擎。级联方案先转写，再把十个答案生成成 JSON；读出方案把它们各读成一个 token。",
   lg_gen:"大模型逐字生成", lg_asr:"语音转写解码", lg_ro:"单 token 读出",
@@ -361,7 +361,7 @@ const T = {
   tick_p:"因为一次判断只要一步，服务器可以按固定节拍收集所有在线通话的最新音频，一批全部回答——级联做不到这一点，因为每一路转写都要走自己的多步解码。下图每一列是一个节拍、每一行是一通电话；琥珀色表示出现停顿、需要做判断。",
   tick_cap:"示意图。在我们的线上系统里，同一段对话中相邻两轮用户发言的中位间隔是 9.9 秒，判断事件稀疏，非常适合批量处理。",
   res_h:"语义理解与副语言",
-  res_p:"语音通路对齐良好时，把答案读成一个受约束的 token，和直接读转写文本相比几乎没有损失：qa100 上 89 对 91（Ultravox v0.6 Whisper 通路，Qwen3-32B）。我们发布的语音通路在 qa100、浙大性别基准和浙大主语言基准（含真人语音）上的结果，会在最终 checkpoint 完成后放在这里。",
+  res_p:"把答案读成一个受约束的 token，和直接读转写文本相比几乎没有损失：最后一层连接器（B）在 qa100 上得 90 分，读标准转写为 91 分。它也听得出说话人：用答案 token 监督、配合混合目标训练后，交叉注意力连接器（A-Para）的性别识别率达到 89.9%，四类情绪 90.0%（原本 55% 和 28%），qa100 只降 1 分（83 → 82）。全部 7 个已发布连接器及成绩见 <a href=\"https://github.com/adventists-ai/duplexjev/blob/main/README_CN.md#5-评测结果\">README</a> 和 <a href=\"https://huggingface.co/adventists-ai\">Hugging Face</a>。",
   pending:"待补",
   lim_h:"局限",
   lim1:"从音频判断话轮还没有解决：现有语音通路在 Easy-Turn 上接近先验水平，而同样的读出方式从转写文本能达到 84.9%。",
@@ -369,7 +369,7 @@ const T = {
   lim3:"置信度可以用来决定是否弃答，但看不出能力缺失：一个听不出性别的通路照样很有把握。",
   lim4:"性别标签来自语料库、只有两类；这个分类器是用来探查信息流的，不是用来识别个人的工具。",
   cite_h:"引用", copy:"复制 BibTeX", copied:"已复制", selected:"已选中，按 Ctrl/Cmd+C 复制",
-  footer:"代码与权重：Apache-2.0 · qa100：CC-BY-4.0 · 基于 Ultravox、Qwen3 与 Qwen3-ASR 构建。",
+  footer:"代码：Apache-2.0 · 权重：Apache-2.0，含情绪能力的连接器为 CC BY-NC 4.0 · qa100：CC-BY-4.0 · 基于 Ultravox、Qwen3 与 Qwen3-ASR 构建。",
   audio_tokens:"个音频 token", illus:"示意波形"
  }
 };

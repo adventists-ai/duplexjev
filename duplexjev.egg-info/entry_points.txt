@@ -1,0 +1,2 @@
+[console_scripts]
+duplexjev = duplexjev.cli:main

@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use DuplexJev or qa100, please cite it as below."
-title: "DuplexJev: Batched Speech Decisions Without Decoding"
+title: "DuplexJev: Batched Speech Decisions Without Decoding (Single-Token Supervision Lets a Frozen LLM Hear Beyond the Transcript)"
 type: software
 license: Apache-2.0
 authors:
@@ -20,6 +20,10 @@ authors:
     given-names: Jinyu
     orcid: "https://orcid.org/0009-0002-0819-1481"
     affiliation: "University of Virginia"
+  - family-names: Song
+    given-names: Haigang
+    orcid: "https://orcid.org/0009-0002-8830-8589"
+    affiliation: "Adventists.ai"
   - family-names: Pang
     given-names: Zhikun
     orcid: "https://orcid.org/0009-0001-1014-2323"
