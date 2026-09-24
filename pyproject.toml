@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "duplexjev"
-version = "0.2.0"
+version = "0.2.1"
 description = "Jev-style typed decisions about speech with zero decode steps: one forward pass answers many option groups about many clips."
 readme = "PYPI.md"
 license = {text = "Apache-2.0"}

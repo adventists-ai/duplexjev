@@ -60,3 +60,13 @@ def test_text_models_are_rejected():
 
     with pytest.raises(ValueError):
         Decider.from_pretrained("Qwen/Qwen3-0.6B", device="cpu")
+
+
+def test_align_pads_silence_at_the_end(decider):
+    import numpy as np
+
+    a = np.linspace(-1, 1, 16000 + 123, dtype=np.float32)
+    b = decider._align(a)
+    hop = 160 * int(getattr(decider.processor, "encoder_ds_factor", 2)) * int(getattr(decider.processor, "stack_factor", 8))
+    assert len(b) % hop == 0 and len(b) - len(a) < hop
+    assert np.array_equal(b[: len(a)], a) and not b[len(a):].any()

@@ -57,6 +57,47 @@ def load_audio(x: Any) -> np.ndarray:
     return a
 
 
+def _load_config(name_or_path: str, *, text_model: str | None = None, audio_model: str | None = None):
+    """Load a checkpoint config with the LLM / encoder ids replaced *before* the config is built.
+
+    Ultravox-format configs resolve ``text_model_id`` and ``audio_model_id`` into sub-configs in ``__init__``, so
+    overriding the attributes afterwards is too late: without network access the original ids (e.g.
+    ``Qwen/Qwen3-32B``) cannot be resolved and loading fails even when local copies are given.
+    """
+    import transformers
+    from transformers.dynamic_module_utils import get_class_from_dynamic_module
+
+    cdict, _ = transformers.PretrainedConfig.get_config_dict(name_or_path)
+    if cdict.get("model_type") != "ultravox":
+        return transformers.AutoConfig.from_pretrained(name_or_path, trust_remote_code=True)
+    if text_model:
+        cdict["text_model_id"] = text_model
+    if audio_model:
+        cdict["audio_model_id"] = audio_model
+    ccls = get_class_from_dynamic_module(cdict["auto_map"]["AutoConfig"], name_or_path)
+    return ccls.from_dict(cdict)
+
+
+def _build_processor(name_or_path: str, cfg):
+    """Build the Ultravox processor from an already-resolved config (same steps as its own ``from_pretrained``)."""
+    import transformers
+    from transformers.dynamic_module_utils import get_class_from_dynamic_module
+
+    audio_processor = transformers.AutoProcessor.from_pretrained(cfg.audio_model_id, trust_remote_code=True)
+    tokenizer = transformers.AutoTokenizer.from_pretrained(name_or_path, trust_remote_code=True)
+    tokenizer.padding_side = "left"
+    tokenizer.pad_token = tokenizer.eos_token
+    auto_map = getattr(cfg, "auto_map", None) or {}
+    ref = auto_map.get("AutoProcessor") or "ultravox_processing.UltravoxProcessor"
+    pcls = get_class_from_dynamic_module(ref, name_or_path)
+    return pcls(
+        audio_processor=audio_processor,
+        tokenizer=tokenizer,
+        stack_factor=cfg.stack_factor,
+        encoder_ds_factor=getattr(cfg.audio_config, "encoder_ds_factor", 2),
+    )
+
+
 # ---------------------------------------------------------------------------------------------------------- engine
 class Decider:
     """Answer Jev-style option groups about speech with zero decode steps.
@@ -108,7 +149,7 @@ class Decider:
         if dtype is None:
             dtype = torch.bfloat16 if str(device).startswith("cuda") or device == "auto" else torch.float32
         dmap = "auto" if device == "auto" else {"": device}
-        cfg = transformers.AutoConfig.from_pretrained(name_or_path, trust_remote_code=True)
+        cfg = _load_config(name_or_path, text_model=text_model, audio_model=audio_model)
         if getattr(cfg, "model_type", "") != "ultravox":
             raise ValueError(
                 f"{name_or_path!r} is not a speech checkpoint. duplexjev answers questions about audio and needs an "
@@ -124,14 +165,13 @@ class Decider:
                     f"transformers {transformers.__version__} loading can be extremely slow (weights built on CPU). "
                     'Install with `pip install "duplexjev[speech]"` to get a compatible version.'
                 )
-            if text_model:
-                cfg.text_model_id = text_model
-            if audio_model:
-                cfg.audio_model_id = audio_model
             model = transformers.AutoModel.from_pretrained(
                 name_or_path, config=cfg, trust_remote_code=True, device_map=dmap, **{dkw: dtype}, **kwargs
             )
-            processor = transformers.AutoProcessor.from_pretrained(name_or_path, trust_remote_code=True)
+            if text_model or audio_model:  # the checkpoint's own processor loader would re-resolve the original ids
+                processor = _build_processor(name_or_path, cfg)
+            else:
+                processor = transformers.AutoProcessor.from_pretrained(name_or_path, trust_remote_code=True)
             if not hasattr(processor, "audio_processor"):  # e.g. a stray preprocessor_config.json took precedence
                 from transformers.dynamic_module_utils import get_class_from_dynamic_module
 
@@ -176,16 +216,17 @@ class Decider:
         return self._letter_ids[letter]
 
     def _align(self, a: np.ndarray) -> np.ndarray:
-        """Left-pad with silence to a whole number of audio tokens.
+        """Right-pad with silence to a whole number of audio tokens.
 
         The projector stacks ``stack_factor`` encoder frames per LLM token. If the last group is partial, it is filled
         with whatever follows in the padded batch tensor, so the same clip would read differently depending on its
         batch neighbours. Aligning every clip to full groups (160 ms for Whisper and Qwen3-ASR encoders at stack 8
-        and 2) makes every answer independent of batch composition.
+        and 2) makes every answer independent of batch composition. The padding goes at the end: padding at the start
+        would shift every stack group against the frames the connector was trained on (-6 points on emotion).
         """
         hop = 160 * int(getattr(self.processor, "encoder_ds_factor", 2)) * int(getattr(self.processor, "stack_factor", 8))
         r = (-len(a)) % hop
-        return np.concatenate([np.zeros(r, dtype=np.float32), a]) if r else a
+        return np.concatenate([a, np.zeros(r, dtype=np.float32)]) if r else a
 
     def _encode_prefix(self, item: dict, lang: str) -> dict:
         head, tail = self._head_tail(item.get("context"), PROMPTS[lang]["audio"], lang)

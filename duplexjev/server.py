@@ -104,7 +104,7 @@ def create_app(decider: Decider, tick_ms: float = 160.0, max_items: Optional[int
         context: Optional[Dict[str, str]] = None
         lang: Optional[str] = None
 
-    app = FastAPI(title="DuplexJev decider", version="0.2.0")
+    app = FastAPI(title="DuplexJev decider", version="0.2.1")
     batcher = TickBatcher(decider, tick_ms=tick_ms, max_items=max_items, max_tokens=max_tokens)
 
     @app.on_event("startup")

@@ -11,4 +11,4 @@ from .decider import Decider, load_audio
 from .question import Question
 
 __all__ = ["Decider", "Question", "load_audio"]
-__version__ = "0.2.0"
+__version__ = "0.2.1"
