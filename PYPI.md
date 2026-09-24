@@ -11,9 +11,9 @@ pip install "duplexjev[speech]"      # add [all] for the HTTP server
 ```python
 from duplexjev import Decider, Question
 
-d = Decider.from_pretrained("fixie-ai/ultravox-v0_6-qwen-3-32b")   # or a DuplexJev adapter
+d = Decider.from_pretrained("adventists-ai/DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B", device="auto")
 groups = [Question("turn", "Has the user finished the turn?", ["finished", "not finished"]),
-          Question("gender", "Speaker gender", ["female", "male"])]
+          Question("gender", "What is the perceived gender of the speaker?", ["female", "male"])]
 
 d.decide("call.wav", groups)
 # {'turn': {'answer': 'finished', 'confidence': 0.97, 'probs': {...}}, 'gender': {...}}
@@ -25,6 +25,14 @@ d.decide_batch({"car1": "a.wav", "car2": "b.wav"},
 # {'car1': {'turn': ...}, 'car2': {'turn': ..., 'gender': ...}}
 ```
 
+Ask in the language of the clip (`Question(..., lang="zh")` with Chinese options for Chinese speech): the DuplexJev
+connectors were trained with language-matched prompts. Released weights, results and licences:
+https://huggingface.co/adventists-ai. Local copies of the encoder and LLM: `from_pretrained(..., text_model=..., audio_model=...)`,
+also offline.
+
 Serve with tick batching: `duplexjev serve --model <checkpoint> --tick-ms 160`.
+
+**0.2.1**: audio is padded to whole audio tokens at the end instead of the start (start padding cost up to 6 points on
+emotion); `text_model` / `audio_model` overrides work offline.
 
 Project: https://github.com/adventists-ai/duplexjev · License: Apache-2.0
