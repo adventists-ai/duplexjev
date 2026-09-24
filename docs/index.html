@@ -61,6 +61,7 @@ section{margin-top:56px}
 .tabs button{font-family:var(--mono);font-size:13px;padding:6px 10px;border:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:4px;cursor:pointer}
 .tabs button[aria-pressed="true"]{background:var(--signal);border-color:var(--signal);color:var(--panel)}
 .phbar{display:flex;gap:10px;align-items:flex-start;padding:10px 16px;background:var(--slow-soft);color:var(--ink);font-size:14px;border-bottom:1px solid var(--rule);line-height:1.5}
+.phbar[hidden]{display:none}
 .phbar b{font-family:var(--mono);font-size:12px;color:var(--slow);white-space:nowrap;padding-top:1px}
 .demo-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
 .clip{padding:16px;border-right:1px solid var(--rule)}
@@ -237,38 +238,12 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
 </div>
 
 <script type="application/json" id="examples-data">
-{"placeholder":true,"examples":[
- {"id":"ex1","label":"EN · pause mid-request","label_zh":"英文 · 话说到一半停顿","lang":"en","source":"placeholder","transcript":"Could you turn the air conditioning down a little and, um —","audio":"audio/ex1.wav","duration_s":3.4,"seed":3,
-  "questions":[
-   {"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.18,0.82]},
-   {"q_en":"What does the user want?","q_zh":"用户想做什么？","options_en":["climate","media","navigation","phone","vehicle info","chit-chat"],"options_zh":["空调","媒体","导航","电话","车辆信息","闲聊"],"p":[0.86,0.02,0.03,0.02,0.04,0.03]},
-   {"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“Sure —”","“One moment —”","“On it, searching now —”","(stay silent)"],"options_zh":["“好的，”","“稍等，”","“马上为您查找，”","（不说话）"],"p":[0.11,0.07,0.12,0.70]},
-   {"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.21,0.79]},
-   {"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.97,0.02,0.01]},
-   {"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.30,0.45,0.18,0.05,0.02]},
-   {"q_en":"Sentiment","q_zh":"情绪","options_en":["positive","neutral","negative"],"options_zh":["正面","中性","负面"],"p":[0.14,0.78,0.08]},
-   {"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.03,0.97]}]},
- {"id":"ex2","label":"ZH · complete request","label_zh":"中文 · 完整请求","lang":"zh","source":"placeholder","transcript":"帮我导航到最近的充电站。","audio":"audio/ex2.wav","duration_s":2.6,"seed":7,
-  "questions":[
-   {"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.93,0.07]},
-   {"q_en":"What does the user want?","q_zh":"用户想做什么？","options_en":["climate","media","navigation","phone","vehicle info","chit-chat"],"options_zh":["空调","媒体","导航","电话","车辆信息","闲聊"],"p":[0.02,0.01,0.91,0.01,0.04,0.01]},
-   {"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“Sure —”","“One moment —”","“On it, searching now —”","(stay silent)"],"options_zh":["“好的，”","“稍等，”","“马上为您查找，”","（不说话）"],"p":[0.19,0.08,0.66,0.07]},
-   {"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.84,0.16]},
-   {"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.01,0.98,0.01]},
-   {"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.10,0.28,0.40,0.17,0.05]},
-   {"q_en":"Sentiment","q_zh":"情绪","options_en":["positive","neutral","negative"],"options_zh":["正面","中性","负面"],"p":[0.08,0.86,0.06]},
-   {"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.02,0.98]}]},
- {"id":"ex3","label":"EN · frustrated caller","label_zh":"英文 · 不满的来电者","lang":"en","source":"placeholder","transcript":"This is the third time I'm calling about the same bill.","audio":"audio/ex3.wav","duration_s":3.1,"seed":11,
-  "questions":[
-   {"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.71,0.29]},
-   {"q_en":"What does the caller want?","q_zh":"来电者想做什么？","options_en":["billing","technical","account","cancel","other","chit-chat"],"options_zh":["账单","技术问题","账户","退订","其他","闲聊"],"p":[0.83,0.03,0.06,0.05,0.02,0.01]},
-   {"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“I'm sorry about that —”","“One moment —”","“Got it —”","(stay silent)"],"options_zh":["“非常抱歉，”","“稍等，”","“明白，”","（不说话）"],"p":[0.74,0.10,0.09,0.07]},
-   {"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.66,0.34]},
-   {"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.96,0.02,0.02]},
-   {"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.02,0.06,0.22,0.46,0.24]},
-   {"q_en":"Sentiment","q_zh":"情绪","options_en":["positive","neutral","negative"],"options_zh":["正面","中性","负面"],"p":[0.02,0.17,0.81]},
-   {"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.58,0.42]}]}
-],"pass":{"forward_ms":92,"decode_steps":0,"engine":"vLLM, 1× H200, Qwen3-32B"}}
+{"placeholder":false,"examples":[
+ {"id":"ex1","label":"EN · pause mid-request","label_zh":"英文 · 话说到一半停顿","lang":"en","source":"TTS (VoxCPM2)","transcript":"Could you turn the air conditioning down a little and, um —","audio":"audio/ex1.wav","duration_s":4.5,"questions":[{"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.001,0.999]},{"q_en":"What does the user want?","q_zh":"用户想做什么？","options_en":["climate","media","navigation","phone","vehicle info","chit-chat"],"options_zh":["空调","媒体","导航","电话","车辆信息","闲聊"],"p":[1.0,0.0,0.0,0.0,0.0,0.0]},{"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“Sure —”","“One moment —”","“On it, searching now —”","(stay silent)"],"options_zh":["“好的，”","“稍等，”","“马上为您查找，”","（不说话）"],"p":[0.993,0.004,0.001,0.002]},{"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.971,0.029]},{"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.32,0.678,0.002]},{"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.035,0.42,0.54,0.005,0.0]},{"q_en":"Emotion","q_zh":"情绪","options_en":["neutral","happy","angry","sad"],"options_zh":["中性","高兴","生气","伤心"],"p":[0.029,0.001,0.005,0.965]},{"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.953,0.047]}],"forward_ms":188},
+ {"id":"ex2","label":"ZH · complete request","label_zh":"中文 · 完整请求","lang":"zh","source":"TTS (VoxCPM2)","transcript":"帮我导航到最近的充电站。","audio":"audio/ex2.wav","duration_s":2.2,"questions":[{"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.971,0.029]},{"q_en":"What does the user want?","q_zh":"用户想做什么？","options_en":["climate","media","navigation","phone","vehicle info","chit-chat"],"options_zh":["空调","媒体","导航","电话","车辆信息","闲聊"],"p":[0.0,0.0,1.0,0.0,0.0,0.0]},{"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“Sure —”","“One moment —”","“On it, searching now —”","(stay silent)"],"options_zh":["“好的，”","“稍等，”","“马上为您查找，”","（不说话）"],"p":[0.022,0.046,0.932,0.0]},{"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.002,0.998]},{"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.0,0.999,0.0]},{"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.0,0.161,0.017,0.098,0.724]},{"q_en":"Emotion","q_zh":"情绪","options_en":["neutral","happy","angry","sad"],"options_zh":["中性","高兴","生气","伤心"],"p":[1.0,0.0,0.0,0.0]},{"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[0.731,0.269]}],"forward_ms":197},
+ {"id":"ex3","label":"EN · frustrated caller","label_zh":"英文 · 不满的来电者","lang":"en","source":"TTS (VoxCPM2)","transcript":"This is the third time I'm calling about the same bill.","audio":"audio/ex3.wav","duration_s":3.2,"questions":[{"q_en":"Has the user finished the turn?","q_zh":"用户这句话说完了吗？","options_en":["finished","not finished"],"options_zh":["说完了","没说完"],"p":[0.076,0.924]},{"q_en":"What does the caller want?","q_zh":"来电者想做什么？","options_en":["billing","technical","account","cancel","other","chit-chat"],"options_zh":["账单","技术问题","账户","退订","其他","闲聊"],"p":[1.0,0.0,0.0,0.0,0.0,0.0]},{"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“I'm sorry about that —”","“One moment —”","“Got it —”","(stay silent)"],"options_zh":["“非常抱歉，”","“稍等，”","“明白，”","（不说话）"],"p":[1.0,0.0,0.0,0.0]},{"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.996,0.004]},{"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[1.0,0.0,0.0]},{"q_en":"Urgency (1–5)","q_zh":"紧急程度（1–5）","options_en":["1","2","3","4","5"],"options_zh":["1","2","3","4","5"],"p":[0.0,0.002,0.0,0.0,0.998]},{"q_en":"Emotion","q_zh":"情绪","options_en":["neutral","happy","angry","sad"],"options_zh":["中性","高兴","生气","伤心"],"p":[0.0,0.0,1.0,0.0]},{"q_en":"Needs a human agent?","q_zh":"需要转人工吗？","options_en":["yes","no"],"options_zh":["需要","不需要"],"p":[1.0,0.0]}],"forward_ms":189}
+],
+"pass":{"decode_steps":0,"engine":"duplexjev 0.2.1, plain PyTorch, 1× H200, DuplexJev-A-Para (Qwen3-32B)"}}
 </script>
 
 <script>
@@ -283,7 +258,7 @@ const T = {
   l_paper:"Paper · arXiv soon", l_code:"Code", l_weights:"Weights", l_qa100:"qa100 test set", l_cite:"Cite",
   lede:"A full-duplex voice agent must keep answering small, closed questions — <em>has the user finished? which filler fits? which step of the flow is this?</em> DuplexJev reads every such question as one constrained token from a frozen speech LLM. No ASR decoding, no text decoding, and many questions — over one call or across calls — share a single forward pass.",
   demo_h:"One utterance, one pass, many answers",
-  demo_p:"Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked).",
+  demo_p:"Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked). These are real outputs of the released A-Para checkpoint (duplexjev 0.2.1) on synthetic clips (VoxCPM2), shown as they are, including its mistakes.",
   ph_tag:"LAYOUT PREVIEW",
   ph_text:"The clips and probabilities below are illustrative placeholders, not model outputs. They will be replaced by outputs of the released checkpoint on real recordings.",
   noaudio:"Audio is published together with the released-checkpoint examples.",
@@ -332,7 +307,7 @@ const T = {
   l_paper:"论文 · arXiv 即将发布", l_code:"代码", l_weights:"权重", l_qa100:"qa100 测试集", l_cite:"引用",
   lede:"全双工语音智能体要不停地回答一些小而封闭的问题——<em>用户说完了吗？先说哪句垫话？流程走到哪一步了？</em>DuplexJev 把每个这样的问题都从冻结的语音大模型里读成一个受约束的 token：不做语音转写的解码，不做文本解码；同一通电话、甚至多通电话里的许多问题，共用一次前向计算。",
   demo_h:"一句话，一次前向，许多答案",
-  demo_p:"选一段音频。右侧面板显示在同一次前向里回答的每个类型化问题，各自给出在自己选项上的概率。波形下方的刻度标出 160&nbsp;毫秒一段——每段变成大模型的一个音频 token（Qwen3-ASR 12.5&nbsp;Hz，两帧拼一）。",
+  demo_p:"选一段音频。右侧面板显示在同一次前向里回答的每个类型化问题，各自给出在自己选项上的概率。波形下方的刻度标出 160&nbsp;毫秒一段——每段变成大模型的一个音频 token（Qwen3-ASR 12.5&nbsp;Hz，两帧拼一）。下面是正式发布的 A-Para 权重（duplexjev 0.2.1）在合成语音（VoxCPM2）上的真实输出，原样展示，包括它答错的地方。",
   ph_tag:"版式预览",
   ph_text:"下面的音频与概率是示意占位，不是模型输出；将替换为正式发布的 checkpoint 在真实录音上的结果。",
   noaudio:"音频将随正式 checkpoint 的示例一起发布。",
