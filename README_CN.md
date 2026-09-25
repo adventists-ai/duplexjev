@@ -51,7 +51,7 @@ Transcript*（已投 ICASSP 2027）。
 
 ## 2. 最新动态
 
-- **2026-09-25** —— 发布 **8 个小模型连接器**（Qwen3-ASR 编码器配 Qwen3-0.6B / 1.7B / 4B，Whisper-small 配 Qwen3-1.7B），各有内容版和性别 + 情绪版，见[小模型连接器](#小模型连接器端侧规模)。
+- **2026-09-25** —— 发布 **14 个小模型连接器**（Qwen3-ASR 编码器配 Qwen3-0.6B / 1.7B / 4B，Whisper-small 配 Qwen3-1.7B），以及 6 个 SenseVoice-Small 编码器连接器（配 Qwen3-0.6B / 1.7B / 4B），各有内容版和性别 + 情绪版，见[小模型连接器](#小模型连接器端侧规模)。
 - **2026-09-24** —— 在 🤗 [Hugging Face](https://huggingface.co/adventists-ai) 发布 **7 个连接器权重和 2 个编码器仓库**；发布 [`duplexjev` 0.2.1](https://pypi.org/project/duplexjev/0.2.1/)（音频改为在末尾补静音：在开头补会让情绪准确率最多低 6 分；`text_model` / `audio_model` 离线可用）。
 - **2026-09** —— 论文投稿 ICASSP 2027；发布 `duplexjev` 包、研究代码、延迟基准和项目主页。
 - **2026-10-10（计划）** —— Speech-to-Decision 商用 API 上线。
@@ -82,8 +82,8 @@ Transcript*（已投 ICASSP 2027）。
 
 ### 小模型连接器（端侧规模）
 
-同一套配方（R1 → R2 → MIX-KD，最后一层连接器 B）用在小的冻结大模型和两种编码器上。下表成绩为 MIX-KD 连接器在论文评测口径下的结果（%）；
-CPU 为一次判断事件（10 个问题、4.5 秒音频）的耗时，fp32、未量化（一张 H200 GPU 上四者都在 40–80 毫秒）。小模型即使读转写，
+同一套配方（R1 → R2 → MIX-KD，最后一层连接器 B）用在小的冻结大模型和三种编码器上。下表成绩为 MIX-KD 连接器在论文评测口径下的结果（%）；
+CPU 为一次判断事件（10 个问题、4.5 秒音频）的耗时，fp32、未量化（一张 H200 GPU 上为 40–80 毫秒；SenseVoice 组合因前端逐段计算为 130–150 毫秒）。小模型即使读转写，
 知识类问答也不强，适合做短判断和听说话人。模型卡里另列了 `duplexjev` 包的实测数字。
 
 | 编码器 | 大模型 | 内容连接器（Apache-2.0） | + 性别与情绪，MIX-KD（CC BY-NC 4.0） | 可训练 | 总参数 | qa100（语音 / 读转写） | 性别 | 情绪 | CPU 8 线程 |
@@ -92,8 +92,12 @@ CPU 为一次判断事件（10 个问题、4.5 秒音频）的耗时，fp32、�
 | Qwen3-ASR-0.6B | Qwen3-1.7B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | 11.5 M | 1.9 B | 59 / 66 | 84.8 | 89.1 | 2.1 s |
 | Whisper-small | Qwen3-1.7B | 🤗 [DuplexJev-B-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Whisper-small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | 29.4 M | 1.8 B | 48 / 66 | 78.8 | 62.4 | 2.4 s |
 | Qwen3-ASR-0.6B | Qwen3-4B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | 12.6 M | 4.2 B | 72 / 82 | 89.4 | 91.9 | 5.4 s |
+| SenseVoice-Small | Qwen3-0.6B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-0.6B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B) | 8.4 M | 0.8 B | 34 / 46 | 67.5 | 85.8 | 1.0 s |
+| SenseVoice-Small | Qwen3-1.7B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B) | 10.5 M | 2.0 B | 47 / 66 | 66.9 | 78.4 | 2.4 s |
+| SenseVoice-Small | Qwen3-4B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-4B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B) | 11.5 M | 4.3 B | 61 / 82 | 76.8 | 89.0 | 6.1 s |
 
 用 Qwen3-ASR 编码器时，连 Qwen3-0.6B 听性别和情绪的能力也和 Qwen3-32B 相当（89 / 89 对 90 / 90）。
+SenseVoice-Small 保留了情绪信息（最高 89），但说话人性别弱一些（67–77）；Whisper-small 两者都更弱。SenseVoice 编码器（[`adventists-ai/SenseVoice-Small-Encoder`](https://huggingface.co/adventists-ai/SenseVoice-Small-Encoder)，不依赖 FunASR 的 SenseVoiceSmall 移植版）按 FunASR 模型许可再分发，需另装 `torchaudio`。
 
 ## 4. 快速上手
 

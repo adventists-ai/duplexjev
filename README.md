@@ -57,7 +57,7 @@ state + N typed questions ──► frozen LLM (Qwen3-32B), ONE forward pass
 
 ## 2. News
 
-- **2026-09-25** — Released **8 small connectors** (Qwen3-0.6B / 1.7B / 4B with the Qwen3-ASR encoder, Qwen3-1.7B with Whisper-small), content and gender + emotion versions; see [Small connectors](#small-connectors-edge-sized).
+- **2026-09-25** — Released **14 small connectors** (Qwen3-0.6B / 1.7B / 4B with the Qwen3-ASR encoder, Qwen3-1.7B with Whisper-small) and 6 with a SenseVoice-Small encoder (Qwen3-0.6B / 1.7B / 4B), content and gender + emotion versions; see [Small connectors](#small-connectors-edge-sized).
 - **2026-09-24** — Released **7 connectors and 2 encoder repositories** on 🤗 [Hugging Face](https://huggingface.co/adventists-ai) and [`duplexjev` 0.2.1](https://pypi.org/project/duplexjev/0.2.1/) (audio is now padded at the end: padding at the start cost up to 6 points on emotion; `text_model` / `audio_model` work offline).
 - **2026-09** — Paper submitted to ICASSP 2027. Released the `duplexjev` package, research code, latency benchmarks and project page.
 - **2026-10-10 (planned)** — Speech-to-Decision commercial API.
@@ -91,9 +91,9 @@ non-commercial research use.
 
 ### Small connectors (edge-sized)
 
-The same recipe (R1 → R2 → MIX-KD, last-layer connector B) on small frozen LLMs and two encoders. Scores are the
+The same recipe (R1 → R2 → MIX-KD, last-layer connector B) on small frozen LLMs and three encoders. Scores are the
 MIX-KD connectors under the paper protocol (%); CPU = one decision event of 10 questions on a 4.5 s clip, fp32,
-not quantized (one H200 GPU: 40–80 ms for all four). Small LLMs answer knowledge questions poorly even from the
+not quantized (one H200 GPU: 40–80 ms; 130–150 ms with SenseVoice, whose frontend runs clip by clip). Small LLMs answer knowledge questions poorly even from the
 transcript, so use them for short decisions and speaker cues. Model cards list the `duplexjev` numbers too.
 
 | encoder | LLM | content connector (Apache-2.0) | + gender & emotion, MIX-KD (CC BY-NC 4.0) | trainable | total | qa100 (speech / transcript) | gender | emotion | CPU, 8 threads |
@@ -102,8 +102,12 @@ transcript, so use them for short decisions and speaker cues. Model cards list t
 | Qwen3-ASR-0.6B | Qwen3-1.7B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | 11.5 M | 1.9 B | 59 / 66 | 84.8 | 89.1 | 2.1 s |
 | Whisper-small | Qwen3-1.7B | 🤗 [DuplexJev-B-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Whisper-small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | 29.4 M | 1.8 B | 48 / 66 | 78.8 | 62.4 | 2.4 s |
 | Qwen3-ASR-0.6B | Qwen3-4B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | 12.6 M | 4.2 B | 72 / 82 | 89.4 | 91.9 | 5.4 s |
+| SenseVoice-Small | Qwen3-0.6B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-0.6B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B) | 8.4 M | 0.8 B | 34 / 46 | 67.5 | 85.8 | 1.0 s |
+| SenseVoice-Small | Qwen3-1.7B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B) | 10.5 M | 2.0 B | 47 / 66 | 66.9 | 78.4 | 2.4 s |
+| SenseVoice-Small | Qwen3-4B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-4B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B) | 11.5 M | 4.3 B | 61 / 82 | 76.8 | 89.0 | 6.1 s |
 
 With the Qwen3-ASR encoder, even Qwen3-0.6B hears gender and emotion about as well as Qwen3-32B (89 / 89 vs. 90 / 90).
+SenseVoice-Small keeps emotion (up to 89) but less speaker gender (67–77), and Whisper-small keeps less of both. The SenseVoice encoder ([`adventists-ai/SenseVoice-Small-Encoder`](https://huggingface.co/adventists-ai/SenseVoice-Small-Encoder), a FunASR-free port of SenseVoiceSmall) is redistributed under the FunASR Model License and needs `torchaudio`.
 
 ## 4. Quick start
 
