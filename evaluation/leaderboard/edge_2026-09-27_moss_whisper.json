@@ -1,0 +1,452 @@
+{
+ "models": [
+  {
+   "repo": "DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "Qwen3-4B-Instruct-2507",
+   "stage": "para",
+   "paper": {
+    "qa100": 61,
+    "zjuml": 42,
+    "easyturn": 45.8,
+    "gender": 95.5,
+    "emotion": 85.4,
+    "qa100_text": 84
+   },
+   "llm_short": "Qwen3-4B-2507",
+   "llm_id": "Qwen/Qwen3-4B-Instruct-2507",
+   "pip": {
+    "gender": 96.1,
+    "emotion": 83.4,
+    "qa100": 63
+   },
+   "trainable_M": 38.8,
+   "latency": {
+    "cpu_ms": 6205,
+    "cuda_ms_shared": 154
+   },
+   "params_M": 4368
+  },
+  {
+   "repo": "DuplexJev-B-MOSS-Transcribe-Qwen3-4B-2507",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "Qwen3-4B-Instruct-2507",
+   "stage": "r2",
+   "paper": {
+    "qa100": 71,
+    "zjuml": 48,
+    "easyturn": 60.2,
+    "gender": 54.4,
+    "emotion": 29.1,
+    "qa100_text": 84
+   },
+   "llm_short": "Qwen3-4B-2507",
+   "llm_id": "Qwen/Qwen3-4B-Instruct-2507",
+   "pip": {
+    "gender": 53.4,
+    "emotion": 30.8,
+    "qa100": 72
+   },
+   "trainable_M": 38.8,
+   "latency": {
+    "cpu_ms": 6205,
+    "cuda_ms_shared": 154
+   },
+   "params_M": 4368
+  },
+  {
+   "repo": "DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "Qwen3-4B-Instruct-2507",
+   "stage": "para",
+   "paper": {
+    "qa100": 43,
+    "zjuml": 45,
+    "easyturn": 49.2,
+    "gender": 91.1,
+    "emotion": 70.1,
+    "qa100_text": 84
+   },
+   "llm_short": "Qwen3-4B-2507",
+   "llm_id": "Qwen/Qwen3-4B-Instruct-2507",
+   "pip": {
+    "gender": 91.6,
+    "emotion": 74.1,
+    "qa100": 55
+   },
+   "trainable_M": 30.4,
+   "latency": {
+    "cpu_ms": 5156,
+    "cuda_ms_shared": 145
+   },
+   "params_M": 4141
+  },
+  {
+   "repo": "DuplexJev-B-Whisper-small-Qwen3-4B-2507",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "Qwen3-4B-Instruct-2507",
+   "stage": "r2",
+   "paper": {
+    "qa100": 53,
+    "zjuml": 51,
+    "easyturn": 56.5,
+    "gender": 55.1,
+    "emotion": 31.0,
+    "qa100_text": 84
+   },
+   "llm_short": "Qwen3-4B-2507",
+   "llm_id": "Qwen/Qwen3-4B-Instruct-2507",
+   "pip": {
+    "gender": 52.9,
+    "emotion": 30.8,
+    "qa100": 61
+   },
+   "trainable_M": 30.4,
+   "latency": {
+    "cpu_ms": 5156,
+    "cuda_ms_shared": 145
+   },
+   "params_M": 4141
+  },
+  {
+   "repo": "DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "SmolLM3-3B",
+   "stage": "para",
+   "paper": {
+    "qa100": 33,
+    "zjuml": 41,
+    "easyturn": 46.1,
+    "gender": 97.9,
+    "emotion": 84.6,
+    "qa100_text": 77
+   },
+   "llm_short": "SmolLM3-3B",
+   "llm_id": "HuggingFaceTB/SmolLM3-3B",
+   "pip": {
+    "gender": 97.8,
+    "emotion": 85.9,
+    "qa100": 41
+   },
+   "trainable_M": 37.8,
+   "latency": {
+    "cpu_ms": 5812,
+    "cuda_ms_shared": 156
+   },
+   "params_M": 3420
+  },
+  {
+   "repo": "DuplexJev-B-MOSS-Transcribe-SmolLM3-3B",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "SmolLM3-3B",
+   "stage": "r2",
+   "paper": {
+    "qa100": 47,
+    "zjuml": 47,
+    "easyturn": 36.4,
+    "gender": 53.5,
+    "emotion": 29.0,
+    "qa100_text": 77
+   },
+   "llm_short": "SmolLM3-3B",
+   "llm_id": "HuggingFaceTB/SmolLM3-3B",
+   "pip": {
+    "gender": 58.0,
+    "emotion": 30.6,
+    "qa100": 53
+   },
+   "trainable_M": 37.8,
+   "latency": {
+    "cpu_ms": 5812,
+    "cuda_ms_shared": 156
+   },
+   "params_M": 3420
+  },
+  {
+   "repo": "DuplexJev-B-Para-Whisper-small-SmolLM3-3B",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "SmolLM3-3B",
+   "stage": "para",
+   "paper": {
+    "qa100": 35,
+    "zjuml": 42,
+    "easyturn": 41.5,
+    "gender": 93.5,
+    "emotion": 77.8,
+    "qa100_text": 77
+   },
+   "llm_short": "SmolLM3-3B",
+   "llm_id": "HuggingFaceTB/SmolLM3-3B",
+   "pip": {
+    "gender": 94.4,
+    "emotion": 76.2,
+    "qa100": 41
+   },
+   "trainable_M": 29.4,
+   "latency": {
+    "cpu_ms": 6491,
+    "cuda_ms_shared": 149
+   },
+   "params_M": 3193
+  },
+  {
+   "repo": "DuplexJev-B-Whisper-small-SmolLM3-3B",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "SmolLM3-3B",
+   "stage": "r2",
+   "paper": {
+    "qa100": 38,
+    "zjuml": 48,
+    "easyturn": 26.1,
+    "gender": 52.9,
+    "emotion": 30.1,
+    "qa100_text": 77
+   },
+   "llm_short": "SmolLM3-3B",
+   "llm_id": "HuggingFaceTB/SmolLM3-3B",
+   "pip": {
+    "gender": 58.0,
+    "emotion": 29.2,
+    "qa100": 40
+   },
+   "trainable_M": 29.4,
+   "latency": {
+    "cpu_ms": 6491,
+    "cuda_ms_shared": 149
+   },
+   "params_M": 3193
+  },
+  {
+   "repo": "DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "Falcon-H1-1.5B-Instruct",
+   "stage": "para",
+   "paper": {
+    "qa100": 44,
+    "zjuml": 38,
+    "easyturn": 29.2,
+    "gender": 94.0,
+    "emotion": 84.6,
+    "qa100_text": 73
+   },
+   "llm_short": "Falcon-H1-1.5B",
+   "llm_id": "tiiuae/Falcon-H1-1.5B-Instruct",
+   "pip": {
+    "gender": 91.6,
+    "emotion": 83.8,
+    "qa100": 46
+   },
+   "trainable_M": 37.8,
+   "latency": {
+    "cpu_ms": 100267,
+    "cuda_ms_shared": 204
+   },
+   "params_M": 1900
+  },
+  {
+   "repo": "DuplexJev-B-MOSS-Transcribe-Falcon-H1-1.5B",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "Falcon-H1-1.5B-Instruct",
+   "stage": "r2",
+   "paper": {
+    "qa100": 50,
+    "zjuml": 32,
+    "easyturn": 35.9,
+    "gender": 53.1,
+    "emotion": 28.1,
+    "qa100_text": 73
+   },
+   "llm_short": "Falcon-H1-1.5B",
+   "llm_id": "tiiuae/Falcon-H1-1.5B-Instruct",
+   "pip": {
+    "gender": 51.7,
+    "emotion": 28.5,
+    "qa100": 56
+   },
+   "trainable_M": 37.8,
+   "latency": {
+    "cpu_ms": 100267,
+    "cuda_ms_shared": 204
+   },
+   "params_M": 1900
+  },
+  {
+   "repo": "DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "Falcon-H1-1.5B-Instruct",
+   "stage": "para",
+   "paper": {
+    "qa100": 43,
+    "zjuml": 35,
+    "easyturn": 32.4,
+    "gender": 83.2,
+    "emotion": 70.2,
+    "qa100_text": 73
+   },
+   "llm_short": "Falcon-H1-1.5B",
+   "llm_id": "tiiuae/Falcon-H1-1.5B-Instruct",
+   "pip": {
+    "gender": 87.0,
+    "emotion": 73.5,
+    "qa100": 44
+   },
+   "trainable_M": 29.4,
+   "latency": {
+    "cpu_ms": 85254,
+    "cuda_ms_shared": 187
+   },
+   "params_M": 1672
+  },
+  {
+   "repo": "DuplexJev-B-Whisper-small-Falcon-H1-1.5B",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "Falcon-H1-1.5B-Instruct",
+   "stage": "r2",
+   "paper": {
+    "qa100": 50,
+    "zjuml": 34,
+    "easyturn": 31.9,
+    "gender": 53.1,
+    "emotion": 26.9,
+    "qa100_text": 73
+   },
+   "llm_short": "Falcon-H1-1.5B",
+   "llm_id": "tiiuae/Falcon-H1-1.5B-Instruct",
+   "pip": {
+    "gender": 54.1,
+    "emotion": 26.8,
+    "qa100": 49
+   },
+   "trainable_M": 29.4,
+   "latency": {
+    "cpu_ms": 85254,
+    "cuda_ms_shared": 187
+   },
+   "params_M": 1672
+  },
+  {
+   "repo": "DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "Falcon-H1-3B-Instruct",
+   "stage": "para",
+   "paper": {
+    "qa100": 51,
+    "zjuml": 37,
+    "easyturn": 43.5,
+    "gender": 98.1,
+    "emotion": 85.1,
+    "qa100_text": 81
+   },
+   "llm_short": "Falcon-H1-3B",
+   "llm_id": "tiiuae/Falcon-H1-3B-Instruct",
+   "pip": {
+    "gender": 98.2,
+    "emotion": 84.1,
+    "qa100": 55
+   },
+   "trainable_M": 38.8,
+   "latency": {
+    "cpu_ms": 171345,
+    "cuda_ms_shared": 185
+   },
+   "params_M": 3495
+  },
+  {
+   "repo": "DuplexJev-B-MOSS-Transcribe-Falcon-H1-3B",
+   "conn": "B",
+   "enc": "moss",
+   "llm": "Falcon-H1-3B-Instruct",
+   "stage": "r2",
+   "paper": {
+    "qa100": 52,
+    "zjuml": 48,
+    "easyturn": 54.6,
+    "gender": 50.4,
+    "emotion": 28.4,
+    "qa100_text": 81
+   },
+   "llm_short": "Falcon-H1-3B",
+   "llm_id": "tiiuae/Falcon-H1-3B-Instruct",
+   "pip": {
+    "gender": 52.9,
+    "emotion": 28.0,
+    "qa100": 63
+   },
+   "trainable_M": 38.8,
+   "latency": {
+    "cpu_ms": 171345,
+    "cuda_ms_shared": 185
+   },
+   "params_M": 3495
+  },
+  {
+   "repo": "DuplexJev-B-Para-Whisper-small-Falcon-H1-3B",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "Falcon-H1-3B-Instruct",
+   "stage": "para",
+   "paper": {
+    "qa100": 50,
+    "zjuml": 45,
+    "easyturn": 42.1,
+    "gender": 90.4,
+    "emotion": 79.5,
+    "qa100_text": 81
+   },
+   "llm_short": "Falcon-H1-3B",
+   "llm_id": "tiiuae/Falcon-H1-3B-Instruct",
+   "pip": {
+    "gender": 91.8,
+    "emotion": 77.6,
+    "qa100": 49
+   },
+   "trainable_M": 30.4,
+   "latency": {
+    "cpu_ms": 169661,
+    "cuda_ms_shared": 104
+   },
+   "params_M": 3268
+  },
+  {
+   "repo": "DuplexJev-B-Whisper-small-Falcon-H1-3B",
+   "conn": "B",
+   "enc": "whisper",
+   "llm": "Falcon-H1-3B-Instruct",
+   "stage": "r2",
+   "paper": {
+    "qa100": 50,
+    "zjuml": 39,
+    "easyturn": 50.4,
+    "gender": 49.5,
+    "emotion": 28.7,
+    "qa100_text": 81
+   },
+   "llm_short": "Falcon-H1-3B",
+   "llm_id": "tiiuae/Falcon-H1-3B-Instruct",
+   "pip": {
+    "gender": 52.2,
+    "emotion": 29.0,
+    "qa100": 54
+   },
+   "trainable_M": 30.4,
+   "latency": {
+    "cpu_ms": 169661,
+    "cuda_ms_shared": 104
+   },
+   "params_M": 3268
+  }
+ ]
+}

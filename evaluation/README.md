@@ -22,3 +22,12 @@ upper bound) and **options-only** (no question, lower bound).
 
 Results for the released checkpoints will be listed in the main README.
 Paths refer to our cluster; see [docs/PATHS.md](../docs/PATHS.md).
+
+## Leaderboard
+
+The README leaderboard adds three benchmarks to qa100 and ZJU-ML: **Easy-Turn** (800 clips of its test set, four-way
+turn state, zero-shot; [arXiv:2509.23938](https://arxiv.org/abs/2509.23938)), **gender** (800 real utterances from
+AISHELL-1, Common Voice and LibriSpeech, balanced by gender and language) and **emotion** (800 acted utterances from
+held-out ESD speakers and CREMA-D actors, balanced over neutral / happy / angry / sad). Scores of every released
+checkpoint are in [`leaderboard/`](leaderboard); `python evaluation/build_leaderboard.py en evaluation/leaderboard/*.json`
+regenerates the tables.

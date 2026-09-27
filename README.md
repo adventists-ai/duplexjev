@@ -15,7 +15,7 @@
   🤗 <a href="https://huggingface.co/adventists-ai">Weights</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
-  📝 <a href="#9-citation">Citation</a>
+  📝 <a href="#10-citation">Citation</a>
 </p>
 
 ---
@@ -28,115 +28,132 @@ LLM, and every runtime-declared question — *is the turn complete? which filler
 as a **single-token, closed-set distribution**: no ASR decoding, no text decoding. Many questions, about one call or
 across many calls, share one forward pass.
 
-Paper: *Batched Speech Decisions Without Decoding: Single-Token Supervision Lets a Frozen LLM Hear Beyond the
-Transcript* (ICASSP 2027 submission).
-
 ```
-audio ──► frozen ASR encoder (Qwen3-ASR-0.6B, 12.5 Hz)
-            ├─ B: last layer h18 ─────────────────────────────┐
-            └─ A: cross-attention fusion  Q=h18, K=h14, V=h9 ─┤  (zero-init, residual)
-                                                              ▼
-                              projector (stack 2 frames → 6.25 tokens/s, MLP → d_LLM)
-                                                              ▼
-state + N typed questions ──► frozen LLM (Qwen3-32B), ONE forward pass
-                                                              ▼
+audio ──► frozen ASR encoder (Qwen3-ASR, MOSS-Transcribe, Whisper, SenseVoice, …)
+            ├─ B: last layer ──────────────────────────────────┐
+            └─ A: cross-attention fusion over three layers ────┤  (zero-init, residual)
+                                                               ▼
+                              connector (frame stacking → 6.25 tokens/s, MLP → d_LLM)
+                                                               ▼
+state + N typed questions ──► frozen LLM (0.6B – 32B), ONE forward pass
+                                                               ▼
             p(A|q1) … p(D|q1),  …,  p(A|qN) … p(D|qN)      — 0 decode steps
 ```
 
-- **Typed single-token readout.** Each question lists its options under permuted letters; the answer is the
-  next-token softmax restricted to those letters. The output is always valid, and `max p` is a confidence score.
-- **Hears the speaker, not only the words.** Speech LLMs trained by transcript distillation are deaf to gender and
-  emotion, because their teacher only reads the transcript. Supervising the single answer token instead
-  (cross-entropy on the option letter) lifts gender and emotion accuracy to 90%, while content understanding drops by
-  1 point.
-- **Prefix sharing.** Template, dialogue context and audio are encoded once; all question suffixes are packed into one
-  row under a block-diagonal 4-D mask, with position ids restarting at the prefix length. The KV cache holds
-  `P + ΣL_i` positions instead of `N(P + L)`, and answers match one-by-one runs up to bf16 noise.
-- **Modular.** Any ASR encoder, a small trainable connector (17.8 M parameters; +3.2 M for the fusion block in
-  variant A) and any frozen LLM that accepts input embeddings.
+- **Typed single-token readout.** Each question lists its options under permuted letters; the answer is the next-token
+  softmax restricted to those letters. The output is always valid, and `max p` is a confidence score.
+- **Hears the speaker, not only the words.** Transcript distillation leaves speech LLMs deaf to gender and emotion;
+  supervising the single answer token lifts both to about 90% while content understanding moves by about 1 point.
+- **Prefix sharing.** Context and audio are encoded once and all question suffixes are packed into one row under a
+  block-diagonal mask; answers match one-by-one runs up to bf16 noise.
 
 ## 2. News
 
-- **2026-09-25** — Released **14 small connectors** (Qwen3-0.6B / 1.7B / 4B with the Qwen3-ASR encoder, Qwen3-1.7B with Whisper-small) and 6 with a SenseVoice-Small encoder (Qwen3-0.6B / 1.7B / 4B), content and gender + emotion versions; see [Small connectors](#small-connectors-edge-sized).
-- **2026-09-24** — Released **7 connectors and 2 encoder repositories** on 🤗 [Hugging Face](https://huggingface.co/adventists-ai) and [`duplexjev` 0.2.1](https://pypi.org/project/duplexjev/0.2.1/) (audio is now padded at the end: padding at the start cost up to 6 points on emotion; `text_model` / `audio_model` work offline).
-- **2026-09** — Paper submitted to ICASSP 2027. Released the `duplexjev` package, research code, latency benchmarks and project page.
-- **2026-10-10 (planned)** — Speech-to-Decision commercial API.
-- **2026-10-15 (planned)** — Open-source full-duplex Jev dialogue pipeline.
+- **2026-09-27** — **16 new connectors** with the MOSS-Transcribe-Diarize and Whisper-small encoders on
+  Qwen3-4B-2507, SmolLM3-3B, Falcon-H1-1.5B and Falcon-H1-3B, the
+  [MOSS encoder](https://huggingface.co/adventists-ai/MOSS-Transcribe-Diarize-Whisper-Encoder), and
+  [`duplexjev` 0.2.2](https://pypi.org/project/duplexjev/0.2.2/) (automatic `mode="batch"` for recurrent LLMs such as
+  Falcon-H1). Qwen3-ASR-0.6B → **Qwen2.5-72B** connectors (A and B) are training; results soon.
+- **2026-09-25** — 20 small connectors on Qwen3-0.6B / 1.7B / 4B with the Qwen3-ASR and SenseVoice-Small encoders (and Whisper-small with Qwen3-1.7B).
+- **2026-09-24** — 7 Qwen3-32B connectors and [`duplexjev` 0.2.1](https://pypi.org/project/duplexjev/0.2.1/); paper submitted to ICASSP 2027.
 
-## 3. Model download
+Coming next: Speech-to-Decision commercial API (2026-10-10), open-source full-duplex Jev dialogue pipeline (2026-10-15).
 
-Each checkpoint is a **connector for one specific pair of models**: it contains only the trained projector (and, for A,
-the fusion block) that joins the frozen ASR encoder to the frozen LLM. It does not work with other encoders or LLMs,
-including other sizes of the same family. `Decider.from_pretrained("adventists-ai/<repo>")` fetches the encoder and the
-LLM automatically.
+## 3. Models
 
-All connectors use the frozen **Qwen3-ASR-0.6B** encoder and the frozen **[Qwen3-32B](https://huggingface.co/Qwen/Qwen3-32B)** LLM.
+Each checkpoint is a **connector for one specific encoder and LLM**: it contains only the trained connector; the frozen
+encoder and LLM are fetched automatically by `Decider.from_pretrained("adventists-ai/<repo>")`. It does not work with
+other encoders or LLMs, including other sizes of the same family.
 
-| repository | connector | trained for | trainable params | license |
-|---|---|---|---:|---|
-| 🤗 [DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B) | A · cross-attention fusion | content (R2) | 21.1 M | Apache-2.0 |
-| 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B) | B · last layer | content (R2), best spoken QA | 17.8 M | Apache-2.0 |
-| 🤗 [DuplexJev-A-Gender-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Gender-Qwen3-ASR-0.6B-Qwen3-32B) | A | + speaker gender | 21.1 M | Apache-2.0 |
-| 🤗 [DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B) | B | + speaker gender | 17.8 M | Apache-2.0 |
-| 🤗 [DuplexJev-A-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | A | + emotion (4-way) | 21.1 M | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | B | + emotion (4-way) | 17.8 M | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B) | A | gender + emotion + content, mixed objective (best paralinguistic) | 21.1 M | CC BY-NC 4.0 |
+### Leaderboard
 
-Encoders (fetched automatically): 🤗 [Qwen3-ASR-0.6B-Encoder](https://huggingface.co/adventists-ai/Qwen3-ASR-0.6B-Encoder)
-(for B) and 🤗 [Qwen3-ASR-0.6B-Encoder-XAttn](https://huggingface.co/adventists-ai/Qwen3-ASR-0.6B-Encoder-XAttn) (for A;
-same weights, plus the fusion-block code). Both are the audio encoder of Qwen3-ASR-0.6B, unchanged, Apache-2.0.
+Total = (main language + paralinguistics) / 2. Main language = mean of qa100, ZJU-ML and Easy-Turn; paralinguistics = mean of gender and emotion (all %). One checkpoint per encoder × LLM × connector: the one with the best total.
 
-The emotion connectors were trained on ESD, which is licensed for research only, so they are released for
-non-commercial research use.
+| rank | encoder | LLM | connector | checkpoint | total | main language | paralinguistics |
+|---:|---|---|---|---|---:|---:|---:|
+| 1 | Qwen3-ASR-0.6B | Qwen3-32B | A · cross-attention | 🤗 [DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B) | **80.6** | 71.2 | 90.0 |
+| 2 | Qwen3-ASR-0.6B | Qwen3-4B | B · native | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | **75.9** | 61.1 | 90.7 |
+| 3 | Qwen3-ASR-0.6B | Qwen3-32B | B · native | 🤗 [DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | **72.7** | 76.7 | 68.7 |
+| 4 | MOSS-Transcribe-Diarize | Qwen3-4B-2507 | B · native | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507) | **70.0** | 49.6 | 90.5 |
+| 5 | MOSS-Transcribe-Diarize | Falcon-H1-3B | B · native | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B) | **67.7** | 43.8 | 91.6 |
+| 6 | SenseVoice-Small | Qwen3-4B | B · native | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B) | **66.5** | 50.0 | 82.9 |
+| 7 | Qwen3-ASR-0.6B | Qwen3-1.7B | B · native | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | **66.3** | 45.8 | 86.9 |
+| 8 | MOSS-Transcribe-Diarize | SmolLM3-3B | B · native | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B) | **65.6** | 40.0 | 91.2 |
+| 9 | Whisper-small | Falcon-H1-3B | B · native | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Falcon-H1-3B) | **65.3** | 45.7 | 85.0 |
+| 10 | MOSS-Transcribe-Diarize | Falcon-H1-1.5B | B · native | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B) | **63.2** | 37.1 | 89.3 |
+| 11 | Whisper-small | Qwen3-4B-2507 | B · native | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507) | **63.1** | 45.7 | 80.6 |
+| 12 | Qwen3-ASR-0.6B | Qwen3-0.6B | B · native | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B) | **62.8** | 36.2 | 89.3 |
+| 13 | Whisper-small | SmolLM3-3B | B · native | 🤗 [DuplexJev-B-Para-Whisper-small-SmolLM3-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-SmolLM3-3B) | **62.6** | 39.5 | 85.7 |
+| 14 | Whisper-small | Falcon-H1-1.5B | B · native | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B) | **56.8** | 36.8 | 76.7 |
+| 15 | SenseVoice-Small | Qwen3-0.6B | B · native | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B) | **55.2** | 33.8 | 76.7 |
+| 16 | SenseVoice-Small | Qwen3-1.7B | B · native | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B) | **54.9** | 37.0 | 72.7 |
+| 17 | Whisper-small | Qwen3-1.7B | B · native | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | **54.2** | 37.9 | 70.6 |
 
-### Small connectors (edge-sized)
+#### Details
 
-The same recipe (R1 → R2 → MIX-KD, last-layer connector B) on small frozen LLMs and three encoders. Scores are the
-MIX-KD connectors under the paper protocol (%); CPU = one decision event of 10 questions on a 4.5 s clip, fp32,
-not quantized (one H200 GPU: 40–80 ms; 130–150 ms with SenseVoice, whose frontend runs clip by clip). Small LLMs answer knowledge questions poorly even from the
-transcript, so use them for short decisions and speaker cues. Model cards list the `duplexjev` numbers too.
+| checkpoint | qa100 | ZJU-ML | Easy-Turn | gender | emotion | params | CPU (8 threads) | licence |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B | 82 | 61 | 70.5 | 89.9 | 90 | 33.4 B | – | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B | 72 | 51 | 60.2 | 89.4 | 91.9 | 4.2 B | 5.4 s | CC BY-NC 4.0 |
+| DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B | 89 | 69 | 72.2 | 51.8 | 85.5 | 33.4 B | – | CC BY-NC 4.0 |
+| DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507 | 61 | 42 | 45.8 | 95.5 | 85.4 | 4.4 B | 6.2 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B | 51 | 37 | 43.5 | 98.1 | 85.1 | 3.5 B | 171.3 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B | 61 | 37 | 52 | 76.8 | 89 | 4.3 B | 6.1 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B | 59 | 39 | 39.4 | 84.8 | 89.1 | 1.9 B | 2.1 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B | 33 | 41 | 46.1 | 97.9 | 84.6 | 3.4 B | 5.8 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Whisper-small-Falcon-H1-3B | 50 | 45 | 42.1 | 90.4 | 79.5 | 3.3 B | 169.7 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B | 44 | 38 | 29.2 | 94 | 84.6 | 1.9 B | 100.3 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507 | 43 | 45 | 49.2 | 91.1 | 70.1 | 4.1 B | 5.2 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B | 38 | 26 | 44.5 | 89.4 | 89.2 | 0.8 B | 0.9 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Whisper-small-SmolLM3-3B | 35 | 42 | 41.5 | 93.5 | 77.8 | 3.2 B | 6.5 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B | 43 | 35 | 32.4 | 83.2 | 70.2 | 1.7 B | 85.3 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B | 34 | 27 | 40.4 | 67.5 | 85.8 | 0.8 B | 1.0 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B | 47 | 30 | 34.1 | 66.9 | 78.4 | 2.0 B | 2.4 s | CC BY-NC 4.0 |
+| DuplexJev-B-Para-Whisper-small-Qwen3-1.7B | 48 | 28 | 37.8 | 78.8 | 62.4 | 1.8 B | 2.4 s | CC BY-NC 4.0 |
 
-| encoder | LLM | content connector (Apache-2.0) | + gender & emotion, MIX-KD (CC BY-NC 4.0) | trainable | total | qa100 (speech / transcript) | gender | emotion | CPU, 8 threads |
-|---|---|---|---|---:|---:|---:|---:|---:|---:|
-| Qwen3-ASR-0.6B | Qwen3-0.6B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-0.6B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B) | 9.4 M | 0.8 B | 38 / 45 | 89.4 | 89.2 | 0.9 s |
-| Qwen3-ASR-0.6B | Qwen3-1.7B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | 11.5 M | 1.9 B | 59 / 66 | 84.8 | 89.1 | 2.1 s |
-| Whisper-small | Qwen3-1.7B | 🤗 [DuplexJev-B-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Whisper-small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | 29.4 M | 1.8 B | 48 / 66 | 78.8 | 62.4 | 2.4 s |
-| Qwen3-ASR-0.6B | Qwen3-4B | 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B) | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | 12.6 M | 4.2 B | 72 / 82 | 89.4 | 91.9 | 5.4 s |
-| SenseVoice-Small | Qwen3-0.6B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-0.6B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B) | 8.4 M | 0.8 B | 34 / 46 | 67.5 | 85.8 | 1.0 s |
-| SenseVoice-Small | Qwen3-1.7B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-1.7B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B) | 10.5 M | 2.0 B | 47 / 66 | 66.9 | 78.4 | 2.4 s |
-| SenseVoice-Small | Qwen3-4B | 🤗 [DuplexJev-B-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-SenseVoice-Small-Qwen3-4B) | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B) | 11.5 M | 4.3 B | 61 / 82 | 76.8 | 89.0 | 6.1 s |
+Scores are % under the paper protocol (single-token readout, one H200); see [Benchmarks](#6-benchmarks). CPU = one
+decision event (10 questions, a 4.5 s clip) on 8 CPU threads, fp32, not quantized; on one H200 every model answers in
+about 0.05–0.2 s.
 
-With the Qwen3-ASR encoder, even Qwen3-0.6B hears gender and emotion about as well as Qwen3-32B (89 / 89 vs. 90 / 90).
-SenseVoice-Small keeps emotion (up to 89) but less speaker gender (67–77), and Whisper-small keeps less of both. The SenseVoice encoder ([`adventists-ai/SenseVoice-Small-Encoder`](https://huggingface.co/adventists-ai/SenseVoice-Small-Encoder), a FunASR-free port of SenseVoiceSmall) is redistributed under the FunASR Model License and needs `torchaudio`.
+**Which one to use.**
+- *Server, best overall:* `DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B` (one 80 GB GPU).
+- *Edge / small GPU:* `DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B`; on CPU, `…-Qwen3-0.6B` answers in under 1 s.
+- *Content decisions only, commercial use:* the content versions without `-Para` (Apache-2.0; gender and emotion at
+  chance), e.g. `DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B` (qa100 90).
+- *Falcon-H1 connectors* need a GPU (no fast CPU path for their Mamba layers).
+
+Every trained variant (content-only, gender-only, emotion-only, all encoders) stays available on
+🤗 [Hugging Face](https://huggingface.co/adventists-ai); the paper's full comparison of the Qwen3-32B variants is in
+[docs/paper_results.md](docs/paper_results.md).
 
 ## 4. Quick start
 
 ```bash
-pip install "duplexjev[speech]>=0.2.1"      # add [all] for the HTTP server
+pip install "duplexjev[speech]>=0.2.2"      # add [all] for the HTTP server
 ```
 
-**One clip, several option groups** (the default):
+**One clip, several option groups:**
 
 ```python
 from duplexjev import Decider, Question
 
-d = Decider.from_pretrained("adventists-ai/DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B", device="auto")
+d = Decider.from_pretrained("adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B", device="auto")
 groups = [Question("turn", "Has the user finished the turn?", ["finished", "not finished"]),
           Question("filler", "Which filler fits?", ["Sure —", "One moment —", "(stay silent)"]),
-          Question("gender", "What is the perceived gender of the speaker?", ["female", "male"])]
+          Question("gender", "What is the perceived gender of the speaker?", ["female", "male"]),
+          Question("emotion", "What is the speaker's emotional state?", ["neutral", "happy", "angry", "sad"])]
 
 d.decide("call_017.wav", groups)
-# {'turn': {'answer': 'finished', 'confidence': 0.97, 'probs': {...}}, 'filler': {...}, 'gender': {...}}
+# {'turn': {'answer': 'finished', 'confidence': 0.97, 'probs': {...}}, 'filler': {...}, 'gender': {...}, 'emotion': {...}}
 
 # Chinese speech: ask in Chinese, with Chinese options
 d.decide("call_018.wav", [Question("gender", "说话人的性别是？", ["男性", "女性"], lang="zh")], lang="zh")
 ```
 
-Ask in the language of the clip: the connectors were trained with language-matched prompts (Chinese questions and
-options for Chinese speech). Each model card lists the question wordings used in training.
+Ask in the language of the clip: the connectors were trained with language-matched prompts. Each model card lists the
+question wordings used in training.
 
-**Many clips, many option groups** (advanced): each group names the clip(s) it is about with `audio=<id>`, a list
-of ids, or `"*"` for every clip. Everything runs in one batched pass.
+**Many clips, many option groups** — each group names the clip(s) it is about; everything runs in one batched pass:
 
 ```python
 d.decide_batch(
@@ -145,10 +162,9 @@ d.decide_batch(
      Question("gender", "What is the perceived gender of the speaker?", ["female", "male"], audio=["car2", "car3"]),
      Question("human", "Does the user need a human agent?", ["yes", "no"], audio="car1")],
     context={"car1": "Driver asked to call home twice."})
-# {'car1': {'turn': ..., 'human': ...}, 'car2': {'turn': ..., 'gender': ...}, 'car3': {...}}
 ```
 
-**Batched server:** every request that arrives within one tick is answered in one pass.
+**Batched server** — every request that arrives within one tick is answered in one pass:
 
 ```bash
 duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tick-ms 160
@@ -156,107 +172,43 @@ duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tic
 # POST /v1/decide_batch  {"audios": {"car1": ..., "car2": ...}, "questions": [{..., "audio": "car1"}]}
 ```
 
-Command line: `duplexjev decide --model M call.wav --q "turn|Has the user finished?|finished,not finished"`.
+Local model copies, multi-GPU sharding, other Ultravox checkpoints and the package's guarantees:
+[docs/package.md](docs/package.md).
 
-### Choosing a model
+## 5. Performance
 
-`Decider.from_pretrained(...)` (CLI: `--model`) takes a Hugging Face repo id or a local path of a **speech checkpoint in
-Ultravox format**. A checkpoint is an ASR encoder plus the connector trained for it, and it names the frozen LLM it was
-trained against. So you pick one name; the encoder comes with it, and the LLM is fetched from the id in its config.
+Ten decisions about one call, Qwen3-32B on one H200 (vLLM, bf16): **92 ms** with the single-token readout, against
+**1,567 ms + 411 ms ASR** for the usual cascade (transcribe, then let the LLM generate JSON). Within a 0.25 s budget the
+readout serves 17 such events per second; the cascade serves none. Full tables: [docs/paper_results.md](docs/paper_results.md).
 
-```python
-d = Decider.from_pretrained("adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B")      # download everything
-d = Decider.from_pretrained("adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B",
-                            text_model="/data/models/Qwen3-32B")                        # reuse a local LLM copy
-d = Decider.from_pretrained("/data/models/my-checkpoint", device="auto")                # local path, shard over GPUs
-```
+## 6. Benchmarks
 
-| checkpoint | encoder (inside) | frozen LLM | status |
-|---|---|---|---|
-| `adventists-ai/DuplexJev-{A,B}[-Gender,-Emotion,-Para]-Qwen3-ASR-0.6B-Qwen3-32B` | Qwen3-ASR-0.6B (A: + fusion) | Qwen3-32B | released, tested with 0.2.1 |
-| `fixie-ai/ultravox-v0_6-qwen-3-32b` | Whisper-large-v3-turbo | Qwen3-32B | tested (qa100 0.89) |
-| `fixie-ai/ultravox-v0_6-gemma-3-27b` | Whisper-large-v3-turbo | Gemma-3-27B (licence acceptance needed) | same format |
+| benchmark | task | size | link |
+|---|---|---:|---|
+| qa100 | spoken multiple-choice, synthetic speech (zh + en) | 100 | 🤗 [adventists-ai/qa100](https://huggingface.co/datasets/adventists-ai/qa100) |
+| ZJU-ML | main-language part of the ZJU audio benchmark v2.0.0: spoken questions, half real speech | 100 | [GitHub](https://github.com/Vsky-morigen/audio-gender-benchmark) |
+| Easy-Turn | four-way turn state (complete / incomplete / backchannel / wait), zero-shot | 800 | Easy-Turn test set ([arXiv:2509.23938](https://arxiv.org/abs/2509.23938)) |
+| gender | speaker gender, real speech (AISHELL-1, Common Voice, LibriSpeech), zh + en | 800 | [`evaluation/`](evaluation) |
+| emotion | neutral / happy / angry / sad, acted speech (ESD, CREMA-D), zh + en | 800 | [`evaluation/`](evaluation) |
 
-- **The ASR encoder is not a separate choice.** The connector only works with the encoder it was trained on.
-  `audio_model=` / `text_model=` exist only to point at a *local copy of the same* encoder or LLM (offline machines,
-  shared model folders); a different encoder or LLM loads without error but gives meaningless answers.
-- Only the encoder's hidden states are used: nothing is transcribed.
-- `device="cuda:0"` (default: first GPU, bf16) or `device="auto"` to shard a large LLM over several GPUs.
-  A 32B LLM in bf16 needs one 80 GB GPU.
-- Standard Hugging Face variables apply: `HF_TOKEN` (gated models), `HF_HOME` (cache location),
-  `HF_ENDPOINT` (mirror), `HF_HUB_OFFLINE=1` (use the local cache only).
+**Main language** = mean of qa100, ZJU-ML and Easy-Turn; **paralinguistics** = mean of gender and emotion;
+**total** = mean of the two. Chance: 25% on the four-way tasks, 50% on gender. The leaderboard is generated by
+[`evaluation/build_leaderboard.py`](evaluation/build_leaderboard.py) from the result files next to it.
 
-What the package guarantees (unit tests in `tests/`, checked on Qwen3-32B):
+## 7. Training
 
-- **0 decode steps.** Each answer is the next-token softmax over its option letters; options appear under permuted letters (`n_perm` averages several orders).
-- **Exact prefix sharing** (`mode="packed"`, default): the context and audio of an item are encoded once and all its questions are packed into one row under a block-diagonal mask. The packing engine, checked in fp32 on Qwen3-32B, matches one-row-per-question to within 2e-5; in bf16 the mean difference is 0.001–0.002, with at most 1/100 answers changed.
-- **Batch invariance.** An item's answers do not depend on which other items share the pass (fp32: max difference 1e-5). For speech this requires aligning every clip to whole audio tokens; the package pads silence at the end of each clip (batched Ultravox inference otherwise leaks padding into the last audio token of shorter clips). In bf16, GPU kernels depend on batch shape, so running an item alone vs. in a batch changed 1/100 answers.
-- **Checked accuracy.** Through the package (0.2.1, default prompts), every released connector is within 0–5 points of the paper's numbers (see each model card), e.g. A-Gender: gender 89.2 (paper 89.4); A-Para: emotion 88.2 (paper 90.0).
-- **Speed (current).** Plain PyTorch, one A800, bf16: 8 questions for 64 calls in 9 s (about 140 ms per call); 48 concurrent server requests are answered in one tick. The paper's latency numbers use a vLLM engine; a vLLM backend for the package is on the roadmap.
+Frozen encoder and frozen LLM; only the connector is trained, with a patched [Ultravox](https://github.com/fixie-ai/ultravox).
 
-Speech checkpoints in Ultravox format need transformers 4.51–4.55, which the `speech` extra installs.
-
-More in [`examples/`](examples): tick-batch timing, server client, speech quick start.
-
-## 5. Evaluation results
-
-**Accuracy** (%, paper Tables 2–3; single-token readout, one H200):
-
-| connector | qa100 | ZJU-ML | Easy-Turn | gender (800 real) | ZJU gender | emotion (800, 4-way) |
-|---|---:|---:|---:|---:|---:|---:|
-| reading the oracle transcript | 91 | – | – | – | – | – |
-| A (R2) | 83 | 77 | 77.1 | 55 | – | 28 |
-| B (R2) | **90** | 79 | 76.1 | 54 | – | 27 |
-| A-Gender | 86 | 79 | – | 89.4 | 73 | – |
-| B-Gender | 87 | 81 | – | 87.9 | 60 | – |
-| A-Emotion | 84 | 71 | – | – | – | 71.8 |
-| B-Emotion | 89 | 69 | – | – | – | 85.5 |
-| A-Para (mixed objective) | 82 | 61 | – | **89.9** | **90** | **90.0** |
-
-qa100: 100 bilingual spoken multiple-choice questions (TTS stems). ZJU-ML: main-language part of the ZJU audio
-benchmark v2.0.0; half of it is real-speech factual questions, and emotion data lower it by 6–17 points, almost all on
-that half. Gender: 800 real utterances (AISHELL-1, Common Voice, LibriSpeech); 50% is chance. Emotion: 800 acted
-utterances (ESD, CREMA-D), neutral / happy / angry / sad; 25% is chance.
-
-**Latency and capacity** (1× H200, bf16, Qwen3-32B; ten decisions per event, 30 real utterances of 2–12 s, the same
-vLLM engine for both methods):
-
-| context | method | decode steps | 1 event | events/s within 0.25 s | 0.5 s | 2 s |
-|---|---|---:|---:|---:|---:|---:|
-| none | ASR → LLM generates JSON | 12.5 + 86 | 1,567 ms (+411 ms ASR) | 0 | 0 | 16.9 |
-| none | single-token readout | 0 | 92 ms | 17.3 | 20.4 | 33.5 |
-| 1.5k tokens | ASR → LLM generates JSON | 12.5 + 87 | 1,598 ms (+ASR) | 0 | 0 | 8.4 |
-| 1.5k tokens | single-token readout | 0 | 144 ms | 9.7 | 12.0 | 18.4 |
-
-On one 8×H200 node (one engine per GPU), eight events (80 decisions) are answered in about 0.1 s.
-
-**Prefix sharing** (one packed row vs sequential calls): 7× cheaper for 100 questions over a 1.5k-token context and
-20× for 50 questions over a 5k-token context, with identical answers on 40/40 items.
-
-| benchmark | task | link |
-|---|---|---|
-| qa100 | spoken multiple-choice, synthetic speech (zh + en) | 🤗 [adventists-ai/qa100](https://huggingface.co/datasets/adventists-ai/qa100) |
-| ZJU audio benchmark · `gender` | speaker gender (zh + en, real + TTS) | [GitHub](https://github.com/Vsky-morigen/audio-gender-benchmark) |
-| ZJU audio benchmark · `main_language` | spoken multiple-choice, real speech + TTS | [GitHub](https://github.com/Vsky-morigen/audio-gender-benchmark) |
-
-Runners: [`evaluation/`](evaluation).
-
-## 6. Training
-
-Frozen Qwen3-ASR-0.6B encoder and frozen Qwen3-32B; only the connector is trained, with a patched
-[Ultravox](https://github.com/fixie-ai/ultravox).
-
-1. **Content (R1–R2).** Transcript distillation (token-level KL to the LLM's transcript-conditioned output) on the
-   Ultravox v0.6 mixture (WenetSpeech, GigaSpeech, Common Voice, CoVoST 2, People's Speech, LibriSpeech, MLS, MUSAN),
-   split into 100 disjoint packs that each keep the official ratio; R1 and R2 use one pack each.
-2. **Decisions.** Answer-token supervision: cross-entropy on the single option letter at the readout position.
-   Gender: real speech from AISHELL-1 and LibriSpeech with corpus speaker labels. Emotion: ESD and CREMA-D.
-3. **Mixed objective (A-Para).** One run over content + gender + emotion samples: distillation for content samples,
+1. **Content (R1–R2).** Transcript distillation on the Ultravox v0.6 mixture (WenetSpeech, GigaSpeech, Common Voice,
+   CoVoST 2, People's Speech, LibriSpeech, MLS, MUSAN), split into 100 disjoint packs; R1 and R2 use one pack each.
+2. **Decisions.** Cross-entropy on the single option letter at the readout position. Gender: AISHELL-1 and LibriSpeech;
+   emotion: ESD and CREMA-D.
+3. **Mixed objective (`-Para`).** One run over content + gender + emotion: distillation for content samples,
    answer-token cross-entropy for decision samples.
 
 Recipe, data links and scripts: [`training/`](training). The emotion corpora are not redistributed.
 
-## 7. Repository layout
+## 8. Repository layout
 
 | path | contents |
 |---|---|
@@ -264,21 +216,21 @@ Recipe, data links and scripts: [`training/`](training). The emotion corpora are
 | [`duplexjev/research/`](duplexjev/research) | paper code: readout, question contract, encoder with fusion |
 | [`tests/`](tests) | equivalence and batch-invariance tests |
 | [`examples/`](examples) | quick starts, tick-batch timing, server client |
-| [`evaluation/`](evaluation) | benchmark runners and where to get each benchmark |
-| [`training/`](training) | Ultravox configs and patches, data recipe, 100-pack split, continuation generation |
+| [`evaluation/`](evaluation) | benchmark runners, leaderboard script and results |
+| [`training/`](training) | Ultravox configs and patches, data recipe, 100-pack split, encoder ports |
 | [`benchmarks/`](benchmarks) | latency, SLO capacity and prefix-sharing experiments |
-| [`docs/`](docs) | project page |
+| [`docs/`](docs) | project page, [paper results](docs/paper_results.md), [package details](docs/package.md) |
 
 The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/PATHS.md).
 
-## 8. License
+## 9. License
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Model weights: Apache-2.0, except the connectors trained on emotion data (A-Emotion,
-B-Emotion, A-Para and every `-Para-` small connector), which are CC BY-NC 4.0 because ESD is licensed for research only. qa100: CC-BY-4.0.
-Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms; check them before commercial use.
-Third-party models and datasets keep their own licenses; see [NOTICE](NOTICE).
+Code: Apache-2.0 ([LICENSE](LICENSE)). Connector weights: Apache-2.0, except those trained on emotion data
+(`-Emotion-` and `-Para-`), which are CC BY-NC 4.0 because ESD is licensed for research only. qa100: CC-BY-4.0.
+The frozen encoders and LLMs keep their own licences (Falcon-H1: TII Falcon License; SenseVoice: FunASR Model License).
+Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms. See [NOTICE](NOTICE).
 
-## 9. Citation
+## 10. Citation
 
 ```bibtex
 @inproceedings{jin2027duplexjev,
@@ -289,9 +241,10 @@ Third-party models and datasets keep their own licenses; see [NOTICE](NOTICE).
 }
 ```
 
-## 10. Acknowledgements
+## 11. Acknowledgements
 
-Built on [Ultravox](https://github.com/fixie-ai/ultravox), [Qwen3](https://github.com/QwenLM/Qwen3) and Qwen3-ASR.
-We thank the ZJU team for the [audio benchmark](https://github.com/Vsky-morigen/audio-gender-benchmark).
+Built on [Ultravox](https://github.com/fixie-ai/ultravox), [Qwen3](https://github.com/QwenLM/Qwen3), Qwen3-ASR,
+[MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize), Whisper, SenseVoice,
+SmolLM3 and Falcon-H1. We thank the ZJU team for the [audio benchmark](https://github.com/Vsky-morigen/audio-gender-benchmark).
 Claude (Anthropic) assisted with code.
 Questions and issues: [GitHub Issues](https://github.com/adventists-ai/duplexjev/issues).

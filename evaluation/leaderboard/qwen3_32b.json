@@ -1,0 +1,109 @@
+{
+ "models": [
+  {
+   "repo": "DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B",
+   "conn": "A",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-32B",
+   "stage": "r2",
+   "params_M": 33400,
+   "paper": {
+    "qa100": 83,
+    "zjuml": 77,
+    "gender": 55,
+    "emotion": 28,
+    "easyturn": 76.2
+   }
+  },
+  {
+   "repo": "DuplexJev-A-Gender-Qwen3-ASR-0.6B-Qwen3-32B",
+   "conn": "A",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-32B",
+   "stage": "gender",
+   "params_M": 33400,
+   "paper": {
+    "qa100": 86,
+    "zjuml": 79,
+    "gender": 89.4,
+    "emotion": 27.1,
+    "easyturn": 72.8
+   }
+  },
+  {
+   "repo": "DuplexJev-A-Emotion-Qwen3-ASR-0.6B-Qwen3-32B",
+   "conn": "A",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-32B",
+   "stage": "emotion",
+   "params_M": 33400,
+   "paper": {
+    "qa100": 84,
+    "zjuml": 71,
+    "gender": 48.8,
+    "emotion": 71.8,
+    "easyturn": 68.4
+   }
+  },
+  {
+   "repo": "DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B",
+   "conn": "A",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-32B",
+   "stage": "para",
+   "params_M": 33400,
+   "paper": {
+    "qa100": 82,
+    "zjuml": 61,
+    "gender": 89.9,
+    "emotion": 90.0,
+    "easyturn": 70.5
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B",
+   "conn": "B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-32B",
+   "stage": "r2",
+   "params_M": 33400,
+   "paper": {
+    "qa100": 90,
+    "zjuml": 79,
+    "gender": 54,
+    "emotion": 27,
+    "easyturn": 76.6
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B",
+   "conn": "B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-32B",
+   "stage": "gender",
+   "params_M": 33400,
+   "paper": {
+    "qa100": 87,
+    "zjuml": 81,
+    "gender": 87.9,
+    "emotion": 27.4,
+    "easyturn": 75.2
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B",
+   "conn": "B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-32B",
+   "stage": "emotion",
+   "params_M": 33400,
+   "paper": {
+    "qa100": 89,
+    "zjuml": 69,
+    "gender": 51.8,
+    "emotion": 85.5,
+    "easyturn": 72.2
+   }
+  }
+ ]
+}

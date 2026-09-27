@@ -1,0 +1,204 @@
+{
+ "models": [
+  {
+   "repo": "DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-1.7B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-1.7B",
+   "stage": "r2",
+   "trainable_M": 11.5,
+   "params_M": 1917,
+   "latency": {
+    "cuda_ms": 44,
+    "cpu_ms": 2142
+   },
+   "paper": {
+    "qa100": 60,
+    "qa100_text": 66,
+    "zjuml": 36,
+    "gender": 49.2,
+    "emotion": 30.5,
+    "easyturn": 40.0
+   },
+   "pip": {
+    "qa100": 43,
+    "gender": 55.4,
+    "emotion": 28.0
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-1.7B",
+   "stage": "para",
+   "trainable_M": 11.5,
+   "params_M": 1917,
+   "latency": {
+    "cuda_ms": 44,
+    "cpu_ms": 2142
+   },
+   "paper": {
+    "qa100": 59,
+    "qa100_text": 66,
+    "zjuml": 39,
+    "gender": 84.8,
+    "emotion": 89.1,
+    "easyturn": 39.4
+   },
+   "pip": {
+    "qa100": 51,
+    "gender": 88.5,
+    "emotion": 88.4
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-0.6B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-0.6B",
+   "stage": "r2",
+   "trainable_M": 9.4,
+   "params_M": 790,
+   "latency": {
+    "cuda_ms": 76,
+    "cpu_ms": 893
+   },
+   "paper": {
+    "qa100": 36,
+    "qa100_text": 45,
+    "zjuml": 23,
+    "gender": 54.1,
+    "emotion": 24.4,
+    "easyturn": 41.6
+   },
+   "pip": {
+    "qa100": 45,
+    "gender": 51.0,
+    "emotion": 26.2
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-0.6B",
+   "stage": "para",
+   "trainable_M": 9.4,
+   "params_M": 790,
+   "latency": {
+    "cuda_ms": 76,
+    "cpu_ms": 893
+   },
+   "paper": {
+    "qa100": 38,
+    "qa100_text": 45,
+    "zjuml": 26,
+    "gender": 89.4,
+    "emotion": 89.2,
+    "easyturn": 44.5
+   },
+   "pip": {
+    "qa100": 48,
+    "gender": 88.2,
+    "emotion": 90.1
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Whisper-small-Qwen3-1.7B",
+   "enc": "whisper",
+   "llm": "Qwen3-1.7B",
+   "stage": "r2",
+   "trainable_M": 29.4,
+   "params_M": 1838,
+   "latency": {
+    "cuda_ms": 42,
+    "cpu_ms": 2351
+   },
+   "paper": {
+    "qa100": 48,
+    "qa100_text": 66,
+    "zjuml": 32,
+    "gender": 47.5,
+    "emotion": 30.4,
+    "easyturn": 40.0
+   },
+   "pip": {
+    "qa100": 42,
+    "gender": 52.4,
+    "emotion": 28.9
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Para-Whisper-small-Qwen3-1.7B",
+   "enc": "whisper",
+   "llm": "Qwen3-1.7B",
+   "stage": "para",
+   "trainable_M": 29.4,
+   "params_M": 1838,
+   "latency": {
+    "cuda_ms": 42,
+    "cpu_ms": 2351
+   },
+   "paper": {
+    "qa100": 48,
+    "qa100_text": 66,
+    "zjuml": 28,
+    "gender": 78.8,
+    "emotion": 62.4,
+    "easyturn": 37.8
+   },
+   "pip": {
+    "qa100": 38,
+    "gender": 83.1,
+    "emotion": 67.8
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-4B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-4B",
+   "stage": "r2",
+   "trainable_M": 12.6,
+   "params_M": 4220,
+   "latency": {
+    "cuda_ms": 54,
+    "cpu_ms": 5427
+   },
+   "paper": {
+    "qa100": 79,
+    "qa100_text": 82,
+    "zjuml": 57,
+    "gender": 52.5,
+    "emotion": 27.9,
+    "easyturn": 59.6
+   },
+   "pip": {
+    "qa100": 77,
+    "gender": 54.0,
+    "emotion": 27.1
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B",
+   "enc": "qwen3asr",
+   "llm": "Qwen3-4B",
+   "stage": "para",
+   "trainable_M": 12.6,
+   "params_M": 4220,
+   "latency": {
+    "cuda_ms": 54,
+    "cpu_ms": 5427
+   },
+   "paper": {
+    "qa100": 72,
+    "qa100_text": 82,
+    "zjuml": 51,
+    "gender": 89.4,
+    "emotion": 91.9,
+    "easyturn": 60.2
+   },
+   "pip": {
+    "qa100": 77,
+    "gender": 88.0,
+    "emotion": 91.4
+   }
+  }
+ ]
+}

@@ -1,0 +1,154 @@
+{
+ "models": [
+  {
+   "repo": "DuplexJev-B-SenseVoice-Small-Qwen3-0.6B",
+   "enc": "sensevoice",
+   "llm": "Qwen3-0.6B",
+   "stage": "r2",
+   "trainable_M": 8.4,
+   "params_M": 826,
+   "latency": {
+    "cuda_ms": 128,
+    "cpu_ms": 1036
+   },
+   "paper": {
+    "qa100": 33,
+    "qa100_text": 46,
+    "zjuml": 24,
+    "gender": 54.9,
+    "emotion": 24.8,
+    "easyturn": 46.4
+   },
+   "pip": {
+    "qa100": 37,
+    "gender": 51.9,
+    "emotion": 27.1
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B",
+   "enc": "sensevoice",
+   "llm": "Qwen3-0.6B",
+   "stage": "para",
+   "trainable_M": 8.4,
+   "params_M": 826,
+   "latency": {
+    "cuda_ms": 128,
+    "cpu_ms": 1036
+   },
+   "paper": {
+    "qa100": 34,
+    "qa100_text": 46,
+    "zjuml": 27,
+    "gender": 67.5,
+    "emotion": 85.8,
+    "easyturn": 40.4
+   },
+   "pip": {
+    "qa100": 41,
+    "gender": 68.0,
+    "emotion": 83.9
+   }
+  },
+  {
+   "repo": "DuplexJev-B-SenseVoice-Small-Qwen3-1.7B",
+   "enc": "sensevoice",
+   "llm": "Qwen3-1.7B",
+   "stage": "r2",
+   "trainable_M": 10.5,
+   "params_M": 1952,
+   "latency": {
+    "cuda_ms": 127,
+    "cpu_ms": 2439
+   },
+   "paper": {
+    "qa100": 51,
+    "qa100_text": 66,
+    "zjuml": 29,
+    "gender": 47.9,
+    "emotion": 27.6,
+    "easyturn": 40.8
+   },
+   "pip": {
+    "qa100": 48,
+    "gender": 53.6,
+    "emotion": 26.9
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B",
+   "enc": "sensevoice",
+   "llm": "Qwen3-1.7B",
+   "stage": "para",
+   "trainable_M": 10.5,
+   "params_M": 1952,
+   "latency": {
+    "cuda_ms": 127,
+    "cpu_ms": 2439
+   },
+   "paper": {
+    "qa100": 47,
+    "qa100_text": 66,
+    "zjuml": 30,
+    "gender": 66.9,
+    "emotion": 78.4,
+    "easyturn": 34.1
+   },
+   "pip": {
+    "qa100": 50,
+    "gender": 66.8,
+    "emotion": 73.4
+   }
+  },
+  {
+   "repo": "DuplexJev-B-SenseVoice-Small-Qwen3-4B",
+   "enc": "sensevoice",
+   "llm": "Qwen3-4B",
+   "stage": "r2",
+   "trainable_M": 11.5,
+   "params_M": 4255,
+   "latency": {
+    "cuda_ms": 149,
+    "cpu_ms": 6057
+   },
+   "paper": {
+    "qa100": 71,
+    "qa100_text": 82,
+    "zjuml": 57,
+    "gender": 53.4,
+    "emotion": 26.9,
+    "easyturn": 60.6
+   },
+   "pip": {
+    "qa100": 74,
+    "gender": 52.9,
+    "emotion": 26.9
+   }
+  },
+  {
+   "repo": "DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B",
+   "enc": "sensevoice",
+   "llm": "Qwen3-4B",
+   "stage": "para",
+   "trainable_M": 11.5,
+   "params_M": 4255,
+   "latency": {
+    "cuda_ms": 149,
+    "cpu_ms": 6057
+   },
+   "paper": {
+    "qa100": 61,
+    "qa100_text": 82,
+    "zjuml": 37,
+    "gender": 76.8,
+    "emotion": 89.0,
+    "easyturn": 52.0
+   },
+   "pip": {
+    "qa100": 66,
+    "gender": 71.8,
+    "emotion": 84.9
+   }
+  }
+ ]
+}
