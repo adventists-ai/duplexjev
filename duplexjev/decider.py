@@ -17,6 +17,7 @@ No tokens are generated.
 """
 from __future__ import annotations
 
+import logging
 import time
 from typing import Any, Iterable, Sequence
 
@@ -55,6 +56,10 @@ def load_audio(x: Any) -> np.ndarray:
         g = gcd(int(sr), SAMPLE_RATE)
         a = resample_poly(a, SAMPLE_RATE // g, int(sr) // g).astype(np.float32)
     return a
+
+
+_SEQUENTIAL_LM = {"falcon_h1", "mamba", "mamba2", "jamba", "zamba", "zamba2", "bamba", "nemotron_h",
+                  "granitemoehybrid", "lfm2", "lfm2_moe", "recurrent_gemma", "rwkv"}
 
 
 def _load_config(name_or_path: str, *, text_model: str | None = None, audio_model: str | None = None):
@@ -121,6 +126,10 @@ class Decider:
         self._letter_ids: dict[str, int] = {}
         self._tail_cache: dict[tuple, tuple[str, str]] = {}
         self.last_stats: dict = {}
+        # LLMs with recurrent / convolutional layers (Mamba-style SSM hybrids, LFM2 short convolutions) carry state
+        # along the row, so the block-diagonal packing of mode="packed" is not valid for them.
+        lm_type = str(getattr(getattr(self.lm, "config", None), "model_type", ""))
+        self.sequential_lm = lm_type in _SEQUENTIAL_LM
 
     # ------------------------------------------------------------------ loading
     @classmethod
@@ -375,6 +384,11 @@ class Decider:
     def _decide_items(self, items, *, mode="packed", n_perm=1, seed=0, max_items=None, max_tokens=None) -> list[dict]:
         if not items:
             return []
+        if mode == "packed" and self.sequential_lm:
+            if not getattr(self, "_warned_seq", False):
+                logging.getLogger(__name__).info("LLM has recurrent layers: using mode='batch' (no prefix packing)")
+                self._warned_seq = True
+            mode = "batch"
         t0 = time.perf_counter()
         plans = []
         for it in items:
