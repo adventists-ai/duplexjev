@@ -49,6 +49,11 @@ state + N typed questions ──► frozen LLM (0.6B – 32B), ONE forward pass
 
 ## 2. News
 
+- **2026-09-28** — First **complete model**, 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)
+  (Qwen3-ASR-0.6B encoder + connector + Qwen3-4B in one repository), deployable with **vLLM**:
+  `pip install duplexjev-vllm`, then `vllm serve adventists-ai/DuplexJev-4B`
+  ([`duplexjev-vllm` 0.1.0](https://pypi.org/project/duplexjev-vllm/0.1.0/)). Same accuracy as the PyTorch package on
+  all five benchmarks.
 - **2026-09-27** — **16 new connectors** with the MOSS-Transcribe-Diarize and Whisper-small encoders on
   Qwen3-4B-2507, SmolLM3-3B, Falcon-H1-1.5B and Falcon-H1-3B, the
   [MOSS encoder](https://huggingface.co/adventists-ai/MOSS-Transcribe-Diarize-Whisper-Encoder), and
@@ -60,6 +65,18 @@ state + N typed questions ──► frozen LLM (0.6B – 32B), ONE forward pass
 Coming next: Speech-to-Decision commercial API (2026-10-10), open-source full-duplex Jev dialogue pipeline (2026-10-15).
 
 ## 3. Models
+
+### Complete models (vLLM)
+
+| model | built on | params | qa100 | ZJU-ML | Easy-Turn | gender | emotion | licence |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | Qwen3-4B + Qwen3-ASR-0.6B encoder | 4.2 B | 72 | 51 | 60.2 | 89.4 | 91.9 | CC BY-NC 4.0 |
+
+One repository holds the encoder, the connector and the LLM; serve it with vLLM ([§4](#4-quick-start)). More sizes
+will follow. The connectors below are the research checkpoints; `DuplexJev-4B` contains the weights of
+`DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B`.
+
+### Connectors
 
 Each checkpoint is a **connector for one specific encoder and LLM**: it contains only the trained connector; the frozen
 encoder and LLM are fetched automatically by `Decider.from_pretrained("adventists-ai/<repo>")`. It does not work with
@@ -127,6 +144,31 @@ Every trained variant (content-only, gender-only, emotion-only, all encoders) st
 [docs/paper_results.md](docs/paper_results.md).
 
 ## 4. Quick start
+
+**Serve a complete model with vLLM** (OpenAI-compatible API; one request per question, `max_tokens=1`):
+
+```bash
+pip install "vllm[audio]>=0.29" duplexjev-vllm
+vllm serve adventists-ai/DuplexJev-4B --max-model-len 4096
+```
+
+```python
+from vllm_client import DuplexJevClient      # examples/vllm_client.py: openai + standard library only
+
+dj = DuplexJevClient("http://localhost:8000/v1")
+dj.decide(open("call_017.wav", "rb").read(), {
+    "turn":    ("Has the user finished speaking?", ["finished", "not finished"]),
+    "gender":  ("What is the perceived gender of the speaker?", ["female", "male"]),
+    "emotion": ("What is the speaker's emotional state?", ["neutral", "happy", "angry", "sad"]),
+})
+# {'turn': {'answer': 'finished', 'confidence': 0.88, 'probs': {...}}, 'gender': {...}, 'emotion': {...}}
+```
+
+The questions about one clip are sent concurrently and share the audio prefix in vLLM's prefix cache. The prompt
+format and the plugin are described on the [model card](https://huggingface.co/adventists-ai/DuplexJev-4B) and in
+[`vllm_plugin/`](vllm_plugin).
+
+**PyTorch package** (every connector checkpoint; batching and prefix sharing in one forward pass):
 
 ```bash
 pip install "duplexjev[speech]>=0.2.2"      # add [all] for the HTTP server
@@ -214,8 +256,9 @@ Recipe, data links and scripts: [`training/`](training). The emotion corpora are
 |---|---|
 | [`duplexjev/`](duplexjev) | the installable package: `Decider`, `Question`, CLI and tick-batched server |
 | [`duplexjev/research/`](duplexjev/research) | paper code: readout, question contract, encoder with fusion |
+| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`: vLLM plugin for the complete models |
 | [`tests/`](tests) | equivalence and batch-invariance tests |
-| [`examples/`](examples) | quick starts, tick-batch timing, server client |
+| [`examples/`](examples) | quick starts, tick-batch timing, server client, [vLLM client](examples/vllm_client.py) |
 | [`evaluation/`](evaluation) | benchmark runners, leaderboard script and results |
 | [`training/`](training) | Ultravox configs and patches, data recipe, 100-pack split, encoder ports |
 | [`benchmarks/`](benchmarks) | latency, SLO capacity and prefix-sharing experiments |
@@ -225,7 +268,7 @@ The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/P
 
 ## 9. License
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Connector weights: Apache-2.0, except those trained on emotion data
+Code: Apache-2.0 ([LICENSE](LICENSE)). Complete models follow the licence of the connector they contain. Connector weights: Apache-2.0, except those trained on emotion data
 (`-Emotion-` and `-Para-`), which are CC BY-NC 4.0 because ESD is licensed for research only. qa100: CC-BY-4.0.
 The frozen encoders and LLMs keep their own licences (Falcon-H1: TII Falcon License; SenseVoice: FunASR Model License).
 Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms. See [NOTICE](NOTICE).

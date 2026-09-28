@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "duplexjev-vllm"
+version = "0.1.0"
+description = "vLLM plugin for DuplexJev speech-decision models (Qwen3-ASR encoder + Ultravox-style projector)."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+authors = [{name = "Adventists.ai"}]
+requires-python = ">=3.10"
+dependencies = ["vllm>=0.29"]
+
+[project.entry-points."vllm.general_plugins"]
+duplexjev = "duplexjev_vllm:register"
+
+[project.urls]
+Homepage = "https://github.com/adventists-ai/duplexjev"
+Repository = "https://github.com/adventists-ai/duplexjev"
+
+[tool.setuptools.packages.find]
+include = ["duplexjev_vllm*"]

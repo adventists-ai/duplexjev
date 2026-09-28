@@ -45,6 +45,10 @@
 
 ## 2. 最新动态
 
+- **2026-09-28** —— 发布第一个**完整模型** 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)
+  （Qwen3-ASR-0.6B 编码器 + 连接器 + Qwen3-4B 合在一个仓库），可以直接用 **vLLM** 部署：
+  `pip install duplexjev-vllm` 后 `vllm serve adventists-ai/DuplexJev-4B`
+  （[`duplexjev-vllm` 0.1.0](https://pypi.org/project/duplexjev-vllm/0.1.0/)）。5 个评测上的准确率与 PyTorch 包一致。
 - **2026-09-27** —— 新增 **16 个连接器**：MOSS-Transcribe-Diarize 和 Whisper-small 两种编码器，分别配 Qwen3-4B-2507、
   SmolLM3-3B、Falcon-H1-1.5B、Falcon-H1-3B；发布 [MOSS 编码器](https://huggingface.co/adventists-ai/MOSS-Transcribe-Diarize-Whisper-Encoder)
   和 [`duplexjev` 0.2.2](https://pypi.org/project/duplexjev/0.2.2/)（遇到 Falcon-H1 等带循环层的大模型自动改用 `mode="batch"`）。
@@ -55,6 +59,17 @@
 即将推出：Speech-to-Decision 商用 API（2026-10-10）、开源全双工 Jev 对话流水线（2026-10-15）。
 
 ## 3. 模型
+
+### 完整模型（vLLM）
+
+| 模型 | 基座 | 参数 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 许可 |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | Qwen3-4B + Qwen3-ASR-0.6B 编码器 | 4.2 B | 72 | 51 | 60.2 | 89.4 | 91.9 | CC BY-NC 4.0 |
+
+一个仓库里包含编码器、连接器和大模型，用 vLLM 部署（见[第 4 节](#4-快速上手)）。其他尺寸陆续发布。下面的连接器是研究用
+checkpoint；`DuplexJev-4B` 的权重就是 `DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B`。
+
+### 连接器
 
 每个 checkpoint 都是**某一对编码器和大模型专用的连接器**：只包含训练好的连接器，冻结的编码器和大模型由
 `Decider.from_pretrained("adventists-ai/<仓库名>")` 自动下载。它不能换用其他编码器或大模型，同系列的其他尺寸也不行。
@@ -119,6 +134,28 @@
 论文中 Qwen3-32B 各版本的完整对比见 [docs/paper_results.md](docs/paper_results.md)。
 
 ## 4. 快速上手
+
+**用 vLLM 部署完整模型**（OpenAI 兼容接口；每个问题一个请求，`max_tokens=1`）：
+
+```bash
+pip install "vllm[audio]>=0.29" duplexjev-vllm
+vllm serve adventists-ai/DuplexJev-4B --max-model-len 4096
+```
+
+```python
+from vllm_client import DuplexJevClient      # examples/vllm_client.py：只依赖 openai 和标准库
+
+dj = DuplexJevClient("http://localhost:8000/v1")
+dj.decide(open("call_018.wav", "rb").read(), {
+    "turn":   ("用户说完了吗？", ["说完了", "还没说完"]),
+    "gender": ("说话人的性别是？", ["男性", "女性"]),
+}, lang="zh")
+```
+
+同一段音频的多个问题并发发送，在 vLLM 的前缀缓存里共用音频部分。提示词格式和插件说明见
+[模型卡](https://huggingface.co/adventists-ai/DuplexJev-4B) 和 [`vllm_plugin/`](vllm_plugin)。
+
+**PyTorch 包**（适用于所有连接器 checkpoint；一次前向里批处理并共享前缀）：
 
 ```bash
 pip install "duplexjev[speech]>=0.2.2"      # 需要 HTTP 服务再加 [all]
@@ -199,8 +236,9 @@ duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tic
 |---|---|
 | [`duplexjev/`](duplexjev) | 可安装的包：`Decider`、`Question`、命令行和按时间片批处理的服务 |
 | [`duplexjev/research/`](duplexjev/research) | 论文代码：读出、问题约定、带融合的编码器 |
+| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`：完整模型的 vLLM 插件 |
 | [`tests/`](tests) | 等价性和批不变性测试 |
-| [`examples/`](examples) | 快速上手、时间片批处理计时、服务客户端 |
+| [`examples/`](examples) | 快速上手、时间片批处理计时、服务客户端、[vLLM 客户端](examples/vllm_client.py) |
 | [`evaluation/`](evaluation) | 评测脚本、排行榜脚本和结果 |
 | [`training/`](training) | Ultravox 配置和补丁、数据配方、100 包切分、编码器移植 |
 | [`benchmarks/`](benchmarks) | 延迟、SLO 容量和前缀共享实验 |
