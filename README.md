@@ -49,6 +49,7 @@ state + N typed questions ──► frozen LLM (0.6B – 32B), ONE forward pass
 
 ## 2. News
 
+- **2026-09-28** — New [research notes](research) section. First note: [does cross-layer fusion help a speech connector?](research/2026-09-connector-a-vs-b.md)
 - **2026-09-28** — First **complete model**, 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)
   (Qwen3-ASR-0.6B encoder + connector + Qwen3-4B in one repository), deployable with **vLLM**:
   `pip install duplexjev-vllm`, then `vllm serve adventists-ai/DuplexJev-4B`
@@ -257,6 +258,7 @@ Recipe, data links and scripts: [`training/`](training). The emotion corpora are
 | [`duplexjev/`](duplexjev) | the installable package: `Decider`, `Question`, CLI and tick-batched server |
 | [`duplexjev/research/`](duplexjev/research) | paper code: readout, question contract, encoder with fusion |
 | [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`: vLLM plugin for the complete models |
+| [`research/`](research) | research notes: experiments and design decisions, with numbers and noise levels |
 | [`tests/`](tests) | equivalence and batch-invariance tests |
 | [`examples/`](examples) | quick starts, tick-batch timing, server client, [vLLM client](examples/vllm_client.py) |
 | [`evaluation/`](evaluation) | benchmark runners, leaderboard script and results |

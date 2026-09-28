@@ -45,6 +45,7 @@
 
 ## 2. 最新动态
 
+- **2026-09-28** —— 新开 [研究笔记](research) 专区。第一篇：[跨层融合对语音连接器有没有用？](research/2026-09-connector-a-vs-b_zh.md)
 - **2026-09-28** —— 发布第一个**完整模型** 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)
   （Qwen3-ASR-0.6B 编码器 + 连接器 + Qwen3-4B 合在一个仓库），可以直接用 **vLLM** 部署：
   `pip install duplexjev-vllm` 后 `vllm serve adventists-ai/DuplexJev-4B`
@@ -237,6 +238,7 @@ duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tic
 | [`duplexjev/`](duplexjev) | 可安装的包：`Decider`、`Question`、命令行和按时间片批处理的服务 |
 | [`duplexjev/research/`](duplexjev/research) | 论文代码：读出、问题约定、带融合的编码器 |
 | [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`：完整模型的 vLLM 插件 |
+| [`research/`](research) | 研究笔记：实验和设计取舍，附数字和误差范围 |
 | [`tests/`](tests) | 等价性和批不变性测试 |
 | [`examples/`](examples) | 快速上手、时间片批处理计时、服务客户端、[vLLM 客户端](examples/vllm_client.py) |
 | [`evaluation/`](evaluation) | 评测脚本、排行榜脚本和结果 |
