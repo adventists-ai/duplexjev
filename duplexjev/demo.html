@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DuplexJev Demo</title>
+<style>
+:root{--bg:#fafaf8;--fg:#1c1c1a;--mut:#6b6b66;--line:#e3e2dc;--card:#fff;--acc:#2f5bd3;--acc2:#e8eefc;--bar:#2f5bd3;--warn:#b3261e}
+@media (prefers-color-scheme:dark){:root{--bg:#141413;--fg:#ecebe6;--mut:#a09f98;--line:#33322e;--card:#1d1d1b;--acc:#8fa9ff;--acc2:#23283a;--bar:#8fa9ff;--warn:#ff8a80}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif}
+main{max-width:860px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:24px;margin:0 0 4px}p.sub{color:var(--mut);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button,select,label.btn{font:inherit;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:8px;padding:8px 14px;cursor:pointer}
+button.primary{background:var(--acc);border-color:var(--acc);color:#fff}button:disabled{opacity:.5;cursor:default}
+button.rec{border-color:var(--warn);color:var(--warn)}
+input[type=file]{display:none}audio{width:100%;margin-top:12px}
+textarea{width:100%;min-height:170px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:10px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-weight:500;font-size:13px}.ans{font-weight:600}
+.bar{height:6px;background:var(--acc2);border-radius:3px;margin-top:4px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--bar)}
+.probs{color:var(--mut);font-size:12px}.stat{font-size:14px;color:var(--mut);margin-top:10px}.stat b{color:var(--fg)}
+.err{color:var(--warn)}details summary{cursor:pointer;color:var(--mut)}
+</style>
+</head>
+<body>
+<main>
+<h1>DuplexJev</h1>
+<p class="sub" id="sub">录一段话或上传音频，一次前向同时给出 8 个判断。</p>
+
+<div class="card">
+  <div class="row">
+    <select id="lang"><option value="zh">中文语音</option><option value="en">English speech</option></select>
+    <button id="rec" class="rec">● 录音</button>
+    <label class="btn" for="file" id="uplabel">上传音频</label><input type="file" id="file" accept="audio/*">
+    <button id="go" class="primary" disabled>判断</button>
+  </div>
+  <audio id="player" controls hidden></audio>
+  <div class="stat" id="clipinfo"></div>
+</div>
+
+<div class="card">
+  <details>
+    <summary id="qsum">题目表（可修改：每行 <code>名称 | 问题 | 选项1, 选项2, …</code>）</summary>
+    <textarea id="qs" spellcheck="false"></textarea>
+    <div class="row"><button id="reset">恢复默认</button><span class="probs" id="keyhint"></span></div>
+  </details>
+</div>
+
+<div class="card" id="out" hidden>
+  <table><thead><tr><th id="h1">判断</th><th id="h2">答案</th><th id="h3">置信度</th></tr></thead><tbody id="tb"></tbody></table>
+  <div class="stat" id="ms"></div>
+</div>
+<p class="probs">音频只用于本次判断，不会保存。模型：<span id="model">DuplexJev</span> · <a href="https://github.com/adventists-ai/duplexjev" style="color:var(--acc)">GitHub</a></p>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const T = {
+  zh:{sub:"录一段话或上传音频，一次前向同时给出 8 个判断。",rec:"● 录音",stop:"■ 停止",up:"上传音频",go:"判断",busy:"判断中…",qsum:"题目表（可修改：每行 名称 | 问题 | 选项1, 选项2, …）",reset:"恢复默认",h:["判断","答案","置信度"],clip:s=>`音频 ${s.toFixed(1)} 秒`,ms:(n,ms,c)=>`<b>${n}</b> 个判断，模型耗时 <b>${ms}</b> ms（含网络 ${c} ms）`,long:"只取前 15 秒",bad:"题目表格式有误：",key:"这个服务需要 API key："},
+  en:{sub:"Record or upload a clip; one forward pass answers 8 decisions at once.",rec:"● Record",stop:"■ Stop",up:"Upload audio",go:"Decide",busy:"Deciding…",qsum:"Question table (editable: one per line, name | question | option 1, option 2, …)",reset:"Reset",h:["decision","answer","confidence"],clip:s=>`clip ${s.toFixed(1)} s`,ms:(n,ms,c)=>`<b>${n}</b> decisions, model time <b>${ms}</b> ms (${c} ms with network)`,long:"only the first 15 s are used",bad:"cannot parse the table: ",key:"This service needs an API key:"}
+};
+let lang = "zh", wav = null, labels = {}, defaults = {}, rec = null, chunks = [], apiKey = "";
+const setLang = l => { lang = l; const t = T[l];
+  $("sub").textContent = t.sub; $("rec").textContent = rec ? t.stop : t.rec; $("uplabel").textContent = t.up;
+  $("go").textContent = t.go; $("qsum").textContent = t.qsum; $("reset").textContent = t.reset;
+  ["h1","h2","h3"].forEach((h,i)=>$(h).textContent = t.h[i]); loadTable(); };
+async function loadTable(){
+  if(!defaults[lang]){ const r = await fetch(`v1/table?lang=${lang}`); const j = await r.json(); defaults[lang]=j.questions; labels[lang]=j.labels; }
+  $("qs").value = defaults[lang].map(q=>`${q.id} | ${q.text} | ${q.options.join(", ")}`).join("\n");
+}
+function parseTable(){
+  return $("qs").value.split("\n").map(s=>s.trim()).filter(Boolean).map(line=>{
+    const p = line.split("|").map(s=>s.trim()); if(p.length!==3) throw new Error(line);
+    const opts = p[2].split(/[,，]/).map(s=>s.trim()).filter(Boolean); if(opts.length<2) throw new Error(line);
+    return {id:p[0], text:p[1], options:opts, lang};
+  });
+}
+// any audio -> 16 kHz mono 16-bit WAV, at most 15 s
+async function toWav(blob){
+  const ac = new (window.AudioContext||window.webkitAudioContext)();
+  const buf = await ac.decodeAudioData(await blob.arrayBuffer()); ac.close();
+  const sr = 16000, n = Math.min(Math.round(buf.duration*sr), 15*sr);
+  const off = new OfflineAudioContext(1, Math.max(n,1), sr); const src = off.createBufferSource();
+  src.buffer = buf; src.connect(off.destination); src.start(); const out = (await off.startRendering()).getChannelData(0);
+  const dv = new DataView(new ArrayBuffer(44+out.length*2)); const w=(o,s)=>[...s].forEach((c,i)=>dv.setUint8(o+i,c.charCodeAt(0)));
+  w(0,"RIFF");dv.setUint32(4,36+out.length*2,true);w(8,"WAVE");w(12,"fmt ");dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);
+  dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,"data");dv.setUint32(40,out.length*2,true);
+  out.forEach((v,i)=>dv.setInt16(44+i*2,Math.max(-1,Math.min(1,v))*0x7fff,true));
+  return {blob:new Blob([dv],{type:"audio/wav"}), secs:buf.duration};
+}
+async function setClip(blob){
+  const {blob:w, secs} = await toWav(blob); wav = w;
+  $("player").src = URL.createObjectURL(w); $("player").hidden = false;
+  $("clipinfo").textContent = T[lang].clip(Math.min(secs,15)) + (secs>15 ? " · "+T[lang].long : ""); $("go").disabled = false;
+}
+$("file").onchange = e => e.target.files[0] && setClip(e.target.files[0]);
+$("rec").onclick = async () => {
+  if(rec){ rec.stop(); return; }
+  const stream = await navigator.mediaDevices.getUserMedia({audio:true}); chunks = [];
+  rec = new MediaRecorder(stream); rec.ondataavailable = e => chunks.push(e.data);
+  rec.onstop = async () => { stream.getTracks().forEach(t=>t.stop()); rec = null; $("rec").textContent = T[lang].rec; await setClip(new Blob(chunks)); };
+  rec.start(); $("rec").textContent = T[lang].stop; setTimeout(()=>rec && rec.stop(), 15000);
+};
+$("lang").onchange = e => setLang(e.target.value);
+$("reset").onclick = () => loadTable();
+$("go").onclick = async () => {
+  let qs; try { qs = parseTable(); } catch(e){ $("ms").innerHTML = `<span class="err">${T[lang].bad}${e.message}</span>`; $("out").hidden=false; return; }
+  $("go").disabled = true; $("go").textContent = T[lang].busy;
+  const b64 = await new Promise(r=>{const fr=new FileReader(); fr.onload=()=>r(fr.result.split(",")[1]); fr.readAsDataURL(wav);});
+  const t0 = performance.now();
+  try{
+    const headers = {"Content-Type":"application/json"}; if(apiKey) headers.Authorization = "Bearer "+apiKey;
+    let r = await fetch("v1/decide",{method:"POST",headers,body:JSON.stringify({audio_b64:b64,format:"wav",lang,questions:qs})});
+    if(r.status===401){ apiKey = prompt(T[lang].key)||""; $("go").disabled=false; $("go").textContent=T[lang].go; return; }
+    const j = await r.json(); if(!r.ok) throw new Error(j.detail||r.status);
+    $("model").textContent = j.model;
+    $("tb").innerHTML = Object.entries(j.answers).map(([k,v])=>{
+      const probs = Object.entries(v.probs).sort((a,b)=>b[1]-a[1]).map(([o,p])=>`${o} ${(p*100).toFixed(0)}%`).join(" · ");
+      return `<tr><td>${(labels[lang]||{})[k]||k}</td><td><div class="ans">${v.answer}</div><div class="probs">${probs}</div></td>
+        <td>${(v.confidence*100).toFixed(0)}%<div class="bar"><i style="width:${(v.confidence*100).toFixed(0)}%"></i></div></td></tr>`; }).join("");
+    $("ms").innerHTML = T[lang].ms(Object.keys(j.answers).length, Math.round(j.ms), Math.round(performance.now()-t0));
+  }catch(e){ $("tb").innerHTML=""; $("ms").innerHTML = `<span class="err">${e.message}</span>`; }
+  $("out").hidden = false; $("go").disabled = false; $("go").textContent = T[lang].go;
+};
+setLang("zh");
+</script>
+</body>
+</html>

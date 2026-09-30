@@ -1,10 +1,9 @@
-torch>=2.1
-transformers<4.58,>=4.51
 numpy
 soundfile
-scipy
 
 [all]
+torch>=2.1
+scipy
 accelerate
 peft
 transformers<4.56,>=4.51
@@ -22,6 +21,8 @@ uvicorn
 pydantic>=2
 
 [speech]
+torch>=2.1
+scipy
 accelerate
 peft
 transformers<4.56,>=4.51

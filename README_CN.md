@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
   📄 论文（arXiv，即将发布） &nbsp;|&nbsp;
   🤗 <a href="https://huggingface.co/adventists-ai">模型权重</a> &nbsp;|&nbsp;
@@ -45,160 +46,86 @@
 
 ## 2. 最新动态
 
+- **2026-10-01** —— 🎧 [**在线体验和试用 API**](https://api.adventists.cn/duplexjev/)（DuplexJev-4B）以及
+  [`duplexjev` 0.3](https://pypi.org/project/duplexjev/)：`duplexjev quick call.wav` 对任意音频打印一张默认判断表
+  （话轮状态、该怎么做、打断/抢话、意图、情绪、性别、语言、转人工）。
+- **2026-09-30** —— 🤗 [**DuplexJev-32B**](https://huggingface.co/adventists-ai/DuplexJev-32B) 发布，成为新的主推模型：
+  Qwen3-ASR-0.6B 编码器 + 连接器 + Qwen3-VL-32B 的语言模型，合在一个仓库，用 vLLM 部署。总分 87.7，是目前最高的：
+  qa100 90、Easy-Turn 79.1、性别 89.4、情绪 90.6；口语 VoiceBench MMSU 70.8（之前的 32B 连接器为 56–60）。DuplexJev-4B 用同一配方更新（总分 75.9 → 78.6）。连接器 checkpoint 移到了[单独的页面](docs/connectors_zh.md)。
 - **2026-09-28** —— 新开 [研究笔记](research) 专区。第一篇：[跨层融合对语音连接器有没有用？](research/2026-09-connector-a-vs-b_zh.md)
-- **2026-09-28** —— 发布第一个**完整模型** 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)
-  （Qwen3-ASR-0.6B 编码器 + 连接器 + Qwen3-4B 合在一个仓库），可以直接用 **vLLM** 部署：
-  `pip install duplexjev-vllm` 后 `vllm serve adventists-ai/DuplexJev-4B`
-  （[`duplexjev-vllm` 0.1.0](https://pypi.org/project/duplexjev-vllm/0.1.0/)）。5 个评测上的准确率与 PyTorch 包一致。
-- **2026-09-27** —— 新增 **16 个连接器**：MOSS-Transcribe-Diarize 和 Whisper-small 两种编码器，分别配 Qwen3-4B-2507、
-  SmolLM3-3B、Falcon-H1-1.5B、Falcon-H1-3B；发布 [MOSS 编码器](https://huggingface.co/adventists-ai/MOSS-Transcribe-Diarize-Whisper-Encoder)
-  和 [`duplexjev` 0.2.2](https://pypi.org/project/duplexjev/0.2.2/)（遇到 Falcon-H1 等带循环层的大模型自动改用 `mode="batch"`）。
-  Qwen3-ASR-0.6B → **Qwen2.5-72B** 的连接器（A、B 两版）正在训练，结果稍后公布。
-- **2026-09-25** —— 20 个小模型连接器：Qwen3-0.6B / 1.7B / 4B 配 Qwen3-ASR 和 SenseVoice-Small 编码器（另有 Whisper-small 配 Qwen3-1.7B）。
-- **2026-09-24** —— 7 个 Qwen3-32B 连接器和 [`duplexjev` 0.2.1](https://pypi.org/project/duplexjev/0.2.1/)；论文投稿 ICASSP 2027。
+- **2026-09-28** —— 第一个完整模型 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) 和 vLLM 插件
+  [`duplexjev-vllm`](https://pypi.org/project/duplexjev-vllm/) 发布。
 
 即将推出：Speech-to-Decision 商用 API（2026-10-10）、开源全双工 Jev 对话流水线（2026-10-15）。
 
 ## 3. 模型
 
-### 完整模型（vLLM）
+每个模型都是**一个包含全部组件的仓库**（音频编码器 + 训练好的连接器 + 大模型），装一个小插件就能用
+[vLLM](https://github.com/vllm-project/vllm) 部署（见[第 4 节](#4-快速上手)）。
 
-| 模型 | 基座 | 参数 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 许可 |
-|---|---|---:|---:|---:|---:|---:|---:|---|
-| 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | Qwen3-4B + Qwen3-ASR-0.6B 编码器 | 4.2 B | 72 | 51 | 60.2 | 89.4 | 91.9 | CC BY-NC 4.0 |
+| 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| ⭐ 🤗 [**DuplexJev-32B**](https://huggingface.co/adventists-ai/DuplexJev-32B) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | 90 | 87 | 79.1\* | 89.4 | 90.6 | **87.7** | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | 小显卡、端侧 | Qwen3-4B + Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 50 | 78.1\* | 88.6 | 91.2 | 78.6 | CC BY-NC 4.0 |
 
-一个仓库里包含编码器、连接器和大模型，用 vLLM 部署（见[第 4 节](#4-快速上手)）。其他尺寸陆续发布。下面的连接器是研究用
-checkpoint；`DuplexJev-4B` 的权重就是 `DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B`。
+分数为论文口径的百分比（单 token 读出）；总分 = 主语言（qa100、ZJU-ML、Easy-Turn）与副语言（性别、情绪）的平均，
+见[评测基准](#6-评测基准)。\* 两个模型训练时用了 Easy-Turn 的训练集（与测试集不重叠），所以 Easy-Turn 分数属于域内。两个模型在单张显卡上回答同一段音频的 10 个问题都在约 0.1–0.25 秒内。
 
-### 连接器
+**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B`，显卡小就用 `DuplexJev-4B`。DuplexJev-32B 只用了 Qwen3-VL-32B 的语言模型部分，
+目前输入是音频和文字（图像输入在计划中）。
 
-每个 checkpoint 都是**某一对编码器和大模型专用的连接器**：只包含训练好的连接器，冻结的编码器和大模型由
-`Decider.from_pretrained("adventists-ai/<仓库名>")` 自动下载。它不能换用其他编码器或大模型，同系列的其他尺寸也不行。
-
-### 排行榜
-
-总分 =（主语言 + 副语言）/ 2。主语言 = qa100、ZJU-ML、Easy-Turn 三项平均；副语言 = 性别、情绪两项平均（均为百分制）。每个 编码器 × LLM × 连接器 组合只列总分最高的一个模型。
-
-| 排名 | 编码器 | LLM | 连接器 | 模型 | 总分 | 主语言 | 副语言 |
-|---:|---|---|---|---|---:|---:|---:|
-| 1 | Qwen3-ASR-0.6B | Qwen3-32B | A · 交叉注意力 | 🤗 [DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B) | **80.6** | 71.2 | 90.0 |
-| 2 | Qwen3-ASR-0.6B | Qwen3-4B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | **75.9** | 61.1 | 90.7 |
-| 3 | Qwen3-ASR-0.6B | Qwen3-32B | B · 原生 | 🤗 [DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | **72.7** | 76.7 | 68.7 |
-| 4 | MOSS-Transcribe-Diarize | Qwen3-4B-2507 | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507) | **70.0** | 49.6 | 90.5 |
-| 5 | MOSS-Transcribe-Diarize | Falcon-H1-3B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B) | **67.7** | 43.8 | 91.6 |
-| 6 | SenseVoice-Small | Qwen3-4B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B) | **66.5** | 50.0 | 82.9 |
-| 7 | Qwen3-ASR-0.6B | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | **66.3** | 45.8 | 86.9 |
-| 8 | MOSS-Transcribe-Diarize | SmolLM3-3B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B) | **65.6** | 40.0 | 91.2 |
-| 9 | Whisper-small | Falcon-H1-3B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Falcon-H1-3B) | **65.3** | 45.7 | 85.0 |
-| 10 | MOSS-Transcribe-Diarize | Falcon-H1-1.5B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B) | **63.2** | 37.1 | 89.3 |
-| 11 | Whisper-small | Qwen3-4B-2507 | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507) | **63.1** | 45.7 | 80.6 |
-| 12 | Qwen3-ASR-0.6B | Qwen3-0.6B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B) | **62.8** | 36.2 | 89.3 |
-| 13 | Whisper-small | SmolLM3-3B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-SmolLM3-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-SmolLM3-3B) | **62.6** | 39.5 | 85.7 |
-| 14 | Whisper-small | Falcon-H1-1.5B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B) | **56.8** | 36.8 | 76.7 |
-| 15 | SenseVoice-Small | Qwen3-0.6B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B) | **55.2** | 33.8 | 76.7 |
-| 16 | SenseVoice-Small | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B) | **54.9** | 37.0 | 72.7 |
-| 17 | Whisper-small | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | **54.2** | 37.9 | 70.6 |
-
-#### 分项成绩
-
-| 模型 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总参数 | CPU（8 线程） | 许可 |
-|---|---:|---:|---:|---:|---:|---:|---:|---|
-| DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B | 82 | 61 | 70.5 | 89.9 | 90 | 33.4 B | – | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B | 72 | 51 | 60.2 | 89.4 | 91.9 | 4.2 B | 5.4 s | CC BY-NC 4.0 |
-| DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B | 89 | 69 | 72.2 | 51.8 | 85.5 | 33.4 B | – | CC BY-NC 4.0 |
-| DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507 | 61 | 42 | 45.8 | 95.5 | 85.4 | 4.4 B | 6.2 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B | 51 | 37 | 43.5 | 98.1 | 85.1 | 3.5 B | 171.3 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B | 61 | 37 | 52 | 76.8 | 89 | 4.3 B | 6.1 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B | 59 | 39 | 39.4 | 84.8 | 89.1 | 1.9 B | 2.1 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B | 33 | 41 | 46.1 | 97.9 | 84.6 | 3.4 B | 5.8 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Whisper-small-Falcon-H1-3B | 50 | 45 | 42.1 | 90.4 | 79.5 | 3.3 B | 169.7 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B | 44 | 38 | 29.2 | 94 | 84.6 | 1.9 B | 100.3 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507 | 43 | 45 | 49.2 | 91.1 | 70.1 | 4.1 B | 5.2 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B | 38 | 26 | 44.5 | 89.4 | 89.2 | 0.8 B | 0.9 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Whisper-small-SmolLM3-3B | 35 | 42 | 41.5 | 93.5 | 77.8 | 3.2 B | 6.5 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B | 43 | 35 | 32.4 | 83.2 | 70.2 | 1.7 B | 85.3 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B | 34 | 27 | 40.4 | 67.5 | 85.8 | 0.8 B | 1.0 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B | 47 | 30 | 34.1 | 66.9 | 78.4 | 2.0 B | 2.4 s | CC BY-NC 4.0 |
-| DuplexJev-B-Para-Whisper-small-Qwen3-1.7B | 48 | 28 | 37.8 | 78.8 | 62.4 | 1.8 B | 2.4 s | CC BY-NC 4.0 |
-
-分数为论文口径的百分比（单 token 读出，单张 H200），见[评测基准](#6-评测基准)。CPU 列为一次判断（10 个问题、4.5 秒音频）
-在 8 个 CPU 线程上的耗时，fp32、未量化；在单张 H200 上所有模型都在约 0.05–0.2 秒内完成。
-
-**怎么选。**
-- *服务器端，综合最好：* `DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B`（一张 80 GB 显卡）。
-- *端侧 / 小显卡：* `DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B`；纯 CPU 用 `…-Qwen3-0.6B`，1 秒以内。
-- *只做内容判断、需要商用：* 用不带 `-Para` 的内容版（Apache-2.0；性别和情绪为随机水平），例如
-  `DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B`（qa100 90 分）。
-- *Falcon-H1 系列* 需要 GPU（其中的 Mamba 层在 CPU 上没有快速实现）。
-
-所有训练过的版本（只训内容、只训性别、只训情绪、各种编码器）都保留在 🤗 [Hugging Face](https://huggingface.co/adventists-ai)；
-论文中 Qwen3-32B 各版本的完整对比见 [docs/paper_results.md](docs/paper_results.md)。
+> **研究用 checkpoint。** 这些模型背后还有几十个连接器 checkpoint，覆盖其他编码器（MOSS、Whisper、SenseVoice）、
+> 大模型（Qwen3 0.6B–32B、Falcon-H1、SmolLM3）和两种连接器类型，配合 `duplexjev` PyTorch 包使用。
+> 排行榜、分项成绩和包的用法见 **[docs/connectors_zh.md](docs/connectors_zh.md)**。
 
 ## 4. 快速上手
 
-**用 vLLM 部署完整模型**（OpenAI 兼容接口；每个问题一个请求，`max_tokens=1`）：
+**不需要显卡**——直接调我们的试用 API（DuplexJev-4B；有限流，不保存音频）：
+
+```bash
+pip install duplexjev
+duplexjev quick call_zh.wav --api https://api.adventists.cn/duplexjev --lang zh
+```
+
+```
+判断       答案                置信度
+-----------------------------------------
+话轮状态   话说完了，可以接话  0.87
+该怎么做   马上回应            0.91
+...
+8 个判断，80 ms
+```
+
+换成自己的题目：`--questions table.json`（`{"id", "text", "options"}` 的列表），或在 Python 里
+`quick("call.wav", lang="zh", questions=[Question("product", "用户在问哪个产品？", ["手机", "电脑", "其他"], lang="zh")])`。
+带录音功能的网页版在 [api.adventists.cn/duplexjev](https://api.adventists.cn/duplexjev/)。
+
+**用自己的显卡**，vLLM 部署：
 
 ```bash
 pip install "vllm[audio]>=0.29" duplexjev-vllm
-vllm serve adventists-ai/DuplexJev-4B --max-model-len 4096
+vllm serve adventists-ai/DuplexJev-32B --max-model-len 4096      # 小显卡换成 adventists-ai/DuplexJev-4B
+duplexjev quick call.wav --vllm http://localhost:8000/v1 --lang zh   # 用默认判断表问自己的服务
+duplexjev gateway --vllm http://localhost:8000/v1 --port 8020        # 在前面套上这个网页 demo 和 HTTP API
 ```
+
+也可以在 Python 里问自己的问题（OpenAI 兼容接口；每个问题一个请求，`max_tokens=1`）：
 
 ```python
 from vllm_client import DuplexJevClient      # examples/vllm_client.py：只依赖 openai 和标准库
 
 dj = DuplexJevClient("http://localhost:8000/v1")
 dj.decide(open("call_018.wav", "rb").read(), {
-    "turn":   ("用户说完了吗？", ["说完了", "还没说完"]),
-    "gender": ("说话人的性别是？", ["男性", "女性"]),
+    "turn":    ("用户说完了吗？", ["说完了", "还没说完"]),
+    "gender":  ("说话人的性别是？", ["男性", "女性"]),
+    "emotion": ("说话人当时的情绪状态是？", ["中性", "高兴", "生气", "伤心"]),
 }, lang="zh")
+# {'turn': {'answer': '说完了', 'confidence': 0.9, 'probs': {...}}, 'gender': {...}, 'emotion': {...}}
 ```
 
-同一段音频的多个问题并发发送，在 vLLM 的前缀缓存里共用音频部分。提示词格式和插件说明见
-[模型卡](https://huggingface.co/adventists-ai/DuplexJev-4B) 和 [`vllm_plugin/`](vllm_plugin)。
-
-**PyTorch 包**（适用于所有连接器 checkpoint；一次前向里批处理并共享前缀）：
-
-```bash
-pip install "duplexjev[speech]>=0.2.2"      # 需要 HTTP 服务再加 [all]
-```
-
-**一段音频，多组选项：**
-
-```python
-from duplexjev import Decider, Question
-
-d = Decider.from_pretrained("adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B", device="auto")
-groups = [Question("turn", "用户说完了吗？", ["说完了", "还没说完"], lang="zh"),
-          Question("filler", "先说哪句垫话？", ["好的——", "请稍等——", "（不说话）"], lang="zh"),
-          Question("gender", "说话人的性别是？", ["男性", "女性"], lang="zh"),
-          Question("emotion", "说话人当时的情绪状态是？", ["中性", "高兴", "生气", "伤心"], lang="zh")]
-
-d.decide("call_018.wav", groups, lang="zh")
-# {'turn': {'answer': '说完了', 'confidence': 0.97, 'probs': {...}}, 'filler': {...}, 'gender': {...}, 'emotion': {...}}
-```
-
-用音频的语言提问：连接器训练时问题和选项的语言与音频一致（中文语音用中文问题和选项）。每个模型卡都列出了训练时用的问法。
-
-**多段音频，多组选项** —— 每组选项注明针对哪段音频，全部在一次批量计算中完成：
-
-```python
-d.decide_batch(
-    {"car1": "a.wav", "car2": "b.wav", "car3": "c.wav"},
-    [Question("turn", "用户说完了吗？", ["说完了", "还没说完"], lang="zh", audio="*"),
-     Question("gender", "说话人的性别是？", ["男性", "女性"], lang="zh", audio=["car2", "car3"]),
-     Question("human", "用户需要转人工吗？", ["需要", "不需要"], lang="zh", audio="car1")],
-    context={"car1": "司机两次要求给家里打电话。"}, lang="zh")
-```
-
-**批量服务** —— 同一个时间片内到达的请求在一次计算里一起回答：
-
-```bash
-duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tick-ms 160
-# POST /v1/decide        {"audio_b64": ..., "questions": [...]}
-# POST /v1/decide_batch  {"audios": {"car1": ..., "car2": ...}, "questions": [{..., "audio": "car1"}]}
-```
-
-使用本地模型副本、多卡切分、其他 Ultravox 格式模型，以及包的各项保证：见 [docs/package.md](docs/package.md)。
+同一段音频的多个问题并发发送，在 vLLM 的前缀缓存里共用音频部分。用音频的语言提问（中文语音用中文问题和选项）。
+提示词格式和插件说明见[模型卡](https://huggingface.co/adventists-ai/DuplexJev-32B)和 [`vllm_plugin/`](vllm_plugin)。
+想用 PyTorch 包加载连接器 checkpoint，见 [docs/connectors_zh.md](docs/connectors_zh.md#pytorch-包)。
 
 ## 5. 性能
 
@@ -217,7 +144,7 @@ duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tic
 | 情绪 | 中性 / 高兴 / 生气 / 伤心，表演语音（ESD、CREMA-D），中 + 英 | 800 | [`evaluation/`](evaluation) |
 
 **主语言** = qa100、ZJU-ML、Easy-Turn 三项平均；**副语言** = 性别、情绪两项平均；**总分** = 两者平均。
-随机水平：四选一任务 25%，性别 50%。排行榜由 [`evaluation/build_leaderboard.py`](evaluation/build_leaderboard.py)
+随机水平：四选一任务 25%，性别 50%。[连接器排行榜](docs/connectors_zh.md#排行榜)由 [`evaluation/build_leaderboard.py`](evaluation/build_leaderboard.py)
 根据同目录下的结果文件生成。
 
 ## 7. 训练
@@ -241,16 +168,16 @@ duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tic
 | [`research/`](research) | 研究笔记：实验和设计取舍，附数字和误差范围 |
 | [`tests/`](tests) | 等价性和批不变性测试 |
 | [`examples/`](examples) | 快速上手、时间片批处理计时、服务客户端、[vLLM 客户端](examples/vllm_client.py) |
-| [`evaluation/`](evaluation) | 评测脚本、排行榜脚本和结果 |
+| [`evaluation/`](evaluation) | 评测脚本、连接器排行榜脚本和结果 |
 | [`training/`](training) | Ultravox 配置和补丁、数据配方、100 包切分、编码器移植 |
 | [`benchmarks/`](benchmarks) | 延迟、SLO 容量和前缀共享实验 |
-| [`docs/`](docs) | 项目主页、[论文结果](docs/paper_results.md)、[包的细节](docs/package.md) |
+| [`docs/`](docs) | 项目主页、[连接器 checkpoint](docs/connectors_zh.md)、[论文结果](docs/paper_results.md)、[包的细节](docs/package.md) |
 
 论文代码里还留有我们集群上的路径，见 [docs/PATHS.md](docs/PATHS.md)。
 
 ## 9. 许可
 
-代码：Apache-2.0（[LICENSE](LICENSE)）。连接器权重：Apache-2.0；用情绪数据训练的（`-Emotion-` 和 `-Para-`）为 CC BY-NC 4.0，
+代码：Apache-2.0（[LICENSE](LICENSE)）。完整模型（DuplexJev-32B、DuplexJev-4B）：CC BY-NC 4.0，因为其中的连接器用情绪数据训练过。连接器权重：Apache-2.0；用情绪数据训练的（`-Emotion-` 和 `-Para-`）为 CC BY-NC 4.0，
 因为 ESD 仅限研究使用。qa100：CC-BY-4.0。冻结的编码器和大模型沿用各自的许可（Falcon-H1：TII Falcon License；
 SenseVoice：FunASR Model License）。部分训练语料（如 WenetSpeech、CoVoST 2）有非商用条款。详见 [NOTICE](NOTICE)。
 

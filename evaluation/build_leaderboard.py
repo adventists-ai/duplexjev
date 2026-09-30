@@ -1,4 +1,4 @@
-"""Leaderboard for the README.
+"""Leaderboard for docs/connectors.md (connector checkpoints).
   main language   = mean(qa100, ZJU-ML, Easy-Turn)      (%)
   paralinguistics = mean(gender, emotion)               (%)
   total           = (main language + paralinguistics) / 2

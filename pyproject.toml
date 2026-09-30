@@ -4,18 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "duplexjev"
-version = "0.2.2"
+version = "0.3.0"
 description = "Jev-style typed decisions about speech with zero decode steps: one forward pass answers many option groups about many clips."
 readme = "PYPI.md"
 license = {text = "Apache-2.0"}
 authors = [{name = "Adventists.ai"}]
 requires-python = ">=3.9"
 dependencies = [
-  "torch>=2.1",
-  "transformers>=4.51,<4.58",
   "numpy",
   "soundfile",
-  "scipy",
 ]
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
@@ -25,9 +22,9 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-speech = ["accelerate", "peft", "transformers>=4.51,<4.56"]
+speech = ["torch>=2.1", "scipy", "accelerate", "peft", "transformers>=4.51,<4.56"]
 server = ["fastapi", "uvicorn", "pydantic>=2"]
-all = ["accelerate", "peft", "transformers>=4.51,<4.56", "fastapi", "uvicorn", "pydantic>=2"]
+all = ["torch>=2.1", "scipy", "accelerate", "peft", "transformers>=4.51,<4.56", "fastapi", "uvicorn", "pydantic>=2"]
 dev = ["pytest", "httpx"]
 
 [project.scripts]
@@ -36,6 +33,9 @@ duplexjev = "duplexjev.cli:main"
 [project.urls]
 Homepage = "https://adventists-ai.github.io/duplexjev/"
 Repository = "https://github.com/adventists-ai/duplexjev"
+
+[tool.setuptools.package-data]
+duplexjev = ["demo.html"]
 
 [tool.setuptools.packages.find]
 include = ["duplexjev", "duplexjev.*"]

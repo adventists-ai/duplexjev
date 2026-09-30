@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: duplexjev
-Version: 0.2.1
+Version: 0.3.0
 Summary: Jev-style typed decisions about speech with zero decode steps: one forward pass answers many option groups about many clips.
 Author: Adventists.ai
 License: Apache-2.0
@@ -14,12 +14,11 @@ Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 License-File: LICENSE
 License-File: NOTICE
-Requires-Dist: torch>=2.1
-Requires-Dist: transformers<4.58,>=4.51
 Requires-Dist: numpy
 Requires-Dist: soundfile
-Requires-Dist: scipy
 Provides-Extra: speech
+Requires-Dist: torch>=2.1; extra == "speech"
+Requires-Dist: scipy; extra == "speech"
 Requires-Dist: accelerate; extra == "speech"
 Requires-Dist: peft; extra == "speech"
 Requires-Dist: transformers<4.56,>=4.51; extra == "speech"
@@ -28,6 +27,8 @@ Requires-Dist: fastapi; extra == "server"
 Requires-Dist: uvicorn; extra == "server"
 Requires-Dist: pydantic>=2; extra == "server"
 Provides-Extra: all
+Requires-Dist: torch>=2.1; extra == "all"
+Requires-Dist: scipy; extra == "all"
 Requires-Dist: accelerate; extra == "all"
 Requires-Dist: peft; extra == "all"
 Requires-Dist: transformers<4.56,>=4.51; extra == "all"
@@ -44,6 +45,25 @@ Dynamic: license-file
 Jev-style typed decisions about speech with **zero decode steps**. Give it audio and one or more option groups
 (*has the user finished? which filler? which intent? speaker gender?*); every group comes back as a probability over
 its options from a single forward pass. Many groups about many calls share one pass, with exact prefix sharing.
+
+**Quick start, no GPU** — eight default decisions about any clip through our trial API (DuplexJev-4B, rate-limited):
+
+```bash
+pip install duplexjev
+duplexjev quick call.wav --api https://api.adventists.cn/duplexjev              # --lang zh for Chinese speech
+```
+
+```python
+from duplexjev import quick, Question
+quick("call.wav", api="https://api.adventists.cn/duplexjev")                   # prints and returns the table
+quick("call.wav", vllm="http://localhost:8000/v1",                              # your own `vllm serve adventists-ai/DuplexJev-4B`
+      questions=[Question("product", "Which product is the user asking about?", ["phone", "laptop", "other"])])
+```
+
+`duplexjev gateway --vllm http://localhost:8000/v1` serves the same web demo and HTTP API in front of your own vLLM
+server. Web demo: https://api.adventists.cn/duplexjev/
+
+**Connector checkpoints in PyTorch** (one forward pass for many option groups and many clips):
 
 ```bash
 pip install "duplexjev[speech]"      # add [all] for the HTTP server
@@ -72,6 +92,9 @@ https://huggingface.co/adventists-ai. Local copies of the encoder and LLM: `from
 also offline.
 
 Serve with tick batching: `duplexjev serve --model <checkpoint> --tick-ms 160`.
+
+**0.3.0**: `quick` / `duplexjev quick` with a default table of eight decisions; clients for vLLM servers and the
+DuplexJev HTTP API that need no torch (torch moved to the `speech` extra); `duplexjev gateway` (web demo + API).
 
 **0.2.1**: audio is padded to whole audio tokens at the end instead of the start (start padding cost up to 6 points on
 emotion); `text_model` / `audio_model` overrides work offline.

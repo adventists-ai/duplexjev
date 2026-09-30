@@ -6,8 +6,13 @@ pyproject.toml
 duplexjev/__init__.py
 duplexjev/cli.py
 duplexjev/decider.py
+duplexjev/demo.html
+duplexjev/gateway.py
 duplexjev/question.py
+duplexjev/quick.py
+duplexjev/remote.py
 duplexjev/server.py
+duplexjev/table.py
 duplexjev.egg-info/PKG-INFO
 duplexjev.egg-info/SOURCES.txt
 duplexjev.egg-info/dependency_links.txt
