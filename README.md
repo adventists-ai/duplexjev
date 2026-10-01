@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">Try it online</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/">Project page</a> &nbsp;|&nbsp;
   📄 Paper (arXiv, coming soon) &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai">Weights</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">DuplexJev-32B</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">DuplexJev-4B</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-citation">Citation</a>
@@ -27,18 +27,19 @@
 (product name: **Speech-to-Decision**). Hidden states of an off-the-shelf ASR encoder are projected into a frozen
 LLM, and every runtime-declared question — *is the turn complete? which filler to play? who is speaking?* — is read
 as a **single-token, closed-set distribution**: no ASR decoding, no text decoding. Many questions, about one call or
-across many calls, share one forward pass.
+across many calls, share one forward pass. We release two ready-to-serve models,
+**[DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B)** (recommended) and
+**[DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)**.
 
 ```
-audio ──► frozen ASR encoder (Qwen3-ASR, MOSS-Transcribe, Whisper, SenseVoice, …)
-            ├─ B: last layer ──────────────────────────────────┐
-            └─ A: cross-attention fusion over three layers ────┤  (zero-init, residual)
-                                                               ▼
-                              connector (frame stacking → 6.25 tokens/s, MLP → d_LLM)
-                                                               ▼
-state + N typed questions ──► frozen LLM (0.6B – 32B), ONE forward pass
-                                                               ▼
-            p(A|q1) … p(D|q1),  …,  p(A|qN) … p(D|qN)      — 0 decode steps
+audio ──► Qwen3-ASR-0.6B encoder (frozen)
+                 ▼  last layer
+          connector: stack 2 frames → 6.25 tokens/s, MLP → d_LLM        ← the only trained part
+                 ▼
+state + N typed questions ──► frozen LLM, ONE forward pass
+                              (DuplexJev-32B: language model of Qwen3-VL-32B · DuplexJev-4B: Qwen3-4B)
+                 ▼
+          p(A|q1) … p(D|q1),  …,  p(A|qN) … p(D|qN)      — 0 decode steps
 ```
 
 - **Typed single-token readout.** Each question lists its options under permuted letters; the answer is the next-token
@@ -141,9 +142,16 @@ To use a connector checkpoint with the PyTorch package instead, see [docs/connec
 
 ## 5. Performance
 
-Ten decisions about one call, Qwen3-32B on one H200 (vLLM, bf16): **92 ms** with the single-token readout, against
-**1,567 ms + 411 ms ASR** for the usual cascade (transcribe, then let the LLM generate JSON). Within a 0.25 s budget the
-readout serves 17 such events per second; the cascade serves none. Full tables: [docs/paper_results.md](docs/paper_results.md).
+| | DuplexJev-32B | DuplexJev-4B |
+|---|---|---|
+| one decision event (ten questions about one clip, sent as ten concurrent requests to the vLLM OpenAI server) | median **240 ms** on one H200 | about **80 ms** for the eight default questions on one H100 (our trial API) |
+| GPU memory | one 80 GB GPU | ~10 GB |
+| spoken knowledge, VoiceBench OBQA / MMSU (speech in) | **83.7 / 70.8** | 47.3 / 41.3 |
+
+For reference, the same LLM answering from text reaches 95.4 / 79.3 (Qwen3-VL-32B). Against the usual cascade
+(transcribe, then let the LLM generate JSON), the single-token readout answers ten decisions in 92 ms instead of
+1,567 ms + 411 ms ASR (paper measurement: Qwen3-32B on one H200, vLLM, all ten questions in one packed request). Full tables:
+[docs/paper_results.md](docs/paper_results.md).
 
 ## 6. Benchmarks
 
@@ -151,7 +159,7 @@ readout serves 17 such events per second; the cascade serves none. Full tables: 
 |---|---|---:|---|
 | qa100 | spoken multiple-choice, synthetic speech (zh + en) | 100 | 🤗 [adventists-ai/qa100](https://huggingface.co/datasets/adventists-ai/qa100) |
 | ZJU-ML | main-language part of the ZJU audio benchmark v2.0.0: spoken questions, half real speech | 100 | [GitHub](https://github.com/Vsky-morigen/audio-gender-benchmark) |
-| Easy-Turn | four-way turn state (complete / incomplete / backchannel / wait), zero-shot | 800 | Easy-Turn test set ([arXiv:2509.23938](https://arxiv.org/abs/2509.23938)) |
+| Easy-Turn | four-way turn state (complete / incomplete / backchannel / wait); the complete models are trained on its training split | 800 | Easy-Turn test set ([arXiv:2509.23938](https://arxiv.org/abs/2509.23938)) |
 | gender | speaker gender, real speech (AISHELL-1, Common Voice, LibriSpeech), zh + en | 800 | [`evaluation/`](evaluation) |
 | emotion | neutral / happy / angry / sad, acted speech (ESD, CREMA-D), zh + en | 800 | [`evaluation/`](evaluation) |
 
@@ -161,31 +169,32 @@ readout serves 17 such events per second; the cascade serves none. Full tables: 
 
 ## 7. Training
 
-Frozen encoder and frozen LLM; only the connector is trained, with a patched [Ultravox](https://github.com/fixie-ai/ultravox).
+Frozen encoder and frozen LLM; only the connector is trained, with a patched
+[Ultravox](https://github.com/fixie-ai/ultravox). Both complete models follow the same three stages:
 
-1. **Content (R1–R2).** Transcript distillation on the Ultravox v0.6 mixture (WenetSpeech, GigaSpeech, Common Voice,
+1. **Content, R1 and R2.** Transcript distillation on the Ultravox v0.6 mixture (WenetSpeech, GigaSpeech, Common Voice,
    CoVoST 2, People's Speech, LibriSpeech, MLS, MUSAN), split into 100 disjoint packs; R1 and R2 use one pack each.
-2. **Decisions.** Cross-entropy on the single option letter at the readout position. Gender: AISHELL-1 and LibriSpeech;
-   emotion: ESD and CREMA-D.
-3. **Mixed objective (`-Para`).** One run over content + gender + emotion: distillation for content samples,
-   answer-token cross-entropy for decision samples.
+2. **Decisions.** Cross-entropy on the single option letter at the readout position: turn state (Easy-Turn training
+   split), gender (AISHELL-1, LibriSpeech) and emotion (ESD, CREMA-D).
+3. **Mixed run.** One run from R2 over content and decision samples (distillation for content, answer-token
+   cross-entropy for decisions); 4,000 steps, learning rate 1e-4, with content weighted up (×10) and gender and emotion
+   weighted down (×0.5) so that content understanding is kept while turn state, gender and emotion are learned.
 
-Recipe, data links and scripts: [`training/`](training). The emotion corpora are not redistributed.
+Recipe, data links and scripts: [`training/`](training). The emotion corpora are not redistributed. The research
+checkpoints in [docs/connectors.md](docs/connectors.md) use earlier versions of this recipe.
 
 ## 8. Repository layout
 
 | path | contents |
 |---|---|
-| [`duplexjev/`](duplexjev) | the installable package: `Decider`, `Question`, CLI and tick-batched server |
-| [`duplexjev/research/`](duplexjev/research) | paper code: readout, question contract, encoder with fusion |
-| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`: vLLM plugin for the complete models |
-| [`research/`](research) | research notes: experiments and design decisions, with numbers and noise levels |
-| [`tests/`](tests) | equivalence and batch-invariance tests |
-| [`examples/`](examples) | quick starts, tick-batch timing, server client, [vLLM client](examples/vllm_client.py) |
-| [`evaluation/`](evaluation) | benchmark runners, connector leaderboard script and results |
+| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`: the vLLM plugin that serves DuplexJev-32B and DuplexJev-4B |
+| [`duplexjev/`](duplexjev) | the `duplexjev` package: `quick()` and the default decision table, vLLM and API clients, the web demo gateway; the PyTorch `Decider` for connector checkpoints |
+| [`examples/`](examples) | [vLLM client](examples/vllm_client.py), quick starts, server client |
+| [`evaluation/`](evaluation) | benchmark runners and results |
 | [`training/`](training) | Ultravox configs and patches, data recipe, 100-pack split, encoder ports |
-| [`benchmarks/`](benchmarks) | latency, SLO capacity and prefix-sharing experiments |
+| [`research/`](research) | research notes: experiments and design decisions, with numbers and noise levels |
 | [`docs/`](docs) | project page, [connector checkpoints](docs/connectors.md), [paper results](docs/paper_results.md), [package details](docs/package.md) |
+| [`duplexjev/research/`](duplexjev/research), [`tests/`](tests), [`benchmarks/`](benchmarks) | paper code (readout, question contract, fused encoder), equivalence tests, latency and capacity experiments |
 
 The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/PATHS.md).
 
@@ -210,8 +219,10 @@ Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms. Se
 
 ## 11. Acknowledgements
 
-Built on [Ultravox](https://github.com/fixie-ai/ultravox), [Qwen3](https://github.com/QwenLM/Qwen3), Qwen3-ASR,
-[MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize), Whisper, SenseVoice,
-SmolLM3 and Falcon-H1. We thank the ZJU team for the [audio benchmark](https://github.com/Vsky-morigen/audio-gender-benchmark).
+DuplexJev-32B and DuplexJev-4B are built on [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL),
+[Qwen3](https://github.com/QwenLM/Qwen3) and Qwen3-ASR, trained with [Ultravox](https://github.com/fixie-ai/ultravox)
+and served with [vLLM](https://github.com/vllm-project/vllm). The research checkpoints also use
+[MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize), Whisper, SenseVoice, SmolLM3
+and Falcon-H1. We thank the ZJU team for the [audio benchmark](https://github.com/Vsky-morigen/audio-gender-benchmark).
 Claude (Anthropic) assisted with code.
 Questions and issues: [GitHub Issues](https://github.com/adventists-ai/duplexjev/issues).

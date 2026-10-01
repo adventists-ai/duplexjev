@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
   📄 论文（arXiv，即将发布） &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai">模型权重</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">DuplexJev-32B</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">DuplexJev-4B</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-引用">引用</a>
@@ -26,18 +26,18 @@
 **DuplexJev** 把一个冻结的语音大模型变成面向全双工语音智能体的**类型化判断引擎**（产品名 **Speech-to-Decision**）。
 现成 ASR 编码器的隐状态经连接器送入冻结的大模型；运行时声明的每个问题——*用户说完了吗？先说哪句垫话？说话的是谁？*——
 都读成**单个 token 上的闭集概率分布**：不做 ASR 解码，也不做文本解码。同一通电话的多个问题、乃至多通电话的问题，
-可以在同一次前向计算里一起完成。
+可以在同一次前向计算里一起完成。我们发布两个可直接部署的模型：
+**[DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B)**（推荐）和 **[DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)**。
 
 ```
-音频 ──► 冻结的 ASR 编码器（Qwen3-ASR、MOSS-Transcribe、Whisper、SenseVoice 等）
-            ├─ B：最后一层 ───────────────────────────────────┐
-            └─ A：三层的交叉注意力融合 ───────────────────────┤ （零初始化，残差）
-                                                              ▼
-                          连接器（帧拼接 → 6.25 token/秒，MLP → d_LLM）
-                                                              ▼
-状态 + N 个类型化问题 ──► 冻结的大模型（0.6B – 32B），一次前向
-                                                              ▼
-            p(A|q1) … p(D|q1),  …,  p(A|qN) … p(D|qN)      —— 0 步解码
+音频 ──► Qwen3-ASR-0.6B 编码器（冻结）
+                 ▼  最后一层
+          连接器：每 2 帧拼接 → 6.25 token/秒，MLP → d_LLM        ← 唯一训练的部分
+                 ▼
+状态 + N 个类型化问题 ──► 冻结的大模型，一次前向
+                          （DuplexJev-32B：Qwen3-VL-32B 的语言模型 · DuplexJev-4B：Qwen3-4B）
+                 ▼
+          p(A|q1) … p(D|q1),  …,  p(A|qN) … p(D|qN)      —— 0 步解码
 ```
 
 - **类型化单 token 读出。** 每个问题的选项用打乱的字母标注，答案取下一个 token 在这些字母上的 softmax。输出一定合法，`max p` 可作置信度。
@@ -129,9 +129,15 @@ dj.decide(open("call_018.wav", "rb").read(), {
 
 ## 5. 性能
 
-同一通电话的 10 个判断，Qwen3-32B、单张 H200（vLLM，bf16）：单 token 读出 **92 毫秒**；常见的级联做法（先转写，
-再让大模型生成 JSON）要 **1,567 毫秒，另加 ASR 411 毫秒**。在 0.25 秒的时限内，单 token 读出每秒能处理 17 个这样的事件，
-级联做法一个也处理不了。完整表格见 [docs/paper_results.md](docs/paper_results.md)。
+| | DuplexJev-32B | DuplexJev-4B |
+|---|---|---|
+| 一次判断（同一段音频 10 个问题，作为 10 个并发请求发给 vLLM OpenAI 服务） | 单张 H200 中位 **240 毫秒** | 默认 8 个问题约 **80 毫秒**（单张 H100，我们的试用 API） |
+| 显存 | 一张 80 GB 显卡 | 约 10 GB |
+| 口语知识问答 VoiceBench OBQA / MMSU（语音输入） | **83.7 / 70.8** | 47.3 / 41.3 |
+
+作为参照，同一个大模型直接读文字是 95.4 / 79.3（Qwen3-VL-32B）。和常见的级联做法（先转写，再让大模型生成 JSON）相比，
+单 token 读出完成 10 个判断要 92 毫秒，级联要 1,567 毫秒另加 ASR 411 毫秒（论文测量：Qwen3-32B、单张 H200、vLLM，10 个问题打包成一个请求）。
+完整表格见 [docs/paper_results.md](docs/paper_results.md)。
 
 ## 6. 评测基准
 
@@ -139,7 +145,7 @@ dj.decide(open("call_018.wav", "rb").read(), {
 |---|---|---:|---|
 | qa100 | 语音选择题，合成语音（中 + 英） | 100 | 🤗 [adventists-ai/qa100](https://huggingface.co/datasets/adventists-ai/qa100) |
 | ZJU-ML | 浙大音频基准 v2.0.0 主语言部分：语音提问，一半为真人录音 | 100 | [GitHub](https://github.com/Vsky-morigen/audio-gender-benchmark) |
-| Easy-Turn | 四类话轮状态（说完 / 没说完 / 附和 / 等一下），零样本 | 800 | Easy-Turn 测试集（[arXiv:2509.23938](https://arxiv.org/abs/2509.23938)） |
+| Easy-Turn | 四类话轮状态（说完 / 没说完 / 附和 / 等一下）；完整模型用过它的训练集 | 800 | Easy-Turn 测试集（[arXiv:2509.23938](https://arxiv.org/abs/2509.23938)） |
 | 性别 | 说话人性别，真人录音（AISHELL-1、Common Voice、LibriSpeech），中 + 英 | 800 | [`evaluation/`](evaluation) |
 | 情绪 | 中性 / 高兴 / 生气 / 伤心，表演语音（ESD、CREMA-D），中 + 英 | 800 | [`evaluation/`](evaluation) |
 
@@ -150,28 +156,30 @@ dj.decide(open("call_018.wav", "rb").read(), {
 ## 7. 训练
 
 编码器和大模型都冻结，只训练连接器；训练框架为打过补丁的 [Ultravox](https://github.com/fixie-ai/ultravox)。
+两个完整模型都按同样的三步训练：
 
-1. **内容（R1–R2）。** 在 Ultravox v0.6 数据混合（WenetSpeech、GigaSpeech、Common Voice、CoVoST 2、People's Speech、
+1. **内容，R1 和 R2。** 在 Ultravox v0.6 数据混合（WenetSpeech、GigaSpeech、Common Voice、CoVoST 2、People's Speech、
    LibriSpeech、MLS、MUSAN）上做转写蒸馏；数据切成 100 个互不重叠的包，R1、R2 各用一包。
-2. **判断。** 在读出位置对单个选项字母做交叉熵。性别：AISHELL-1、LibriSpeech；情绪：ESD、CREMA-D。
-3. **混合目标（`-Para`）。** 内容、性别、情绪样本一起训练：内容样本做蒸馏，判断样本做答案 token 交叉熵。
+2. **判断。** 在读出位置对单个选项字母做交叉熵：话轮状态（Easy-Turn 训练集）、性别（AISHELL-1、LibriSpeech）、
+   情绪（ESD、CREMA-D）。
+3. **混合训练。** 从 R2 出发，内容和判断样本一起训练（内容做蒸馏，判断做答案 token 交叉熵）；4,000 步，学习率 1e-4，
+   内容样本加权（×10）、性别和情绪降权（×0.5），在学会话轮、性别、情绪的同时保住内容理解。
 
-配方、数据链接和脚本：[`training/`](training)。情绪语料不再分发。
+配方、数据链接和脚本：[`training/`](training)。情绪语料不再分发。[docs/connectors_zh.md](docs/connectors_zh.md) 里的研究用
+checkpoint 用的是这套配方的早期版本。
 
 ## 8. 仓库结构
 
 | 路径 | 内容 |
 |---|---|
-| [`duplexjev/`](duplexjev) | 可安装的包：`Decider`、`Question`、命令行和按时间片批处理的服务 |
-| [`duplexjev/research/`](duplexjev/research) | 论文代码：读出、问题约定、带融合的编码器 |
-| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`：完整模型的 vLLM 插件 |
-| [`research/`](research) | 研究笔记：实验和设计取舍，附数字和误差范围 |
-| [`tests/`](tests) | 等价性和批不变性测试 |
-| [`examples/`](examples) | 快速上手、时间片批处理计时、服务客户端、[vLLM 客户端](examples/vllm_client.py) |
-| [`evaluation/`](evaluation) | 评测脚本、连接器排行榜脚本和结果 |
+| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`：部署 DuplexJev-32B 和 DuplexJev-4B 的 vLLM 插件 |
+| [`duplexjev/`](duplexjev) | `duplexjev` 包：`quick()` 和默认判断表、vLLM 与 API 客户端、网页 demo 网关；加载连接器 checkpoint 的 PyTorch `Decider` |
+| [`examples/`](examples) | [vLLM 客户端](examples/vllm_client.py)、快速上手、服务客户端 |
+| [`evaluation/`](evaluation) | 评测脚本和结果 |
 | [`training/`](training) | Ultravox 配置和补丁、数据配方、100 包切分、编码器移植 |
-| [`benchmarks/`](benchmarks) | 延迟、SLO 容量和前缀共享实验 |
+| [`research/`](research) | 研究笔记：实验和设计取舍，附数字和误差范围 |
 | [`docs/`](docs) | 项目主页、[连接器 checkpoint](docs/connectors_zh.md)、[论文结果](docs/paper_results.md)、[包的细节](docs/package.md) |
+| [`duplexjev/research/`](duplexjev/research)、[`tests/`](tests)、[`benchmarks/`](benchmarks) | 论文代码（读出、问题约定、融合编码器）、等价性测试、延迟和容量实验 |
 
 论文代码里还留有我们集群上的路径，见 [docs/PATHS.md](docs/PATHS.md)。
 
@@ -194,8 +202,9 @@ SenseVoice：FunASR Model License）。部分训练语料（如 WenetSpeech、Co
 
 ## 11. 致谢
 
-基于 [Ultravox](https://github.com/fixie-ai/ultravox)、[Qwen3](https://github.com/QwenLM/Qwen3)、Qwen3-ASR、
-[MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize)、Whisper、SenseVoice、
-SmolLM3 和 Falcon-H1 构建。感谢浙大团队提供[音频基准](https://github.com/Vsky-morigen/audio-gender-benchmark)。
+DuplexJev-32B 和 DuplexJev-4B 基于 [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL)、[Qwen3](https://github.com/QwenLM/Qwen3)
+和 Qwen3-ASR，用 [Ultravox](https://github.com/fixie-ai/ultravox) 训练，用 [vLLM](https://github.com/vllm-project/vllm) 部署。
+研究用 checkpoint 还用到 [MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize)、Whisper、
+SenseVoice、SmolLM3 和 Falcon-H1。感谢浙大团队提供[音频基准](https://github.com/Vsky-morigen/audio-gender-benchmark)。
 Claude（Anthropic）协助编写代码。
 问题和建议：[GitHub Issues](https://github.com/adventists-ai/duplexjev/issues)。

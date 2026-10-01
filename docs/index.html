@@ -134,7 +134,9 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
     <nav class="links" aria-label="Resources">
       <span data-i18n="l_paper"></span>
       <a href="https://github.com/adventists-ai/duplexjev" data-i18n="l_code"></a>
-      <a href="https://huggingface.co/adventists-ai" data-i18n="l_weights"></a>
+      <a href="https://api.adventists.cn/duplexjev/" data-i18n="l_try"></a>
+      <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">DuplexJev-32B</a>
+      <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">DuplexJev-4B</a>
       <a href="https://huggingface.co/datasets/adventists-ai/qa100" data-i18n="l_qa100"></a>
       <a href="#cite" data-i18n="l_cite"></a>
     </nav>
@@ -255,7 +257,7 @@ const T = {
   title:"Batched Speech Decisions Without Decoding",
   subtitle:"DuplexJev — single-token supervision lets a frozen LLM hear beyond the transcript",
   affil:"<sup>1</sup>Adventists.ai, Melbourne · <sup>2</sup>College of CS&amp;T, Zhejiang University · <sup>3</sup>Future Design Lab, Innovation Center of Yangtze River Delta, Zhejiang University · <sup>4</sup>University of Virginia · <sup>★</sup>jiejin@adventists.ai",
-  l_paper:"Paper · arXiv soon", l_code:"Code", l_weights:"Weights", l_qa100:"qa100 test set", l_cite:"Cite",
+  l_paper:"Paper · arXiv soon", l_code:"Code", l_weights:"Weights",l_try:"Try it online", l_qa100:"qa100 test set", l_cite:"Cite",
   lede:"A full-duplex voice agent must keep answering small, closed questions — <em>has the user finished? which filler fits? which step of the flow is this?</em> DuplexJev reads every such question as one constrained token from a frozen speech LLM. No ASR decoding, no text decoding, and many questions — over one call or across calls — share a single forward pass.",
   demo_h:"One utterance, one pass, many answers",
   demo_p:"Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked). These are real outputs of the released A-Para checkpoint (duplexjev 0.2.1) on synthetic clips (VoxCPM2), shown as they are, including its mistakes.",
@@ -304,7 +306,7 @@ const T = {
   title:"不解码的批量语音判断",
   subtitle:"DuplexJev —— 单 token 监督让冻结的大模型听到转写之外的信息",
   affil:"<sup>1</sup>Adventists.ai（墨尔本）· <sup>2</sup>浙江大学计算机科学与技术学院 · <sup>3</sup>浙江大学长三角智慧绿洲创新中心 Future Design Lab · <sup>4</sup>弗吉尼亚大学 · <sup>★</sup>jiejin@adventists.ai",
-  l_paper:"论文 · arXiv 即将发布", l_code:"代码", l_weights:"权重", l_qa100:"qa100 测试集", l_cite:"引用",
+  l_paper:"论文 · arXiv 即将发布", l_code:"代码", l_weights:"权重",l_try:"在线体验", l_qa100:"qa100 测试集", l_cite:"引用",
   lede:"全双工语音智能体要不停地回答一些小而封闭的问题——<em>用户说完了吗？先说哪句垫话？流程走到哪一步了？</em>DuplexJev 把每个这样的问题都从冻结的语音大模型里读成一个受约束的 token：不做语音转写的解码，不做文本解码；同一通电话、甚至多通电话里的许多问题，共用一次前向计算。",
   demo_h:"一句话，一次前向，许多答案",
   demo_p:"选一段音频。右侧面板显示在同一次前向里回答的每个类型化问题，各自给出在自己选项上的概率。波形下方的刻度标出 160&nbsp;毫秒一段——每段变成大模型的一个音频 token（Qwen3-ASR 12.5&nbsp;Hz，两帧拼一）。下面是正式发布的 A-Para 权重（duplexjev 0.2.1）在合成语音（VoxCPM2）上的真实输出，原样展示，包括它答错的地方。",
