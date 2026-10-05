@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "duplexjev-vllm"
-version = "0.1.0"
+version = "0.2.0"
 description = "vLLM plugin for DuplexJev speech-decision models (Qwen3-ASR encoder + Ultravox-style projector)."
 readme = "README.md"
 license = {text = "Apache-2.0"}

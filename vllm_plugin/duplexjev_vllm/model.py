@@ -61,3 +61,30 @@ class DuplexJevForConditionalGeneration(U.UltravoxModel):
             super().__init__(vllm_config=vllm_config, prefix=prefix)
         finally:
             U.UltravoxWhisperEncoder = orig
+
+
+class DuplexJevGemmaForConditionalGeneration(DuplexJevForConditionalGeneration):
+    """DuplexJev on a Gemma-4 language model.
+
+    Two differences from the Qwen models, both from how the connector was trained:
+    - the audio soft tokens are wrapped in Gemma's native audio markers, ``<|audio>`` ... ``<audio|>``;
+    - the projector output is multiplied by ``audio_embed_scale`` (3.0) before it enters the LLM, which puts the audio
+      tokens at about the RMS of Gemma's (sqrt(hidden)-scaled) text embeddings.
+    """
+
+    @classmethod
+    def get_placeholder_str(cls, modality: str, i: int):
+        if modality.startswith("audio"):
+            return "<|audio><|audio|><audio|>"
+        raise ValueError("Only audio modality is supported")
+
+    def __init__(self, *, vllm_config, prefix: str = ""):
+        super().__init__(vllm_config=vllm_config, prefix=prefix)
+        self._audio_embed_scale = float(getattr(vllm_config.model_config.hf_config, "audio_embed_scale", 3.0))
+
+    def embed_multimodal(self, **kwargs):
+        emb = super().embed_multimodal(**kwargs)
+        s = self._audio_embed_scale
+        if s == 1.0 or emb is None or len(emb) == 0:
+            return emb
+        return type(emb)(e * s for e in emb) if not isinstance(emb, torch.Tensor) else emb * s

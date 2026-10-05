@@ -3,9 +3,11 @@
 Registered as a `vllm.general_plugins` entry point: `pip install duplexjev-vllm`, then
 `vllm serve adventists-ai/DuplexJev-4B`.
 """
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 ARCH = "DuplexJevForConditionalGeneration"
+ARCHS = {ARCH: "duplexjev_vllm.model:DuplexJevForConditionalGeneration",
+         "DuplexJevGemmaForConditionalGeneration": "duplexjev_vllm.model:DuplexJevGemmaForConditionalGeneration"}
 
 
 def register():
@@ -20,5 +22,7 @@ def register():
 
     from vllm import ModelRegistry
 
-    if ARCH not in ModelRegistry.get_supported_archs():
-        ModelRegistry.register_model(ARCH, "duplexjev_vllm.model:DuplexJevForConditionalGeneration")
+    supported = ModelRegistry.get_supported_archs()
+    for arch, path in ARCHS.items():
+        if arch not in supported:
+            ModelRegistry.register_model(arch, path)

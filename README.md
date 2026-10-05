@@ -12,14 +12,41 @@
 <p align="center">
   🎧 <a href="https://api.adventists.cn/duplexjev/">Try it online</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/">Project page</a> &nbsp;|&nbsp;
-  📄 Paper (arXiv, coming soon) &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">DuplexJev-32B</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">DuplexJev-4B</a> &nbsp;|&nbsp;
+  📄 <a href="https://arxiv.org/abs/2610.02638">Paper (arXiv:2610.02638)</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">32B</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">4B</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-citation">Citation</a>
 </p>
 
 ---
+
+## 🏆 Turn-taking: one general model vs. dedicated detectors
+
+DuplexJev-32B-Turn decides turn-taking as well as dedicated detectors do, and in the same forward pass it also answers
+every other question you declare (intent, emotion, gender, barge-in, …). It does not decode any tokens, so ten
+decisions about one clip cost about as much as one.
+
+| model | Easy-Turn test (complete / incomplete / backchannel / wait) | Easy-Turn overall | CoDeTT zh / en | other decisions in the same call | latency |
+|---|---|---:|---:|---|---|
+| Smart Turn v2 (95 MB) | 78.7 / 62.0 / – / – | – | – / 51.4 (v3) | no | 27 ms |
+| TEN Turn Detection (7 B) | 86.7 / 89.3 / – / 91.0 | – | – | no | 204 ms |
+| Easy-Turn (0.85 B) | 96.3 / 97.7 / 91.0 / 98.0 | 96.4 | 37.9 / – | no | 263 ms |
+| NAMO-Turn · FireRedChat | – | – | 59.5 / – · – / 65.4 | no | – |
+| GPT-4o-audio · Qwen3-Omni | – | – | 66.6 / 71.9 · 70.4 / 70.9 | yes, by generating text | seconds |
+| **DuplexJev-32B-Turn** (ours) | **98.7** / 94.3 / 88.0 / 95.0 | **95.3** | **69.2 / 70.0** | **yes, any number, one pass** | **~0.24 s for 10 decisions** (one H200) |
+| DuplexJev-4B-Turn (ours) | 92.3 / 93.0 / 90.0 / 94.0 | 92.5 | 67.0 / 68.6 | yes | ~0.08 s for 8 decisions (one H100) |
+
+- **Easy-Turn**: accuracy (%) on the 800-item test set. Easy-Turn itself and our Turn models were both trained on its
+  training split. Other rows are from the Easy-Turn paper (Table 2, their hardware); their latency is per single decision.
+- **CoDeTT** ([arXiv:2603.25434](https://arxiv.org/abs/2603.25434)): 18 k items, system state given, mean of four
+  action accuracies. Zero-shot for us: no CoDeTT data in training. Other rows are from the CoDeTT paper. Our protocol gives
+  the current utterance as audio without history; the official one also plays earlier user turns.
+- On our TurnBench-dev clip protocol (not the official leaderboard), the Turn models reach 88.7 (32B) and 87.3 (4B),
+  against 60.7 and 49.4 before the upgrade.
+- **Nothing else got worse.** For 32B: qa100 90 → 96, gender 89.4 → 91.5, emotion 90.6 → 91.1, VoiceBench MMSU
+  70.8 → 72.1. How it was done (public data only, a rank-16 LoRA, one recipe for 4B and 32B):
+  [research note](research/2026-10-turn-taking-lora.md).
 
 ## 1. Introduction
 
@@ -51,6 +78,13 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
+- **2026-10-05** — 📄 Paper on arXiv: [arXiv:2610.02638](https://arxiv.org/abs/2610.02638). 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)
+  and [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn): a turn-taking upgrade (connector + rank-16
+  LoRA on public turn-taking data). 32B-Turn: Easy-Turn 95.3, CoDeTT 69.2 / 70.0 zero-shot, with qa100, gender and emotion
+  all slightly up. [Research note](research/2026-10-turn-taking-lora.md).
+- **2026-10-03** — 🤗 [**DuplexJev-Gemma-31B**](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B), the first
+  non-Qwen model: Qwen3-ASR-0.6B encoder + connector + Gemma-4-31B-it with a merged LoRA. In vLLM: qa100 97, gender
+  94.4, emotion 90.6 (no turn-taking training yet). Needs [`duplexjev-vllm`](https://pypi.org/project/duplexjev-vllm/) ≥ 0.2.0.
 - **2026-10-01** — 🎧 [**Online demo and trial API**](https://api.adventists.cn/duplexjev/) (DuplexJev-4B) and
   [`duplexjev` 0.3](https://pypi.org/project/duplexjev/): `duplexjev quick call.wav` prints a table of eight default
   decisions (turn state, what to do, barge-in, intent, emotion, gender, language, wants a human) for any clip.
@@ -71,16 +105,25 @@ Each model is **one repository with everything needed** (audio encoder + trained
 
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B**](https://huggingface.co/adventists-ai/DuplexJev-32B) | server, best quality | Qwen3-VL-32B (language model) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | 90 | 87 | 79.1\* | 89.4 | 90.6 | **87.7** | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality, turn-taking | DuplexJev-32B + turn-taking LoRA (merged) | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | small GPU, turn-taking | DuplexJev-4B + turn-taking LoRA (merged) | 4.2 B | ~10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) | server | Qwen3-VL-32B (language model) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | 90 | 87 | 79.1\* | 89.4 | 90.6 | **87.7** | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | small GPU, edge | Qwen3-4B + Qwen3-ASR-0.6B encoder | 4.2 B | ~10 GB | 74 | 50 | 78.1\* | 88.6 | 91.2 | 78.6 | CC BY-NC 4.0 |
 
 % under the paper protocol (single-token readout); total = mean of main language (qa100, ZJU-ML, Easy-Turn) and
-paralinguistics (gender, emotion), see [Benchmarks](#6-benchmarks). \* Both models were trained with the Easy-Turn
-training split (disjoint from the test set), so their Easy-Turn scores are in-domain. Both answer ten questions about one clip in about
+paralinguistics (gender, emotion), see [Benchmarks](#6-benchmarks). \* All four models were trained with the Easy-Turn
+training split (disjoint from the test set), so their Easy-Turn scores are in-domain. All answer ten questions about one clip in about
 0.1–0.25 s on one GPU.
 
-**Which one to use.** `DuplexJev-32B` wherever an 80 GB GPU is available; `DuplexJev-4B` on smaller GPUs. DuplexJev-32B
-uses only the language model of Qwen3-VL-32B: its inputs are audio and text for now (image input is planned).
+**Also available: 🤗 [DuplexJev-Gemma-31B](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B)** (Gemma-4-31B-it +
+Qwen3-ASR-0.6B encoder, ~58 GB, one 80 GB GPU, CC BY-NC 4.0). Unlike the two models above, its LLM was adapted with a
+LoRA (merged). Served by vLLM in the prompt wording of [§4](#4-quick-start): qa100 97, ZJU-ML 87, gender 94.4, emotion
+90.6; Easy-Turn 68.0 zero-shot (no turn-taking training). It is sensitive to question wording (paper-protocol wording:
+gender 78.5, emotion 60.9), so it is not in the table above; details on its model card.
+
+**Which one to use.** `DuplexJev-32B-Turn` wherever an 80 GB GPU is available; `DuplexJev-4B-Turn` on smaller GPUs. The Turn
+models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
+use only the language model of Qwen3-VL-32B: their inputs are audio and text for now (image input is planned).
 
 > **Research checkpoints.** Behind these models are several dozen connector checkpoints for other encoders (MOSS, Whisper,
 > SenseVoice), LLMs (Qwen3 0.6B–32B, Falcon-H1, SmolLM3) and both connector types, used with the `duplexjev` PyTorch
@@ -187,7 +230,7 @@ checkpoints in [docs/connectors.md](docs/connectors.md) use earlier versions of 
 
 | path | contents |
 |---|---|
-| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`: the vLLM plugin that serves DuplexJev-32B and DuplexJev-4B |
+| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`: the vLLM plugin that serves DuplexJev-32B, DuplexJev-4B and DuplexJev-Gemma-31B |
 | [`duplexjev/`](duplexjev) | the `duplexjev` package: `quick()` and the default decision table, vLLM and API clients, the web demo gateway; the PyTorch `Decider` for connector checkpoints |
 | [`examples/`](examples) | [vLLM client](examples/vllm_client.py), quick starts, server client |
 | [`evaluation/`](evaluation) | benchmark runners and results |
@@ -200,7 +243,7 @@ The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/P
 
 ## 9. License
 
-Code: Apache-2.0 ([LICENSE](LICENSE)). Complete models (DuplexJev-32B, DuplexJev-4B): CC BY-NC 4.0, because their
+Code: Apache-2.0 ([LICENSE](LICENSE)). Complete models (DuplexJev-32B, DuplexJev-4B, DuplexJev-Gemma-31B): CC BY-NC 4.0, because their
 connectors were trained on emotion data. Connector weights: Apache-2.0, except those trained on emotion data
 (`-Emotion-` and `-Para-`), which are CC BY-NC 4.0 because ESD is licensed for research only. qa100: CC-BY-4.0.
 The frozen encoders and LLMs keep their own licences (Falcon-H1: TII Falcon License; SenseVoice: FunASR Model License).
@@ -209,18 +252,20 @@ Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms. Se
 ## 10. Citation
 
 ```bibtex
-@inproceedings{jin2027duplexjev,
-  title     = {Batched Speech Decisions Without Decoding: Single-Token Supervision Lets a Frozen {LLM} Hear Beyond the Transcript},
-  author    = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Song, Haigang and Pang, Zhikun and Zhang, Xiaowen},
-  booktitle = {Submitted to IEEE ICASSP},
-  year      = {2027}
+@misc{jin2026duplexjev,
+  title         = {Batched Speech Decisions Without Decoding: Single-Token Supervision Lets a Frozen {LLM} Hear Beyond the Transcript},
+  author        = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Song, Haigang and Pang, Zhikun and Zhang, Xiaowen},
+  year          = {2026},
+  eprint        = {2610.02638},
+  archivePrefix = {arXiv},
+  note          = {Submitted to IEEE ICASSP 2027}
 }
 ```
 
 ## 11. Acknowledgements
 
 DuplexJev-32B and DuplexJev-4B are built on [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL),
-[Qwen3](https://github.com/QwenLM/Qwen3) and Qwen3-ASR, trained with [Ultravox](https://github.com/fixie-ai/ultravox)
+[Qwen3](https://github.com/QwenLM/Qwen3) and Qwen3-ASR (DuplexJev-Gemma-31B on [Gemma 4](https://huggingface.co/google/gemma-4-31B-it)), trained with [Ultravox](https://github.com/fixie-ai/ultravox)
 and served with [vLLM](https://github.com/vllm-project/vllm). The research checkpoints also use
 [MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize), Whisper, SenseVoice, SmolLM3
 and Falcon-H1. We thank the ZJU team for the [audio benchmark](https://github.com/Vsky-morigen/audio-gender-benchmark).

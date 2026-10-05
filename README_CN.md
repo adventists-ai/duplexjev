@@ -12,14 +12,38 @@
 <p align="center">
   🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
-  📄 论文（arXiv，即将发布） &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">DuplexJev-32B</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">DuplexJev-4B</a> &nbsp;|&nbsp;
+  📄 <a href="https://arxiv.org/abs/2610.02638">论文（arXiv:2610.02638）</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">32B</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">4B</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-引用">引用</a>
 </p>
 
 ---
+
+## 🏆 话轮判断：一个通用模型 vs. 专用检测器
+
+DuplexJev-32B-Turn 的话轮判断达到专用检测器的水平；同一次前向里，它还能回答你声明的其他任意问题（意图、情绪、性别、
+是否打断……）。全程不解码，同一段音频问 10 个问题和问 1 个的耗时差不多。
+
+| 模型 | Easy-Turn 测试集（说完 / 没说完 / 附和 / 等一下） | Easy-Turn 总体 | CoDeTT 中 / 英 | 同一次调用的其他判断 | 延迟 |
+|---|---|---:|---:|---|---|
+| Smart Turn v2（95 MB） | 78.7 / 62.0 / – / – | – | – / 51.4（v3） | 无 | 27 ms |
+| TEN Turn Detection（7 B） | 86.7 / 89.3 / – / 91.0 | – | – | 无 | 204 ms |
+| Easy-Turn（0.85 B） | 96.3 / 97.7 / 91.0 / 98.0 | 96.4 | 37.9 / – | 无 | 263 ms |
+| NAMO-Turn · FireRedChat | – | – | 59.5 / – · – / 65.4 | 无 | – |
+| GPT-4o-audio · Qwen3-Omni | – | – | 66.6 / 71.9 · 70.4 / 70.9 | 有（靠生成文字） | 秒级 |
+| **DuplexJev-32B-Turn**（本项目） | **98.7** / 94.3 / 88.0 / 95.0 | **95.3** | **69.2 / 70.0** | **有，任意多个，一次前向** | **10 个判断约 0.24 s**（单张 H200） |
+| DuplexJev-4B-Turn（本项目） | 92.3 / 93.0 / 90.0 / 94.0 | 92.5 | 67.0 / 68.6 | 有 | 8 个判断约 0.08 s（单张 H100） |
+
+- **Easy-Turn**：800 条测试集的准确率（%）。Easy-Turn 本身和我们的 Turn 模型都用过它的训练集。其他行取自 Easy-Turn
+  论文（表 2，他们的硬件），延迟是单个判断的耗时。
+- **CoDeTT**（[arXiv:2603.25434](https://arxiv.org/abs/2603.25434)）：1.8 万条，系统状态已知，4 个动作准确率平均。
+  对我们是零样本（训练中没有 CoDeTT 数据）；其他行取自 CoDeTT 论文。我们的口径只给当前这句的音频、不给历史，
+  官方口径还会播放之前的用户语音。
+- 在我们自建的 TurnBench-dev 片段协议上（非官方榜单），Turn 模型 88.7（32B）/ 87.3（4B），升级前为 60.7 / 49.4。
+- **其他能力没有变差。** 32B：qa100 90 → 96，性别 89.4 → 91.5，情绪 90.6 → 91.1，VoiceBench MMSU 70.8 → 72.1。
+  做法（只用公开数据、一个 rank 16 的 LoRA，4B 和 32B 同一配方）见[研究笔记](research/2026-10-turn-taking-lora_zh.md)。
 
 ## 1. 简介
 
@@ -46,6 +70,13 @@
 
 ## 2. 最新动态
 
+- **2026-10-05** —— 📄 论文已上 arXiv：[arXiv:2610.02638](https://arxiv.org/abs/2610.02638)。🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)
+  和 [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) 发布：话轮升级版（连接器 + rank 16 的 LoRA，
+  用公开话轮数据训练）。32B-Turn：Easy-Turn 95.3，CoDeTT 零样本 69.2 / 70.0，qa100、性别、情绪都略有提升。
+  [研究笔记](research/2026-10-turn-taking-lora_zh.md)。
+- **2026-10-03** —— 🤗 [**DuplexJev-Gemma-31B**](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B) 发布，第一个非 Qwen 模型：
+  Qwen3-ASR-0.6B 编码器 + 连接器 + Gemma-4-31B-it（合并了 LoRA）。vLLM 下 qa100 97、性别 94.4、情绪 90.6（尚未做话轮训练）。
+  需要 [`duplexjev-vllm`](https://pypi.org/project/duplexjev-vllm/) ≥ 0.2.0。
 - **2026-10-01** —— 🎧 [**在线体验和试用 API**](https://api.adventists.cn/duplexjev/)（DuplexJev-4B）以及
   [`duplexjev` 0.3](https://pypi.org/project/duplexjev/)：`duplexjev quick call.wav` 对任意音频打印一张默认判断表
   （话轮状态、该怎么做、打断/抢话、意图、情绪、性别、语言、转人工）。
@@ -65,13 +96,21 @@
 
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B**](https://huggingface.co/adventists-ai/DuplexJev-32B) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | 90 | 87 | 79.1\* | 89.4 | 90.6 | **87.7** | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好，话轮增强 | DuplexJev-32B + 话轮 LoRA（已合并） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡，话轮增强 | DuplexJev-4B + 话轮 LoRA（已合并） | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) | 服务器端 | Qwen3-VL-32B（语言模型部分）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | 90 | 87 | 79.1\* | 89.4 | 90.6 | **87.7** | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | 小显卡、端侧 | Qwen3-4B + Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 50 | 78.1\* | 88.6 | 91.2 | 78.6 | CC BY-NC 4.0 |
 
 分数为论文口径的百分比（单 token 读出）；总分 = 主语言（qa100、ZJU-ML、Easy-Turn）与副语言（性别、情绪）的平均，
-见[评测基准](#6-评测基准)。\* 两个模型训练时用了 Easy-Turn 的训练集（与测试集不重叠），所以 Easy-Turn 分数属于域内。两个模型在单张显卡上回答同一段音频的 10 个问题都在约 0.1–0.25 秒内。
+见[评测基准](#6-评测基准)。\* 四个模型训练时都用了 Easy-Turn 的训练集（与测试集不重叠），所以 Easy-Turn 分数属于域内。这些模型在单张显卡上回答同一段音频的 10 个问题都在约 0.1–0.25 秒内。
 
-**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B`，显卡小就用 `DuplexJev-4B`。DuplexJev-32B 只用了 Qwen3-VL-32B 的语言模型部分，
+**另有 🤗 [DuplexJev-Gemma-31B](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B)**（Gemma-4-31B-it + Qwen3-ASR-0.6B 编码器，
+约 58 GB，一张 80 GB 显卡，CC BY-NC 4.0）。和上面两个不同，它的大模型用 LoRA 微调过（已合并）。用 vLLM、按[第 4 节](#4-快速上手)的提问格式：
+qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，未做话轮训练）。它对提问措辞敏感（论文口径措辞下性别 78.5、
+情绪 60.9），所以没有放进上表；详见模型卡。
+
+**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B-Turn`，显卡小就用 `DuplexJev-4B-Turn`。Turn 版可以直接替换原版（提示词、插件都一样），
+我们跑的每项评测都持平或更好（在误差范围内）。32B 模型只用了 Qwen3-VL-32B 的语言模型部分，
 目前输入是音频和文字（图像输入在计划中）。
 
 > **研究用 checkpoint。** 这些模型背后还有几十个连接器 checkpoint，覆盖其他编码器（MOSS、Whisper、SenseVoice）、
@@ -172,7 +211,7 @@ checkpoint 用的是这套配方的早期版本。
 
 | 路径 | 内容 |
 |---|---|
-| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`：部署 DuplexJev-32B 和 DuplexJev-4B 的 vLLM 插件 |
+| [`vllm_plugin/`](vllm_plugin) | `duplexjev-vllm`：部署 DuplexJev-32B、DuplexJev-4B 和 DuplexJev-Gemma-31B 的 vLLM 插件 |
 | [`duplexjev/`](duplexjev) | `duplexjev` 包：`quick()` 和默认判断表、vLLM 与 API 客户端、网页 demo 网关；加载连接器 checkpoint 的 PyTorch `Decider` |
 | [`examples/`](examples) | [vLLM 客户端](examples/vllm_client.py)、快速上手、服务客户端 |
 | [`evaluation/`](evaluation) | 评测脚本和结果 |
@@ -185,25 +224,27 @@ checkpoint 用的是这套配方的早期版本。
 
 ## 9. 许可
 
-代码：Apache-2.0（[LICENSE](LICENSE)）。完整模型（DuplexJev-32B、DuplexJev-4B）：CC BY-NC 4.0，因为其中的连接器用情绪数据训练过。连接器权重：Apache-2.0；用情绪数据训练的（`-Emotion-` 和 `-Para-`）为 CC BY-NC 4.0，
+代码：Apache-2.0（[LICENSE](LICENSE)）。完整模型（DuplexJev-32B、DuplexJev-4B、DuplexJev-Gemma-31B）：CC BY-NC 4.0，因为其中的连接器用情绪数据训练过。连接器权重：Apache-2.0；用情绪数据训练的（`-Emotion-` 和 `-Para-`）为 CC BY-NC 4.0，
 因为 ESD 仅限研究使用。qa100：CC-BY-4.0。冻结的编码器和大模型沿用各自的许可（Falcon-H1：TII Falcon License；
 SenseVoice：FunASR Model License）。部分训练语料（如 WenetSpeech、CoVoST 2）有非商用条款。详见 [NOTICE](NOTICE)。
 
 ## 10. 引用
 
 ```bibtex
-@inproceedings{jin2027duplexjev,
-  title     = {Batched Speech Decisions Without Decoding: Single-Token Supervision Lets a Frozen {LLM} Hear Beyond the Transcript},
-  author    = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Song, Haigang and Pang, Zhikun and Zhang, Xiaowen},
-  booktitle = {Submitted to IEEE ICASSP},
-  year      = {2027}
+@misc{jin2026duplexjev,
+  title         = {Batched Speech Decisions Without Decoding: Single-Token Supervision Lets a Frozen {LLM} Hear Beyond the Transcript},
+  author        = {Jin, Jie and Ma, Ziyin and Yin, Min and Chen, Jinyu and Song, Haigang and Pang, Zhikun and Zhang, Xiaowen},
+  year          = {2026},
+  eprint        = {2610.02638},
+  archivePrefix = {arXiv},
+  note          = {Submitted to IEEE ICASSP 2027}
 }
 ```
 
 ## 11. 致谢
 
 DuplexJev-32B 和 DuplexJev-4B 基于 [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL)、[Qwen3](https://github.com/QwenLM/Qwen3)
-和 Qwen3-ASR，用 [Ultravox](https://github.com/fixie-ai/ultravox) 训练，用 [vLLM](https://github.com/vllm-project/vllm) 部署。
+和 Qwen3-ASR（DuplexJev-Gemma-31B 基于 [Gemma 4](https://huggingface.co/google/gemma-4-31B-it)），用 [Ultravox](https://github.com/fixie-ai/ultravox) 训练，用 [vLLM](https://github.com/vllm-project/vllm) 部署。
 研究用 checkpoint 还用到 [MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize)、Whisper、
 SenseVoice、SmolLM3 和 Falcon-H1。感谢浙大团队提供[音频基准](https://github.com/Vsky-morigen/audio-gender-benchmark)。
 Claude（Anthropic）协助编写代码。

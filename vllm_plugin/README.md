@@ -8,8 +8,10 @@ pip install "vllm[audio]>=0.29" duplexjev-vllm
 vllm serve adventists-ai/DuplexJev-4B --max-model-len 4096
 ```
 
-The plugin registers the architecture `DuplexJevForConditionalGeneration` through vLLM's `vllm.general_plugins`
-entry point, so nothing needs to be imported by hand. It adds the Qwen3-ASR audio encoder and the matching
+The plugin registers the architectures `DuplexJevForConditionalGeneration` (Qwen-based DuplexJev-32B / 4B) and,
+since 0.2.0, `DuplexJevGemmaForConditionalGeneration` (DuplexJev-Gemma-31B: audio embeddings scaled ×3 and wrapped in
+Gemma's `<|audio> … <audio|>` markers) through vLLM's `vllm.general_plugins` entry point, so nothing needs to be
+imported by hand. It adds the Qwen3-ASR audio encoder and the matching
 preprocessing (128-bin log-mel, clips padded to whole audio tokens) to vLLM's Ultravox implementation; the connector
 and the LLM run on vLLM's own code.
 
