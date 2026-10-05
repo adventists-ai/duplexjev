@@ -21,32 +21,20 @@
 
 ---
 
-## 🏆 Turn-taking: one general model vs. dedicated detectors
+**DuplexJev answers the closed questions a full-duplex voice agent asks about every user turn — *finished? reply or keep
+listening? backchannel? emotion, gender, intent?* — as one token from an LLM that hears the audio: no decoding, many
+questions in one pass.**
 
-DuplexJev-32B-Turn decides turn-taking as well as dedicated detectors do, and in the same forward pass it also answers
-every other question you declare (intent, emotion, gender, barge-in, …). It does not decode any tokens, so ten
-decisions about one clip cost about as much as one.
+| [DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | score | reference |
+|---|---:|---|
+| turn-taking, Easy-Turn test set | **95.3** | dedicated Easy-Turn detector 96.4 |
+| turn-taking, CoDeTT zh / en (zero-shot) | **69.2 / 70.0** | Qwen3-Omni 70.4 / 70.9; dedicated turn models 37.9–65.4 |
+| gender / emotion | **91.5 / 91.1** | chance (~55 / ~28) for speech LLMs trained on transcripts only |
+| spoken QA: qa100 / VoiceBench MMSU | **96 / 72.1** | DuplexJev-32B before the turn-taking upgrade: 90 / 70.8 |
+| speed | **10 decisions ≈ 0.24 s** | one H200, all questions in one pass; Easy-Turn detector: 263 ms for one |
 
-| model | Easy-Turn test (complete / incomplete / backchannel / wait) | Easy-Turn overall | CoDeTT zh / en | other decisions in the same call | latency |
-|---|---|---:|---:|---|---|
-| Smart Turn v2 (95 MB) | 78.7 / 62.0 / – / – | – | – / 51.4 (v3) | no | 27 ms |
-| TEN Turn Detection (7 B) | 86.7 / 89.3 / – / 91.0 | – | – | no | 204 ms |
-| Easy-Turn (0.85 B) | 96.3 / 97.7 / 91.0 / 98.0 | 96.4 | 37.9 / – | no | 263 ms |
-| NAMO-Turn · FireRedChat | – | – | 59.5 / – · – / 65.4 | no | – |
-| GPT-4o-audio · Qwen3-Omni | – | – | 66.6 / 71.9 · 70.4 / 70.9 | yes, by generating text | seconds |
-| **DuplexJev-32B-Turn** (ours) | **98.7** / 94.3 / 88.0 / 95.0 | **95.3** | **69.2 / 70.0** | **yes, any number, one pass** | **~0.24 s for 10 decisions** (one H200) |
-| DuplexJev-4B-Turn (ours) | 92.3 / 93.0 / 90.0 / 94.0 | 92.5 | 67.0 / 68.6 | yes | ~0.08 s for 8 decisions (one H100) |
-
-- **Easy-Turn**: accuracy (%) on the 800-item test set. Easy-Turn itself and our Turn models were both trained on its
-  training split. Other rows are from the Easy-Turn paper (Table 2, their hardware); their latency is per single decision.
-- **CoDeTT** ([arXiv:2603.25434](https://arxiv.org/abs/2603.25434)): 18 k items, system state given, mean of four
-  action accuracies. Zero-shot for us: no CoDeTT data in training. Other rows are from the CoDeTT paper. Our protocol gives
-  the current utterance as audio without history; the official one also plays earlier user turns.
-- On our TurnBench-dev clip protocol (not the official leaderboard), the Turn models reach 88.7 (32B) and 87.3 (4B),
-  against 60.7 and 49.4 before the upgrade.
-- **Nothing else got worse.** For 32B: qa100 90 → 96, gender 89.4 → 91.5, emotion 90.6 → 91.1, VoiceBench MMSU
-  70.8 → 72.1. How it was done (public data only, a rank-16 LoRA, one recipe for 4B and 32B):
-  [research note](research/2026-10-turn-taking-lora.md).
+Open models: **DuplexJev-32B-Turn** (recommended), DuplexJev-4B-Turn, DuplexJev-32B, DuplexJev-4B, DuplexJev-Gemma-31B
+([§3](#3-models)). Full comparison with dedicated detectors: [§5](#5-performance).
 
 ## 1. Introduction
 
@@ -54,14 +42,14 @@ decisions about one clip cost about as much as one.
 (product name: **Speech-to-Decision**). Hidden states of an off-the-shelf ASR encoder are projected into a frozen
 LLM, and every runtime-declared question — *is the turn complete? which filler to play? who is speaking?* — is read
 as a **single-token, closed-set distribution**: no ASR decoding, no text decoding. Many questions, about one call or
-across many calls, share one forward pass. We release two ready-to-serve models,
-**[DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B)** (recommended) and
-**[DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)**.
+across many calls, share one forward pass. All released models are ready to serve with vLLM ([§3](#3-models)); we
+recommend **[DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)**, or
+**[DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn)** on smaller GPUs.
 
 ```
 audio ──► Qwen3-ASR-0.6B encoder (frozen)
                  ▼  last layer
-          connector: stack 2 frames → 6.25 tokens/s, MLP → d_LLM        ← the only trained part
+          connector: stack 2 frames → 6.25 tokens/s, MLP → d_LLM        ← trained (Turn models: + rank-16 LoRA on the LLM)
                  ▼
 state + N typed questions ──► frozen LLM, ONE forward pass
                               (DuplexJev-32B: language model of Qwen3-VL-32B · DuplexJev-4B: Qwen3-4B)
@@ -184,6 +172,35 @@ language of the clip. The prompt format and the plugin are described on the
 To use a connector checkpoint with the PyTorch package instead, see [docs/connectors.md](docs/connectors.md#pytorch-package).
 
 ## 5. Performance
+
+### Turn-taking vs. dedicated detectors
+
+DuplexJev-32B-Turn decides turn-taking as well as dedicated detectors do, and in the same forward pass it also answers
+every other question you declare (intent, emotion, gender, barge-in, …). It does not decode any tokens, so ten
+decisions about one clip cost about as much as one.
+
+| model | Easy-Turn test (complete / incomplete / backchannel / wait) | Easy-Turn overall | CoDeTT zh / en | other decisions in the same call | latency |
+|---|---|---:|---:|---|---|
+| Smart Turn v2 (95 MB) | 78.7 / 62.0 / – / – | – | – / 51.4 (v3) | no | 27 ms |
+| TEN Turn Detection (7 B) | 86.7 / 89.3 / – / 91.0 | – | – | no | 204 ms |
+| Easy-Turn (0.85 B) | 96.3 / 97.7 / 91.0 / 98.0 | 96.4 | 37.9 / – | no | 263 ms |
+| NAMO-Turn · FireRedChat | – | – | 59.5 / – · – / 65.4 | no | – |
+| GPT-4o-audio · Qwen3-Omni | – | – | 66.6 / 71.9 · 70.4 / 70.9 | yes, by generating text | seconds |
+| **DuplexJev-32B-Turn** (ours) | **98.7** / 94.3 / 88.0 / 95.0 | **95.3** | **69.2 / 70.0** | **yes, any number, one pass** | **~0.24 s for 10 decisions** (one H200) |
+| DuplexJev-4B-Turn (ours) | 92.3 / 93.0 / 90.0 / 94.0 | 92.5 | 67.0 / 68.6 | yes | ~0.08 s for 8 decisions (one H100) |
+
+- **Easy-Turn**: accuracy (%) on the 800-item test set. Easy-Turn itself and our Turn models were both trained on its
+  training split. Other rows are from the Easy-Turn paper (Table 2, their hardware); their latency is per single decision.
+- **CoDeTT** ([arXiv:2603.25434](https://arxiv.org/abs/2603.25434)): 18 k items, system state given, mean of four
+  action accuracies. Zero-shot for us: no CoDeTT data in training. Other rows are from the CoDeTT paper. Our protocol gives
+  the current utterance as audio without history; the official one also plays earlier user turns.
+- On our TurnBench-dev clip protocol (not the official leaderboard), the Turn models reach 88.7 (32B) and 87.3 (4B),
+  against 60.7 and 49.4 before the upgrade.
+- **Nothing else got worse.** For 32B: qa100 90 → 96, gender 89.4 → 91.5, emotion 90.6 → 91.1, VoiceBench MMSU
+  70.8 → 72.1. How it was done (public data only, a rank-16 LoRA, one recipe for 4B and 32B):
+  [research note](research/2026-10-turn-taking-lora.md).
+
+### Speed and spoken knowledge
 
 | | DuplexJev-32B | DuplexJev-4B |
 |---|---|---|

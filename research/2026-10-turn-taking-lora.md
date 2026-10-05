@@ -2,12 +2,10 @@
 
 *Adventists.ai research note, 2026-10-05. [中文版](2026-10-turn-taking-lora_zh.md)*
 
-**Headline.** With one training recipe and public data only, DuplexJev-32B-Turn reaches **95.3 on the Easy-Turn
-test set** (the dedicated Easy-Turn detector reports 96.4; TEN Turn Detection and Smart Turn v2 do not cover all four
-states) and **69.2 / 70.0 on CoDeTT** (Chinese / English, zero-shot), level with Qwen3-Omni (70.4 / 70.9) and above every
-dedicated turn-taking model in the CoDeTT paper (37.9–65.4). It stays a general decision engine: in the same forward
-pass it answers any other closed-set question (intent, emotion, gender, barge-in, …), with no decoding: about 0.24 s
-for ten decisions on one H200. Spoken QA, gender and emotion did not drop; they went up slightly.
+*DuplexJev reads the decisions a voice agent needs (turn-taking, emotion, intent, …) as one token from an LLM that
+hears the audio.* **Adding a rank-16 LoRA trained on public turn-taking data puts it level with dedicated detectors:**
+DuplexJev-32B-Turn scores 95.3 on Easy-Turn (dedicated detector 96.4) and 69.2 / 70.0 on CoDeTT zero-shot (Qwen3-Omni
+70.4 / 70.9; dedicated turn models 37.9–65.4), and nothing else got worse.
 
 | | Easy-Turn | CoDeTT zh / en | TurnBench-dev clips† | qa100 | ZJU-ML | gender | emotion | VoiceBench OBQA / MMSU |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -21,6 +19,9 @@ FireRedChat 65.4 (en), MiniCPM-o-4.5 64.4 / 65.1, GPT-4o-audio 66.6 / 71.9, Qwen
 
 † Our own clip-level protocol on the TurnBench development conversations (the official test labels are withheld); not
 comparable with the official leaderboard.
+
+Unlike a dedicated detector, it stays a general decision engine: the same forward pass answers any other closed-set
+question (intent, emotion, gender, barge-in, …) with no decoding, about 0.24 s for ten decisions on one H200.
 
 ## Starting point
 
