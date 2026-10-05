@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.02638">论文（arXiv:2610.02638）</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">32B</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">4B</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-引用">引用</a>
@@ -29,11 +29,10 @@
 | 话轮，Easy-Turn 测试集 | **95.3** | 专用 Easy-Turn 检测器 96.4 |
 | 话轮，CoDeTT 中 / 英（零样本） | **69.2 / 70.0** | Qwen3-Omni 70.4 / 70.9；专用话轮模型 37.9–65.4 |
 | 性别 / 情绪 | **91.5 / 91.1** | 只用转写训练的语音大模型：约 55 / 28（瞎猜） |
-| 口语问答：qa100 / VoiceBench MMSU | **96 / 72.1** | 话轮升级前的 DuplexJev-32B：90 / 70.8 |
+| 口语问答，VoiceBench OBQA / MMSU（题目用语音） | **85.5 / 72.1** | 同一大模型直接读文字转写：95.4 / 79.3 |
 | 速度 | **10 个判断约 0.24 秒** | 单张 H200，一次前向；Easy-Turn 检测器 1 个判断 263 ms |
 
-开源模型：**DuplexJev-32B-Turn**（推荐）、DuplexJev-4B-Turn、DuplexJev-32B、DuplexJev-4B、DuplexJev-Gemma-31B
-（[第 3 节](#3-模型)）。与专用检测器的完整对比见[第 5 节](#5-性能)。
+模型：**DuplexJev-32B-Turn**（一张 80 GB 显卡）和 **DuplexJev-4B-Turn**（约 10 GB）（[第 3 节](#3-模型)）。与专用检测器的完整对比见[第 5 节](#5-性能)。
 
 ## 1. 简介
 
@@ -86,16 +85,17 @@
 
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好，话轮增强 | DuplexJev-32B + 话轮 LoRA（已合并） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡，话轮增强 | DuplexJev-4B + 话轮 LoRA（已合并） | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) | 服务器端 | Qwen3-VL-32B（语言模型部分）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | 90 | 87 | 79.1\* | 89.4 | 90.6 | **87.7** | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | 小显卡、端侧 | Qwen3-4B + Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 50 | 78.1\* | 88.6 | 91.2 | 78.6 | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡、端侧 | Qwen3-4B（加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
+
+话轮升级前的 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B)（总分 87.7）和 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)（78.6）
+仍可下载，但已被替代：Turn 版在我们跑的每项评测上都持平或更好。
 
 分数为论文口径的百分比（单 token 读出）；总分 = 主语言（qa100、ZJU-ML、Easy-Turn）与副语言（性别、情绪）的平均，
-见[评测基准](#6-评测基准)。\* 四个模型训练时都用了 Easy-Turn 的训练集（与测试集不重叠），所以 Easy-Turn 分数属于域内。这些模型在单张显卡上回答同一段音频的 10 个问题都在约 0.1–0.25 秒内。
+见[评测基准](#6-评测基准)。\* 两个模型训练时都用了 Easy-Turn 的训练集（与测试集不重叠），所以 Easy-Turn 分数属于域内。两个模型在单张显卡上回答同一段音频的 10 个问题都在约 0.1–0.25 秒内。
 
 **另有 🤗 [DuplexJev-Gemma-31B](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B)**（Gemma-4-31B-it + Qwen3-ASR-0.6B 编码器，
-约 58 GB，一张 80 GB 显卡，CC BY-NC 4.0）。和上面两个不同，它的大模型用 LoRA 微调过（已合并）。用 vLLM、按[第 4 节](#4-快速上手)的提问格式：
+约 58 GB，一张 80 GB 显卡，CC BY-NC 4.0）。它还没做话轮训练；和 Turn 版一样，大模型带一个已合并的 LoRA。用 vLLM、按[第 4 节](#4-快速上手)的提问格式：
 qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，未做话轮训练）。它对提问措辞敏感（论文口径措辞下性别 78.5、
 情绪 60.9），所以没有放进上表；详见模型卡。
 
@@ -184,7 +184,7 @@ DuplexJev-32B-Turn 的话轮判断达到专用检测器的水平；同一次前�
 
 ### 速度与口语知识
 
-| | DuplexJev-32B | DuplexJev-4B |
+| | DuplexJev-32B(-Turn) | DuplexJev-4B(-Turn) |
 |---|---|---|
 | 一次判断（同一段音频 10 个问题，作为 10 个并发请求发给 vLLM OpenAI 服务） | 单张 H200 中位 **240 毫秒** | 默认 8 个问题约 **80 毫秒**（单张 H100，我们的试用 API） |
 | 显存 | 一张 80 GB 显卡 | 约 10 GB |
