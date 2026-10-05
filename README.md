@@ -25,20 +25,27 @@
 listening? backchannel? emotion, gender, intent?* — as one token from an LLM that hears the audio: no decoding, many
 questions in one pass.**
 
-| [DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | score | reference |
-|---|---:|---|
-| **Speed** | | |
-| ten decisions about one clip | **≈ 0.24 s** | one H200, all questions in one pass; the Easy-Turn detector needs 0.26 s for one decision |
-| ten decisions in one packed request, vs. a cascade (ASR, then the LLM writes JSON) | **92 ms** | cascade: 1,567 ms + 411 ms ASR (paper measurement, Qwen3-32B) |
-| **Main language** | | |
-| turn-taking, Easy-Turn test set | **95.3** | dedicated Easy-Turn detector 96.4 |
-| turn-taking, CoDeTT zh / en (zero-shot) | **69.2 / 70.0** | Qwen3-Omni 70.4 / 70.9; dedicated turn models 37.9–65.4 |
-| spoken QA, VoiceBench OBQA / MMSU (question spoken) | **85.5 / 72.1** | same LLM reading the transcript as text: 95.4 / 79.3 |
-| **Paralinguistics** | | |
-| gender / emotion | **91.5 / 91.1** | chance (~55 / ~28) for speech LLMs trained on transcripts only |
-| speaker verification, VCTK / LibriSpeech test-clean / test-other / VoxCeleb1 *(preview‡)* | **88.5 / 88.5 / 97.0 / 71.2** | speech LLMs zero-shot: ~50 (chance) |
+- **Speed.** No decoding at all: ten decisions about one clip take about **0.24 s** on one H200; packed into one request,
+  ten decisions take **92 ms** against about 2 s (paper measurement) for an ASR + LLM-writes-JSON cascade.
+- **Main language.** Turn-taking on par with dedicated detectors (Easy-Turn **95.3**, CoDeTT **69.2 / 70.0** zero-shot);
+  spoken QA on VoiceBench OBQA / MMSU **85.5 / 72.1** (the same LLM reading the transcript: 95.4 / 79.3).
+- **Paralinguistics.** Gender **91.5**, emotion **91.1**; speaker verification *(preview‡)* **88.5–97.0** on read
+  speech, **71.2** in the wild (VoxCeleb1).
 
-‡ Research preview: a 4B checkpoint trained on public speaker-verification pairs, not yet part of the released models.
+How it compares on common decision tasks (DuplexJev-32B-Turn, % accuracy):
+
+| task | benchmark | DuplexJev | dedicated and other models |
+|---|---|---:|---|
+| turn state: finished / unfinished / backchannel / wait | Easy-Turn test (800) | **95.3** | Easy-Turn detector 96.4 · TEN Turn Detection and Smart Turn v2 cover only 3 / 2 of the 4 states |
+| what to do, system state given | CoDeTT zh / en (18 k, zero-shot) | **69.2 / 70.0** | Easy-Turn 37.9 (zh) · Smart-Turn-v3 51.4 (en) · NAMO-Turn 59.5 (zh) · FireRedChat 65.4 (en) · GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
+| gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
+| emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) |
+| same speaker? *(preview‡)* | VCTK / LibriSpeech clean / other / VoxCeleb1 | **88.5 / 88.5 / 97.0 / 71.2** | speech LLMs on Dynamic-SUPERB speaker verification: 44–51 (chance); dedicated speaker models (ECAPA) reach about 1% EER on VoxCeleb1, ours is 30.5% |
+| spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
+
+Other systems' numbers are from their papers (Easy-Turn Table 2, CoDeTT, Dynamic-SUPERB Phase-2). Easy-Turn is in-domain
+for both the Easy-Turn detector and our model. ‡ Research preview: a 4B checkpoint trained on public speaker-verification
+pairs, not yet part of the released models. Details: [§5](#5-performance).
 
 Models: **DuplexJev-32B-Turn** (one 80 GB GPU) and **DuplexJev-4B-Turn** (~10 GB) ([§3](#3-models)). Full comparison with dedicated detectors: [§5](#5-performance).
 
