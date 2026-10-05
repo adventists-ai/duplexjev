@@ -36,7 +36,7 @@ questions in one pass.**
 | spoken QA, VoiceBench OBQA / MMSU (question spoken) | **85.5 / 72.1** | same LLM reading the transcript as text: 95.4 / 79.3 |
 | **Paralinguistics** | | |
 | gender / emotion | **91.5 / 91.1** | chance (~55 / ~28) for speech LLMs trained on transcripts only |
-| speaker verification, VCTK / LibriSpeech test-clean / VoxCeleb1 *(preview‡)* | **88.5 / 88.5 / 71.2** | speech LLMs zero-shot: ~50 (chance) |
+| speaker verification, VCTK / LibriSpeech test-clean / test-other / VoxCeleb1 *(preview‡)* | **88.5 / 88.5 / 97.0 / 71.2** | speech LLMs zero-shot: ~50 (chance) |
 
 ‡ Research preview: a 4B checkpoint trained on public speaker-verification pairs, not yet part of the released models.
 
