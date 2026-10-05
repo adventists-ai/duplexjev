@@ -49,19 +49,19 @@ is speaking and how (paralinguistics):
   </picture>
 </p>
 
-**One clip, eight decisions.** 🔊 *"This is the third time I'm calling about the same bill."*
-([listen](docs/audio/ex3.wav), synthetic clip) — one call to DuplexJev-32B-Turn, 0.2 s on one H200:
+**One clip, eight decisions.** 🔊 *"Wait, wait — stop. That's not the address I asked for."* — said while the assistant is talking
+([listen](docs/audio/ex1.wav), synthetic clip) — one call to DuplexJev-32B-Turn, 0.2 s on one H200:
 
 | question | answer | probability |
 |---|---|---:|
-| Has the user finished the turn? | finished | 0.96 |
-| What does the caller want? | billing | 1.00 |
-| Which filler fits? | "I'm sorry about that —" | 0.86 |
-| Emotion | angry | 1.00 |
-| Urgency (1–5) | 5 | 0.71 |
-| Needs a human agent? | yes | 1.00 |
-| Speaker gender | male | 1.00 |
+| What is the user's turn state? | asking to wait | 0.92 |
+| What does the user want? | navigation | 1.00 |
+| Which filler fits? | “One moment —” | 0.73 |
+| The assistant is speaking when this comes in. What should it do? | stop and listen | 1.00 |
+| Speaker gender | male | 0.99 |
 | Language | English | 1.00 |
+| Emotion | angry | 1.00 |
+| Can the assistant handle this by itself? | ask a follow-up question first | 0.51 |
 
 <details>
 <summary><b>Full comparison on common decision tasks</b></summary>
