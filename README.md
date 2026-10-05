@@ -21,18 +21,50 @@
 
 ---
 
-**DuplexJev answers the closed questions a full-duplex voice agent asks about every user turn — *finished? reply or keep
-listening? backchannel? emotion, gender, intent?* — as one token from an LLM that hears the audio: no decoding, many
-questions in one pass.**
+### DuplexJev is a speech-to-decision model.
 
-- **Speed.** No decoding at all: ten decisions about one clip take about **0.24 s** on one H200; packed into one request,
-  ten decisions take **92 ms** against about 2 s (paper measurement) for an ASR + LLM-writes-JSON cascade.
-- **Main language.** Turn-taking on par with dedicated detectors (Easy-Turn **95.3**, CoDeTT **69.2 / 70.0** zero-shot);
-  spoken QA on VoiceBench OBQA / MMSU **85.5 / 72.1** (the same LLM reading the transcript: 95.4 / 79.3).
-- **Paralinguistics.** Gender **91.5**, emotion **91.1**; speaker verification *(preview‡)* **88.5–97.0** on read
-  speech, **71.2** in the wild (VoxCeleb1).
+**Input:** an audio clip and the questions you need decided, each with its options. **Output:** for every question,
+the chosen option and its probability. All questions are answered together in one forward pass, with no transcription
+and no text decoding: ten decisions take **about 0.1–0.24 s**, and one H200 serves about **170 decisions per second**
+while keeping every request under 0.25 s ([§5](#5-performance)).
 
-How it compares on common decision tasks (DuplexJev-32B-Turn, % accuracy):
+It decides from the raw audio, so it uses both **what is said** (main language) and **what a transcript drops** — who
+is speaking and how (paralinguistics):
+
+- **Main language, close to the text LLM.** Spoken multiple-choice questions: 90 against 91 when the same LLM reads the
+  oracle transcript (qa100, paper). DuplexJev-32B-Turn: qa100 96, ZJU-ML 87; VoiceBench OBQA / MMSU 85.5 / 72.1
+  (95.4 / 79.3 from text).
+- **Paralinguistics, strong perception.** Gender 91.5, emotion 91.1, where speech LLMs trained on transcripts sit at
+  chance (~55 / ~28); speaker verification *(preview‡)* 88.5–97.0 on read speech, 71.2 in the wild (VoxCeleb1).
+- **Common decision tasks, on par with or above dedicated models.** Turn state on the Easy-Turn test set 95.3 (the
+  dedicated Easy-Turn detector 96.4; TEN and Smart Turn cover only some states). Turn action on CoDeTT 69.2 / 70.0
+  zero-shot, above every dedicated turn model (37.9–65.4) and level with Qwen3-Omni (70.4 / 70.9).
+
+<sub>‡ Research preview: a 4B checkpoint trained on public speaker-verification pairs, not yet in the released models.</sub>
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/bench_turn_dark.svg">
+    <img src="docs/assets/bench_turn_light.svg" alt="Turn-taking accuracy of DuplexJev against dedicated detectors and speech LLMs on CoDeTT and Easy-Turn" width="880">
+  </picture>
+</p>
+
+**One clip, eight decisions.** 🔊 *"This is the third time I'm calling about the same bill."*
+([listen](docs/audio/ex3.wav), synthetic clip) — one call to DuplexJev-32B-Turn, 0.2 s on one H200:
+
+| question | answer | probability |
+|---|---|---:|
+| Has the user finished the turn? | finished | 0.96 |
+| What does the caller want? | billing | 1.00 |
+| Which filler fits? | "I'm sorry about that —" | 0.86 |
+| Emotion | angry | 1.00 |
+| Urgency (1–5) | 5 | 0.71 |
+| Needs a human agent? | yes | 1.00 |
+| Speaker gender | male | 1.00 |
+| Language | English | 1.00 |
+
+<details>
+<summary><b>Full comparison on common decision tasks</b></summary>
 
 | task | benchmark | DuplexJev | dedicated and other models |
 |---|---|---:|---|
@@ -47,7 +79,10 @@ Other systems' numbers are from their papers (Easy-Turn Table 2, CoDeTT, Dynamic
 for both the Easy-Turn detector and our model. ‡ Research preview: a 4B checkpoint trained on public speaker-verification
 pairs, not yet part of the released models. Details: [§5](#5-performance).
 
-Models: **DuplexJev-32B-Turn** (one 80 GB GPU) and **DuplexJev-4B-Turn** (~10 GB) ([§3](#3-models)). Full comparison with dedicated detectors: [§5](#5-performance).
+</details>
+
+**Models:** 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) (one 80 GB GPU) ·
+🤗 [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) (~10 GB), served with vLLM ([§4](#4-quick-start)).
 
 ## 1. Introduction
 
