@@ -27,11 +27,18 @@ questions in one pass.**
 
 | [DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | score | reference |
 |---|---:|---|
+| **Speed** | | |
+| ten decisions about one clip | **≈ 0.24 s** | one H200, all questions in one pass; the Easy-Turn detector needs 0.26 s for one decision |
+| ten decisions in one packed request, vs. a cascade (ASR, then the LLM writes JSON) | **92 ms** | cascade: 1,567 ms + 411 ms ASR (paper measurement, Qwen3-32B) |
+| **Main language** | | |
 | turn-taking, Easy-Turn test set | **95.3** | dedicated Easy-Turn detector 96.4 |
 | turn-taking, CoDeTT zh / en (zero-shot) | **69.2 / 70.0** | Qwen3-Omni 70.4 / 70.9; dedicated turn models 37.9–65.4 |
-| gender / emotion | **91.5 / 91.1** | chance (~55 / ~28) for speech LLMs trained on transcripts only |
 | spoken QA, VoiceBench OBQA / MMSU (question spoken) | **85.5 / 72.1** | same LLM reading the transcript as text: 95.4 / 79.3 |
-| speed | **10 decisions ≈ 0.24 s** | one H200, all questions in one pass; Easy-Turn detector: 263 ms for one |
+| **Paralinguistics** | | |
+| gender / emotion | **91.5 / 91.1** | chance (~55 / ~28) for speech LLMs trained on transcripts only |
+| speaker verification, VCTK / LibriSpeech test-clean / VoxCeleb1 *(preview‡)* | **88.5 / 88.5 / 71.2** | speech LLMs zero-shot: ~50 (chance) |
+
+‡ Research preview: a 4B checkpoint trained on public speaker-verification pairs, not yet part of the released models.
 
 Models: **DuplexJev-32B-Turn** (one 80 GB GPU) and **DuplexJev-4B-Turn** (~10 GB) ([§3](#3-models)). Full comparison with dedicated detectors: [§5](#5-performance).
 
