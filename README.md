@@ -35,12 +35,13 @@ is speaking and how (paralinguistics):
   oracle transcript (qa100, paper). DuplexJev-32B-Turn: qa100 96, ZJU-ML 87; VoiceBench OBQA / MMSU 85.5 / 72.1
   (95.4 / 79.3 from text).
 - **Paralinguistics, strong perception.** Gender 91.5, emotion 91.1, where speech LLMs trained on transcripts sit at
-  chance (~55 / ~28); speaker verification *(preview‡)* 88.5–97.0 on read speech, 71.2 in the wild (VoxCeleb1).
+  chance (~55 / ~28); speaker verification is still weak *(preview‡)*: EER 30.5% on hard VoxCeleb1 pairs (same gender and nationality),
+  against about 2% for dedicated speaker models.
 - **Common decision tasks, on par with or above dedicated models.** Turn state on the Easy-Turn test set 95.3 (the
   dedicated Easy-Turn detector 96.4; TEN and Smart Turn cover only some states). Turn action on CoDeTT 69.2 / 70.0
   zero-shot, above every dedicated turn model (37.9–65.4) and level with Qwen3-Omni (70.4 / 70.9).
 
-<sub>‡ Research preview: a 4B checkpoint trained on public speaker-verification pairs, not yet in the released models.</sub>
+<sub>‡ Research preview: a 32B checkpoint trained on public speaker-verification pairs, not yet in the released models.</sub>
 
 <p align="center">
   <picture>
@@ -72,12 +73,13 @@ is speaking and how (paralinguistics):
 | what to do, system state given | CoDeTT zh / en (18 k, zero-shot) | **69.2 / 70.0** | Easy-Turn 37.9 (zh) · Smart-Turn-v3 51.4 (en) · NAMO-Turn 59.5 (zh) · FireRedChat 65.4 (en) · GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
 | gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
 | emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) |
-| same speaker? *(preview‡)* | VCTK / LibriSpeech clean / other / VoxCeleb1 | **88.5 / 88.5 / 97.0 / 71.2** | speech LLMs on Dynamic-SUPERB speaker verification: 44–51 (chance); dedicated speaker models (ECAPA) reach about 1% EER on VoxCeleb1, ours is 30.5% |
+| same speaker? *(preview‡)* | VoxCeleb1 test, hard pairs: different speakers share gender and nationality (2,000) | **EER 30.5%** (accuracy 67.8) | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
 | spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
 
 Other systems' numbers are from their papers (Easy-Turn Table 2, CoDeTT, Dynamic-SUPERB Phase-2). Easy-Turn is in-domain
-for both the Easy-Turn detector and our model. ‡ Research preview: a 4B checkpoint trained on public speaker-verification
-pairs, not yet part of the released models. Details: [§5](#5-performance).
+for both the Easy-Turn detector and our model. ‡ Research preview: a 32B checkpoint trained on public speaker-verification
+pairs, not yet part of the released models. On random pairs about half of the different-speaker pairs also differ in
+gender, so a gender-only guess already reaches 74%; we therefore report hard pairs only. Details: [§5](#5-performance).
 
 </details>
 
