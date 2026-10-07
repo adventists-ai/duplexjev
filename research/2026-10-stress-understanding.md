@@ -31,7 +31,20 @@ learn to use stress and pauses.
 | meaning from stress: DEBATE stress (held-out sentences) / StressTest | 35 / 52 | 83 / 67 |
 | meaning from pause: DEBATE pause (held-out sentences) | 71 | 75 |
 
-<!-- RESULT_TABLE_4B -->
+At 4B we release **DuplexJev-4B-Stress** next to 4B-Turn, as a second version:
+
+| | DuplexJev-4B-Turn | **DuplexJev-4B-Stress** |
+|---|---:|---:|
+| qa100 / ZJU (spoken QA) | 74 / 52 | 73 / 51 |
+| gender / emotion | 89.4 / 92.0 | 89.1 / 91.4 |
+| Easy-Turn / CoDeTT zh / CoDeTT en / TurnBench-dev | 92.5 / 67.0 / 68.6 / 87.3 | 91.8 / 67.0 / 68.9 / 86.9 |
+| VoiceBench OBQA / MMSU | **46.4 / 41.7** | 42.0 / 38.2 |
+| which word is stressed: DEBATE / StressPresso ("none" offered) | 39 / 26 | **95 / 95** |
+| neutral speech answered "no word is stressed": AISHELL / LibriSpeech | 78 / 37 | **99 / 99** |
+| meaning from stress: DEBATE stress (held-out) / StressTest | 36 / 49 | **94 / 86** |
+| meaning from pause: DEBATE pause (held-out) | 67 | **85** |
+
+4B-Stress is about 4 points below 4B-Turn on VoiceBench (section 6), so 4B-Turn stays the default small model.
 
 ## 1. Starting point: stress unused, pauses partly used
 
@@ -170,7 +183,25 @@ paralinguistic and turn-taking benchmark within statistical noise (MMSU −0.7, 
 Pushing meaning-from-stress above 90 currently costs VoiceBench points (the full-mix model: 94 on meaning, 81.5 on
 OBQA), so we do not release that recipe.
 
-<!-- RECIPE_4B -->
+**4B is more sensitive, and the cost did not go away.** The same approach at 4B left VoiceBench 4–10 points down in every
+configuration. Its control does not drop either (46.2 / 41.9), so the cause is again the stress data itself:
+
+| 4B | VB OBQA / MMSU | qa100 | DEBATE stress, meaning choice |
+|---|---:|---:|---:|
+| released 4B-Turn / control | 46.4 / 41.7 · 46.2 / 41.9 | 74 · 76 | 35.7 · 34.6 |
+| all item types, weight 3000 / 2200 / 1500 / 800 | 38.9 / 38.0 · 40.7 / 36.1 · 36.0 / 36.2 · 40.9 / 37.3 | 73 · 73 · 72 · 71 | 94.1 · 92.5 · 92.2 · 90.0 |
+| detection only, weight 2200 / 1300 / 600 | 42.4 / 38.1 · 40.2 / 38.0 · 40.4 / 37.3 | 70 · 72 · 75 | 81.9 · 79.8 · 64.7 |
+| detection only, 2,000 steps | 37.1 / 37.0 · 38.9 / 37.2 | 71 · 73 | 78.1 · 72.2 |
+| **all item types + content distillation ×2.5 (released)** | 42.0 / 38.2 | 73 | 93.6 |
+| all item types + content distillation ×4, weight 3000 / 2000 | 42.9 / 38.0 · 40.7 / 36.4 | 71 · 69 | 92.2 · 92.2 |
+
+- At 4B, dropping meaning-choice items did not help VoiceBench (42.4 / 38.1, about the same as the full mix) and cost 12
+  points on meaning from stress.
+- More content distillation recovers a little.
+- The 4B release therefore uses the full mix with content distillation ×2.5 and sits next to 4B-Turn: use 4B-Stress if
+  stress matters more than about 4 points of spoken multiple choice, 4B-Turn otherwise.
+- VoiceBench differences between weights are not monotonic, which suggests noise of about ±2 points at 4B (OBQA has 455
+  items and 4B scores about 45 %).
 
 ## 7. Limitations
 

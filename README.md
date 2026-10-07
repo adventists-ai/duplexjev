@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">Try it online</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/">Project page</a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.02638">Paper (arXiv:2610.02638)</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-citation">Citation</a>
@@ -141,7 +141,8 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 - **2026-10-08** — 🤗 [**DuplexJev-32B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress): DuplexJev-32B-Turn
   that also hears **stress and pauses**. Which word is stressed: 92 (Mandarin, held-out sentences) / 88 (English); neutral speech
   answered "no word is stressed" 99%; spoken QA, gender, emotion and turn-taking unchanged within noise. Trained with balanced
-  negatives in every speech source; meaning-choice items were left out because they cost VoiceBench points.
+  negatives in every speech source; meaning-choice items were left out because they cost VoiceBench points. Also
+  🤗 [**DuplexJev-4B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) (which word is stressed 95 / 95; about 4 points below 4B-Turn on VoiceBench).
   [Research note](research/2026-10-stress-understanding.md).
 - **2026-10-05** — 📄 Paper on arXiv: [arXiv:2610.02638](https://arxiv.org/abs/2610.02638). 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)
   and [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn): a turn-taking upgrade (connector + rank-16
@@ -171,8 +172,12 @@ Each model is **one repository with everything needed** (audio encoder + trained
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | **92.1** | **91.4** | 92.1 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | small GPU, edge | Qwen3-4B (+ rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 4.2 B | ~10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | small GPU, + stress and pauses | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
+
+The Stress models add stress and pause understanding (which word is stressed: 92 / 95 on held-out Mandarin sentences for 32B / 4B; see the [research note](research/2026-10-stress-understanding.md)). 32B-Stress matches 32B-Turn on every other benchmark within noise. **4B-Stress trades about 4 points of VoiceBench** (42.0 / 38.2 vs 46.4 / 41.7) for it, so 4B-Turn stays the default small model.
+
 
 Earlier versions without the turn-taking upgrade, [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) (total 87.7)
 and [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) (78.6), stay online but are superseded: the Turn models
@@ -189,7 +194,7 @@ Qwen3-ASR-0.6B encoder, ~58 GB, one 80 GB GPU, CC BY-NC 4.0). No turn-taking tra
 gender 78.5, emotion 60.9), so it is not in the table above; details on its model card.
 
 **Which one to use.** `DuplexJev-32B-Turn` wherever an 80 GB GPU is available; `DuplexJev-32B-Stress` if your questions
-depend on stress or pauses (which word is emphasised, how a sentence is phrased); `DuplexJev-4B-Turn` on smaller GPUs. The Turn
+depend on stress or pauses (which word is emphasised, how a sentence is phrased); `DuplexJev-4B-Turn` on smaller GPUs, or `DuplexJev-4B-Stress` there if stress matters more than about 4 points of spoken QA. The Turn
 models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
 use only the language model of Qwen3-VL-32B: their inputs are audio and text for now (image input is planned).
 

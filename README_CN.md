@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.02638">论文（arXiv:2610.02638）</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-引用">引用</a>
@@ -127,7 +127,8 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 - **2026-10-08** —— 🤗 [**DuplexJev-32B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress)：在 DuplexJev-32B-Turn
   基础上**听得懂重音和停顿**。重读的是哪个词：中文留出句 92 / 英文 88；中性语音答“没有特别强调”99%；主语言、性别、情绪、话轮
-  都在误差范围内持平。每种语音来源里都配了正负样本；“靠重音选意思”的题会拉低 VoiceBench，所以没有放进训练。
+  都在误差范围内持平。每种语音来源里都配了正负样本；“靠重音选意思”的题会拉低 VoiceBench，所以没有放进训练。同时发布
+  🤗 [**DuplexJev-4B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress)（重读词判断 95 / 95；VoiceBench 比 4B-Turn 低约 4 分）。
   [研究笔记](research/2026-10-stress-understanding_zh.md)。
 - **2026-10-05** —— 📄 论文已上 arXiv：[arXiv:2610.02638](https://arxiv.org/abs/2610.02638)。🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)
   和 [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) 发布：话轮升级版（连接器 + rank 16 的 LoRA，
@@ -156,8 +157,12 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | 服务器端，加重音与停顿 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | 94.4\* | **92.1** | **91.4** | 92.1 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | 服务器端，加重音与停顿 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡、端侧 | Qwen3-4B（加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | 小显卡，加重音与停顿 | 同 4B-Turn（再加一个 rank 16 LoRA） | 4.2 B | 约 10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
+
+Stress 版增加了重音和停顿理解（哪个词被重读：中文留出句 32B 92 / 4B 95，见[研究笔记](research/2026-10-stress-understanding_zh.md)）。32B-Stress 其余各项都与 32B-Turn 在误差内持平；**4B-Stress 用约 4 分 VoiceBench 换来这项能力**（42.0 / 38.2 对 46.4 / 41.7），所以小显卡默认仍推荐 4B-Turn。
+
 
 话轮升级前的 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B)（总分 87.7）和 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)（78.6）
 仍可下载，但已被替代：Turn 版在我们跑的每项评测上都持平或更好。
@@ -170,7 +175,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，未做话轮训练）。它对提问措辞敏感（论文口径措辞下性别 78.5、
 情绪 60.9），所以没有放进上表；详见模型卡。
 
-**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B-Turn`；问题依赖重音或停顿（哪个词被强调、句子怎么断）就用 `DuplexJev-32B-Stress`；显卡小就用 `DuplexJev-4B-Turn`。Turn 版可以直接替换原版（提示词、插件都一样），
+**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B-Turn`；问题依赖重音或停顿（哪个词被强调、句子怎么断）就用 `DuplexJev-32B-Stress`；显卡小就用 `DuplexJev-4B-Turn`（重音比主语言约 4 分 VoiceBench 更重要时用 `DuplexJev-4B-Stress`）。Turn 版可以直接替换原版（提示词、插件都一样），
 我们跑的每项评测都持平或更好（在误差范围内）。32B 模型只用了 Qwen3-VL-32B 的语言模型部分，
 目前输入是音频和文字（图像输入在计划中）。
 
