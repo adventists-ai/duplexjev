@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">Try it online</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/">Project page</a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.02638">Paper (arXiv:2610.02638)</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-citation">Citation</a>
@@ -37,6 +37,9 @@ is speaking and how (paralinguistics):
 - **Paralinguistics, strong perception.** Gender 91.5, emotion 91.1, where speech LLMs trained on transcripts sit at
   chance (~55 / ~28); speaker verification is still weak *(preview‡)*: EER about 30% on the official VoxCeleb1-H list (same gender and
   nationality), against about 2% for dedicated speaker models ([research note](research/2026-10-speaker-identity.md)).
+- **Stress and pauses (new).** DuplexJev-32B-Stress finds the stressed word ("**I** didn't say…" vs "I didn't say she took the
+  **money**") on unseen Mandarin and English sentences, 92 / 88, and answers "no word is stressed" on 99% of neutral speech;
+  the other models are at chance ([research note](research/2026-10-stress-understanding.md)).
 - **Common decision tasks, on par with or above dedicated models.** Turn state on the Easy-Turn test set 95.3 (the
   dedicated Easy-Turn detector 96.4; TEN and Smart Turn cover only some states). Turn action on CoDeTT 69.2 / 70.0
   zero-shot, above every dedicated turn model (37.9–65.4) and level with Qwen3-Omni (70.4 / 70.9).
@@ -63,6 +66,25 @@ is speaking and how (paralinguistics):
 | Language | English | 1.00 |
 | Emotion | angry | 1.00 |
 | Can the assistant handle this by itself? | ask a follow-up question first | 0.51 |
+
+<details>
+<summary><b>What it hears beyond the words: one example per ability</b></summary>
+
+Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on short clips; the same cards, with a player, are on the
+[project page](https://adventists-ai.github.io/duplexjev/#abilities). Real-speech stress and phrasing clips: MSPB (CC BY 4.0).
+
+| ability | what it decides | examples → model answer (DuplexJev-32B-Stress) |
+|---|---|---|
+| Turn state | Has the user finished, stopped mid-sentence, only made a backchannel, or asked the assistant to wait? Intonation and rhythm decide it, not only the words. | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **finished** 100%<br>🔊 [Could you turn the air conditioning down a little and, um —](docs/audio/ex3.wav) → **not finished** 99%<br>🔊 [Mm-hmm, yeah.](docs/audio/ex2.wav) → **just a backchannel** 100%<br>🔊 [等一下，我想想……](docs/audio/ex5.wav) → **asking to wait** 100% |
+| Barge-in while speaking | While the assistant is talking, tell a real interruption from a backchannel: stop and listen, or keep talking. | 🔊 [Wait, wait — stop. That's not the address I asked for.](docs/audio/ex1.wav) → **stop and listen** 100%<br>🔊 [Mm-hmm, yeah.](docs/audio/ex2.wav) → **keep talking** 100% |
+| Voices not meant for the assistant | People chatting nearby, a TV, or noise should neither trigger a reply nor stop the assistant. | 🔊 [哎你晚上吃什么？要不我们去吃火锅吧。——行啊，那我先订个位子。](docs/audio/ab_b1.wav) → **stay silent and keep waiting (not addressed to the assistant)** 100% |
+| Emotion | Neutral, happy, angry or sad, heard in the voice rather than read from the words. | 🔊 [Wait, wait — stop. That's not the address I asked for.](docs/audio/ex1.wav) → **angry** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **happy** 93%<br>🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **neutral** 100% |
+| Speaker gender | Perceived gender of the voice, a cue a transcript does not carry. | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **male** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **female** 100% |
+| Stress (word focus) 🆕 | Same words, different stressed word, different meaning. The model tells which word carries the stress, and also when no word is stressed. | 🔊 [**张昊**昨晚做烤肉。](docs/audio/ab_m1.wav) → **张昊 (Zhang Hao)** 100%<br>🔊 [张昊**昨晚**做烤肉。](docs/audio/ab_m2.wav) → **昨晚 (last night)** 100%<br>🔊 [张昊昨晚**做烤肉**。](docs/audio/ab_m3.wav) → **做烤肉 (made barbecue)** 97%<br>🔊 [我明天去北京开会。](docs/audio/ab_n0.wav) → **no word is particularly emphasized** 96% |
+| Pauses and phrasing 🆕 | Where the speaker pauses can change the structure of a sentence: one item or two, who did what to whom. | 🔊 [我买了巧克力雪糕｜和果汁。](docs/audio/ab_q1.wav) → **two (chocolate ice cream, juice)** 96%<br>🔊 [我买了巧克力｜雪糕｜和果汁。](docs/audio/ab_q2.wav) → **three (chocolate, ice cream, juice)** 98% |
+| Who is speaking *(preview‡)* | Same speaker or not, given a reference clip. The model learns a coarse version of this, far behind dedicated speaker models, so it is not in the released models. | Official VoxCeleb1-H list: EER 29.6% (dedicated x-vector model: ~2–4%). Details in the research note on speaker identity. |
+
+</details>
 
 <details>
 <summary><b>Full comparison on common decision tasks</b></summary>
@@ -116,6 +138,11 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
+- **2026-10-08** — 🤗 [**DuplexJev-32B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress): DuplexJev-32B-Turn
+  that also hears **stress and pauses**. Which word is stressed: 92 (Mandarin, held-out sentences) / 88 (English); neutral speech
+  answered "no word is stressed" 99%; spoken QA, gender, emotion and turn-taking unchanged within noise. Trained with balanced
+  negatives in every speech source; meaning-choice items were left out because they cost VoiceBench points.
+  [Research note](research/2026-10-stress-understanding.md).
 - **2026-10-05** — 📄 Paper on arXiv: [arXiv:2610.02638](https://arxiv.org/abs/2610.02638). 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)
   and [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn): a turn-taking upgrade (connector + rank-16
   LoRA on public turn-taking data). 32B-Turn: Easy-Turn 95.3, CoDeTT 69.2 / 70.0 zero-shot, with qa100, gender and emotion
@@ -144,6 +171,7 @@ Each model is **one repository with everything needed** (audio encoder + trained
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | **92.1** | **91.4** | 92.1 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | small GPU, edge | Qwen3-4B (+ rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 4.2 B | ~10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
 
 Earlier versions without the turn-taking upgrade, [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) (total 87.7)
@@ -160,7 +188,8 @@ Qwen3-ASR-0.6B encoder, ~58 GB, one 80 GB GPU, CC BY-NC 4.0). No turn-taking tra
 90.6; Easy-Turn 68.0 zero-shot (no turn-taking training). It is sensitive to question wording (paper-protocol wording:
 gender 78.5, emotion 60.9), so it is not in the table above; details on its model card.
 
-**Which one to use.** `DuplexJev-32B-Turn` wherever an 80 GB GPU is available; `DuplexJev-4B-Turn` on smaller GPUs. The Turn
+**Which one to use.** `DuplexJev-32B-Turn` wherever an 80 GB GPU is available; `DuplexJev-32B-Stress` if your questions
+depend on stress or pauses (which word is emphasised, how a sentence is phrased); `DuplexJev-4B-Turn` on smaller GPUs. The Turn
 models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
 use only the language model of Qwen3-VL-32B: their inputs are audio and text for now (image input is planned).
 

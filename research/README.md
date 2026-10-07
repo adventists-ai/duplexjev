@@ -9,6 +9,7 @@ DuplexJev 背后那些没写进论文的实验和取舍：试过什么、哪些�
 
 | date | note | 中文 |
 |---|---|---|
+| 2026-10-08 | [Teaching a speech-decision LLM to hear stress: data, two gates, negatives and the "source shortcut"](2026-10-stress-understanding.md) | [让语音判断大模型听懂重音](2026-10-stress-understanding_zh.md) |
 | 2026-10-06 | [Can a speech-decision LLM tell who is speaking? Shortcuts, probes and ten ablations](2026-10-speaker-identity.md) | [语音判断大模型能听出“是谁在说”吗？](2026-10-speaker-identity_zh.md) |
 | 2026-10-05 | [A rank-16 LoRA makes a speech-decision LLM a competitive turn-taking detector](2026-10-turn-taking-lora.md) | [一个 rank 16 的 LoRA，让话轮能力追上专用检测器](2026-10-turn-taking-lora_zh.md) |
 | 2026-09-28 | [Does cross-layer fusion help a speech connector? A vs. B on Qwen3-32B and Qwen2.5-72B](2026-09-connector-a-vs-b.md) | [跨层融合对语音连接器有没有用？](2026-09-connector-a-vs-b_zh.md) |

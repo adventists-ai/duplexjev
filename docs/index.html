@@ -107,7 +107,26 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
 .tick-grid span{aspect-ratio:1;border-radius:2px;background:var(--grid);max-width:100%}
 .tick-grid span.on{background:var(--signal)}
 .tick-grid span.ev{background:var(--slow)}
+.abil{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}
+.ab{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.ab h3{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.ab h3 .badge{flex:none}
+.ab p{font-size:15px;margin:0;max-width:none}
+.ab-q{font-family:var(--mono);font-size:12px;color:var(--ink-2);border-top:1px solid var(--grid);padding-top:8px}
+.ab-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--grid)}
+.ab-row:last-of-type{border-bottom:0}
+.ab-row button{grid-row:span 2;width:30px;height:30px;border-radius:50%;border:1px solid var(--rule);background:var(--ground);color:var(--signal);cursor:pointer;font-size:12px;line-height:1}
+.ab-row button:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.ab-row button[aria-pressed="true"]{background:var(--signal);color:var(--panel);border-color:var(--signal)}
+.ab-tx{font-size:15px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ab-tx b{color:var(--signal);font-weight:600}
+.ab-tx small{font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.ab-ans{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.ab-ans em{font-style:normal;color:var(--signal)}
+.ab-ans em.miss{color:var(--warn)}
+.ab-note{font-size:13px!important;color:var(--ink-2)}
 @media (max-width:760px){
+  .abil{grid-template-columns:minmax(0,1fr)}
   .demo-body{grid-template-columns:minmax(0,1fr)}
   .clip{border-right:0;border-bottom:1px solid var(--rule)}
   .two{grid-template-columns:minmax(0,1fr)}
@@ -135,6 +154,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
       <a href="https://arxiv.org/abs/2610.02638" data-i18n="l_paper"></a>
       <a href="https://github.com/adventists-ai/duplexjev" data-i18n="l_code"></a>
       <a href="https://api.adventists.cn/duplexjev/" data-i18n="l_try"></a>
+      <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">DuplexJev-32B-Stress</a>
       <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a>
       <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">DuplexJev-32B</a>
       <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">DuplexJev-4B</a>
@@ -162,6 +182,12 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
       </div>
       <div class="pass" id="pass"></div>
     </div>
+  </section>
+
+  <section id="abilities" aria-labelledby="ab-h">
+    <h2 id="ab-h" data-i18n="ab_h"></h2>
+    <p data-i18n="ab_p"></p>
+    <div class="abil" id="abil"></div>
   </section>
 
   <section id="how" aria-labelledby="how-h">
@@ -242,6 +268,9 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
   <footer data-i18n="footer"></footer>
 </div>
 
+<script type="application/json" id="abil-data">
+{"model": "DuplexJev-32B-Stress", "engine": "vLLM 0.29 + duplexjev-vllm, both option orders averaged", "abilities": [{"id": "turn", "title_en": "Turn state", "title_zh": "话轮状态", "desc_en": "Has the user finished, stopped mid-sentence, only made a backchannel, or asked the assistant to wait? Intonation and rhythm decide it, not only the words.", "desc_zh": "用户是说完了、话说到一半、只是附和，还是让助手等一下？靠语调和节奏判断，不只看文字。", "q_en": "What is the user's turn state?", "q_zh": "用户现在的话轮状态是？", "rows": [{"audio": "audio/ex4.wav", "transcript": "帮我导航到最近的充电站。", "options_en": ["finished", "not finished", "just a backchannel", "asking to wait"], "options_zh": ["说完了", "没说完", "只是附和", "让对方等一下"], "p": [1.0, 0.0, 0.0, 0.0], "gold": 0, "tag_en": "", "tag_zh": ""}, {"audio": "audio/ex3.wav", "transcript": "Could you turn the air conditioning down a little and, um —", "options_en": ["finished", "not finished", "just a backchannel", "asking to wait"], "options_zh": ["说完了", "没说完", "只是附和", "让对方等一下"], "p": [0.006, 0.994, 0.0, 0.0], "gold": 1, "tag_en": "", "tag_zh": ""}, {"audio": "audio/ex2.wav", "transcript": "Mm-hmm, yeah.", "options_en": ["finished", "not finished", "just a backchannel", "asking to wait"], "options_zh": ["说完了", "没说完", "只是附和", "让对方等一下"], "p": [0.004, 0.001, 0.995, 0.0], "gold": 2, "tag_en": "", "tag_zh": ""}, {"audio": "audio/ex5.wav", "transcript": "等一下，我想想……", "options_en": ["finished", "not finished", "just a backchannel", "asking to wait"], "options_zh": ["说完了", "没说完", "只是附和", "让对方等一下"], "p": [0.001, 0.0, 0.0, 0.998], "gold": 3, "tag_en": "", "tag_zh": ""}], "note_en": "Easy-Turn test set (800 clips): 94.4 (in-domain: its training split is in our mix).", "note_zh": "Easy-Turn 测试集（800 条）：94.4（域内：训练数据含其训练集）。"}, {"id": "barge", "title_en": "Barge-in while speaking", "title_zh": "说话时被插话", "desc_en": "While the assistant is talking, tell a real interruption from a backchannel: stop and listen, or keep talking.", "desc_zh": "助手正在说话时，分清用户是真的要打断，还是只在附和：该停下来听，还是继续说。", "q_en": "The assistant is speaking when this comes in. What should it do?", "q_zh": "助手正在说话时听到这句，应该怎么做？", "rows": [{"audio": "audio/ex1.wav", "transcript": "Wait, wait — stop. That's not the address I asked for.", "options_en": ["keep talking", "stop and listen"], "options_zh": ["继续说", "停下来听"], "p": [0.0, 1.0], "gold": 1, "tag_en": "", "tag_zh": ""}, {"audio": "audio/ex2.wav", "transcript": "Mm-hmm, yeah.", "options_en": ["keep talking", "stop and listen"], "options_zh": ["继续说", "停下来听"], "p": [0.997, 0.003], "gold": 0, "tag_en": "", "tag_zh": ""}], "note_en": "CoDeTT (18 k clips, system state given, zero-shot): 69.7 zh / 70.5 en.", "note_zh": "CoDeTT（1.8 万条，给定系统状态，零样本）：中文 69.7 / 英文 70.5。"}, {"id": "bg", "title_en": "Voices not meant for the assistant", "title_zh": "不理会旁人的声音", "desc_en": "People chatting nearby, a TV, or noise should neither trigger a reply nor stop the assistant.", "desc_zh": "旁边有人聊天、电视声或噪声，既不该让助手开口，也不该让它停下。", "q_en": "The assistant has finished and is waiting. On hearing this, what should it do?", "q_zh": "助手已经讲完，正在等用户。听到这段声音，助手该怎么做？", "rows": [{"audio": "audio/ab_b1.wav", "transcript": "哎你晚上吃什么？要不我们去吃火锅吧。——行啊，那我先订个位子。", "options_en": ["reply", "stay silent and keep waiting (not addressed to the assistant)"], "options_zh": ["开口回应", "不出声，继续等（这不是对助手说的）"], "p": [0.001, 0.999], "gold": 1, "tag_en": "synthetic: far-field chatter + noise", "tag_zh": "合成：远处闲聊 + 噪声"}], "note_en": "Same clip while the assistant is speaking: keep talking, 98%.", "note_zh": "同一段声音，若助手正在说话：继续说，98%。"}, {"id": "emo", "title_en": "Emotion", "title_zh": "情绪", "desc_en": "Neutral, happy, angry or sad, heard in the voice rather than read from the words.", "desc_zh": "中性、高兴、生气或伤心，从声音里听出来，而不是从文字里猜。", "q_en": "Emotion", "q_zh": "情绪", "rows": [{"audio": "audio/ex1.wav", "transcript": "Wait, wait — stop. That's not the address I asked for.", "options_en": ["neutral", "happy", "angry", "sad"], "options_zh": ["中性", "高兴", "生气", "伤心"], "p": [0.001, 0.0, 0.998, 0.0], "gold": 2, "tag_en": "", "tag_zh": ""}, {"audio": "audio/ex6.wav", "transcript": "太好了，谢谢你！", "options_en": ["neutral", "happy", "angry", "sad"], "options_zh": ["中性", "高兴", "生气", "伤心"], "p": [0.0, 0.933, 0.066, 0.0], "gold": 1, "tag_en": "", "tag_zh": ""}, {"audio": "audio/ex4.wav", "transcript": "帮我导航到最近的充电站。", "options_en": ["neutral", "happy", "angry", "sad"], "options_zh": ["中性", "高兴", "生气", "伤心"], "p": [0.998, 0.0, 0.001, 0.0], "gold": 0, "tag_en": "", "tag_zh": ""}], "note_en": "800-clip 4-way test (ESD, CREMA-D): 91.4; speech LLMs trained on transcripts stay near chance (~28). Labels come from acted speech.", "note_zh": "800 条四分类测试（ESD、CREMA-D）：91.4；只用转写训练的语音大模型接近瞎猜（约 28）。标签来自表演式语音。"}, {"id": "gender", "title_en": "Speaker gender", "title_zh": "说话人性别", "desc_en": "Perceived gender of the voice, a cue a transcript does not carry.", "desc_zh": "听出说话人的性别——转写里没有这个信息。", "q_en": "Speaker gender", "q_zh": "说话人性别", "rows": [{"audio": "audio/ex4.wav", "transcript": "帮我导航到最近的充电站。", "options_en": ["female", "male"], "options_zh": ["女性", "男性"], "p": [0.004, 0.996], "gold": 1, "tag_en": "", "tag_zh": ""}, {"audio": "audio/ex6.wav", "transcript": "太好了，谢谢你！", "options_en": ["female", "male"], "options_zh": ["女性", "男性"], "p": [0.999, 0.001], "gold": 0, "tag_en": "", "tag_zh": ""}], "note_en": "800 real utterances (AISHELL-1, LibriSpeech): 92.1. Labels are corpus-provided and binary; not a tool for identifying people.", "note_zh": "800 条真人语音（AISHELL-1、LibriSpeech）：92.1。标签来自语料、只有两类；不用于识别个人。"}, {"id": "stress", "title_en": "Stress (word focus)", "title_zh": "重音（强调哪个词）", "badge_en": "new", "badge_zh": "新", "desc_en": "Same words, different stressed word, different meaning. The model tells which word carries the stress, and also when no word is stressed.", "desc_zh": "同样的字，重读不同的词，意思就不同。模型能听出重读落在哪个词上，也能判断“没有特别强调”。", "q_en": "Which word does the speaker emphasize?", "q_zh": "说话人特别强调（重读）的是哪个词？", "rows": [{"audio": "audio/ab_m1.wav", "transcript": "**张昊**昨晚做烤肉。", "options_en": ["张昊 (Zhang Hao)", "昨晚 (last night)", "做烤肉 (made barbecue)", "no word is particularly emphasized"], "options_zh": ["张昊", "昨晚", "做烤肉", "没有特别强调哪个词"], "p": [1.0, 0.0, 0.0, 0.0], "gold": 0, "tag_en": "real speech · MSPB", "tag_zh": "真人 · MSPB"}, {"audio": "audio/ab_m2.wav", "transcript": "张昊**昨晚**做烤肉。", "options_en": ["张昊 (Zhang Hao)", "昨晚 (last night)", "做烤肉 (made barbecue)", "no word is particularly emphasized"], "options_zh": ["张昊", "昨晚", "做烤肉", "没有特别强调哪个词"], "p": [0.0, 0.999, 0.0, 0.0], "gold": 1, "tag_en": "real speech · MSPB", "tag_zh": "真人 · MSPB"}, {"audio": "audio/ab_m3.wav", "transcript": "张昊昨晚**做烤肉**。", "options_en": ["张昊 (Zhang Hao)", "昨晚 (last night)", "做烤肉 (made barbecue)", "no word is particularly emphasized"], "options_zh": ["张昊", "昨晚", "做烤肉", "没有特别强调哪个词"], "p": [0.018, 0.007, 0.967, 0.007], "gold": 2, "tag_en": "real speech · MSPB", "tag_zh": "真人 · MSPB"}, {"audio": "audio/ab_n0.wav", "transcript": "我明天去北京开会。", "options_en": ["我 (I)", "明天 (tomorrow)", "北京 (Beijing)", "no word is particularly emphasized"], "options_zh": ["我", "明天", "北京", "没有特别强调哪个词"], "p": [0.008, 0.01, 0.025, 0.957], "gold": 3, "tag_en": "synthetic", "tag_zh": "合成"}], "note_en": "New in DuplexJev-32B-Stress. On this unseen real speaker (MSPB, 24 clips) it finds the stressed word 20 times; on held-out Mandarin sentences (DEBATE) 92, on English (StressPresso) 88. DuplexJev-32B-Turn answers “no word is particularly emphasized” on all three clips above.", "note_zh": "DuplexJev-32B-Stress 新增的能力。在这位没见过的真人说话人上（MSPB，24 条）答对 20 条；中文留出句（DEBATE）92，英文（StressPresso）88。DuplexJev-32B-Turn 对上面三条都回答“没有特别强调哪个词”。"}, {"id": "pause", "title_en": "Pauses and phrasing", "title_zh": "停顿与断句", "badge_en": "new", "badge_zh": "新", "desc_en": "Where the speaker pauses can change the structure of a sentence: one item or two, who did what to whom.", "desc_zh": "在哪里停顿会改变句子结构：是一样东西还是两样，谁对谁做了什么。", "q_en": "How many things did the speaker buy?", "q_zh": "说话人买了几样东西？", "rows": [{"audio": "audio/ab_q1.wav", "transcript": "我买了巧克力雪糕｜和果汁。", "options_en": ["two (chocolate ice cream, juice)", "three (chocolate, ice cream, juice)"], "options_zh": ["两样（巧克力雪糕、果汁）", "三样（巧克力、雪糕、果汁）"], "p": [0.955, 0.045], "gold": 0, "tag_en": "real speech · MSPB", "tag_zh": "真人 · MSPB"}, {"audio": "audio/ab_q2.wav", "transcript": "我买了巧克力｜雪糕｜和果汁。", "options_en": ["two (chocolate ice cream, juice)", "three (chocolate, ice cream, juice)"], "options_zh": ["两样（巧克力雪糕、果汁）", "三样（巧克力、雪糕、果汁）"], "p": [0.023, 0.977], "gold": 1, "tag_en": "real speech · MSPB", "tag_zh": "真人 · MSPB"}], "note_en": "MSPB ambiguity set (40 clips, meaning from prosody): 82.5; DEBATE pause, held-out sentences: 75. Earlier models already use pauses in part (DuplexJev-32B-Turn: 70.6 on DEBATE).", "note_zh": "MSPB 歧义句（40 条，靠韵律选意思）：82.5；DEBATE 停顿留出句：75。之前的模型已经部分会用停顿（DuplexJev-32B-Turn 在 DEBATE 上 70.6）。"}, {"id": "spk", "title_en": "Who is speaking", "title_zh": "是谁在说", "badge_en": "research preview", "badge_zh": "研究预览", "desc_en": "Same speaker or not, given a reference clip. The model learns a coarse version of this, far behind dedicated speaker models, so it is not in the released models.", "desc_zh": "给一段参考声音，判断是不是同一个人。模型能学会粗粒度的判断，但远不如专用说话人模型，所以没有放进发布的模型。", "rows": [], "note_en": "Official VoxCeleb1-H list: EER 29.6% (dedicated x-vector model: ~2–4%). Details in the research note on speaker identity.", "note_zh": "官方 VoxCeleb1-H 列表：EER 29.6%（专用 x-vector 模型约 2–4%）。详见说话人识别研究笔记。"}]}
+</script>
 <script type="application/json" id="examples-data">
 {"placeholder":false,"examples":[
  {"id":"ex1","label":"EN · barge-in correction","label_zh":"英文 · 打断纠正","lang":"en","source":"TTS (VoxCPM2)","transcript":"Wait, wait — stop. That's not the address I asked for.","audio":"audio/ex1.wav","duration_s":5.0,"questions":[{"q_en":"What is the user's turn state?","q_zh":"用户现在的话轮状态是？","options_en":["finished","not finished","just a backchannel","asking to wait"],"options_zh":["说完了","没说完","只是附和","让对方等一下"],"p":[0.074,0.004,0.0,0.922]},{"q_en":"What does the user want?","q_zh":"用户想做什么？","options_en":["climate","media","navigation","phone","vehicle info","chit-chat"],"options_zh":["空调","媒体","导航","电话","车辆信息","闲聊"],"p":[0.0,0.0,0.999,0.0,0.0,0.0]},{"q_en":"Which filler fits?","q_zh":"先说哪句垫话？","options_en":["“Sure —”","“One moment —”","“I'm sorry about that —”","(stay silent)"],"options_zh":["“好的，”","“稍等，”","“非常抱歉，”","（不说话）"],"p":[0.005,0.728,0.086,0.182]},{"q_en":"The assistant is speaking when this comes in. What should it do?","q_zh":"助手正在说话时听到这句，应该怎么做？","options_en":["keep talking","stop and listen"],"options_zh":["继续说","停下来听"],"p":[0.0,1.0]},{"q_en":"Speaker gender","q_zh":"说话人性别","options_en":["female","male"],"options_zh":["女性","男性"],"p":[0.007,0.993]},{"q_en":"Language","q_zh":"语言","options_en":["English","Chinese","other"],"options_zh":["英语","中文","其他"],"p":[0.999,0.0,0.001]},{"q_en":"Emotion","q_zh":"情绪","options_en":["neutral","happy","angry","sad"],"options_zh":["中性","高兴","生气","伤心"],"p":[0.004,0.0,0.996,0.0]},{"q_en":"Can the assistant handle this by itself?","q_zh":"助手自己能处理吗？","options_en":["yes, answer directly","needs a tool or backend call","ask a follow-up question first","hand over to a human"],"options_zh":["能，直接回答","需要调用工具或后台","先向用户追问","转人工"],"p":[0.274,0.015,0.506,0.206]}],"forward_ms":177},
@@ -265,6 +294,8 @@ const T = {
   affil:"<sup>1</sup>Adventists.ai, Melbourne · <sup>2</sup>College of CS&amp;T, Zhejiang University · <sup>3</sup>Future Design Lab, Innovation Center of Yangtze River Delta, Zhejiang University · <sup>4</sup>University of Virginia · <sup>★</sup>jiejin@adventists.ai",
   l_paper:"Paper · arXiv", l_code:"Code", l_weights:"Weights",l_try:"Try it online", l_qa100:"qa100 test set", l_cite:"Cite",
   lede:"A full-duplex voice agent must keep answering small, closed questions — <em>has the user finished? which filler fits? which step of the flow is this?</em> DuplexJev reads every such question as one constrained token from a frozen speech LLM. No ASR decoding, no text decoding, and many questions — over one call or across calls — share a single forward pass.",
+  ab_h:"What it hears beyond the words",
+  ab_p:"Each card is one paralinguistic ability: a short explanation, then real model answers on example clips (DuplexJev-32B-Stress through vLLM, both option orders averaged). Press ▶ to listen; the arrow shows the chosen option and its probability.",
   demo_h:"One utterance, one pass, many answers",
   demo_p:"Pick a clip. The right-hand panel shows every typed question answered in the same forward pass, each as a probability over its own options. Ticks under the waveform mark the 160&nbsp;ms spans that become one audio token for the LLM (Qwen3-ASR at 12.5&nbsp;Hz, two frames stacked). These are real outputs of the released A-Para checkpoint (duplexjev 0.2.1) on synthetic clips (VoxCPM2), shown as they are, including its mistakes.",
   ph_tag:"LAYOUT PREVIEW",
@@ -303,7 +334,7 @@ const T = {
   lim3:"Confidence gates abstention but does not reveal a missing skill: a path that cannot hear gender is still confident.",
   lim4:"Gender labels are corpus-provided and binary; the classifier is a probe of information flow, not a tool for identifying people.",
   cite_h:"Cite", copy:"Copy BibTeX", copied:"Copied", selected:"Selected — press Ctrl/Cmd+C",
-  footer:"Code: Apache-2.0 · Weights: Apache-2.0, emotion connectors CC BY-NC 4.0 · qa100: CC-BY-4.0 · Built on Ultravox, Qwen3 and Qwen3-ASR.",
+  footer:"Code: Apache-2.0 · Weights: Apache-2.0, emotion connectors CC BY-NC 4.0; full models CC BY-NC 4.0 · qa100: CC-BY-4.0 · Real-speech stress and phrasing clips: MSPB (zenodo 15548258), CC BY 4.0 · Built on Ultravox, Qwen3 and Qwen3-ASR.",
   audio_tokens:"audio tokens", illus:"illustrative waveform"
  },
  zh: {
@@ -314,6 +345,8 @@ const T = {
   affil:"<sup>1</sup>Adventists.ai（墨尔本）· <sup>2</sup>浙江大学计算机科学与技术学院 · <sup>3</sup>浙江大学长三角智慧绿洲创新中心 Future Design Lab · <sup>4</sup>弗吉尼亚大学 · <sup>★</sup>jiejin@adventists.ai",
   l_paper:"论文 · arXiv", l_code:"代码", l_weights:"权重",l_try:"在线体验", l_qa100:"qa100 测试集", l_cite:"引用",
   lede:"全双工语音智能体要不停地回答一些小而封闭的问题——<em>用户说完了吗？先说哪句垫话？流程走到哪一步了？</em>DuplexJev 把每个这样的问题都从冻结的语音大模型里读成一个受约束的 token：不做语音转写的解码，不做文本解码；同一通电话、甚至多通电话里的许多问题，共用一次前向计算。",
+  ab_h:"听懂文字之外的信息",
+  ab_p:"每张卡片是一种副语言能力：先说明它是什么，再给出模型在示例音频上的真实回答（DuplexJev-32B-Stress，vLLM 推理，两种选项顺序取平均）。点 ▶ 播放；箭头后是模型选的答案和概率。",
   demo_h:"一句话，一次前向，许多答案",
   demo_p:"选一段音频。右侧面板显示在同一次前向里回答的每个类型化问题，各自给出在自己选项上的概率。波形下方的刻度标出 160&nbsp;毫秒一段——每段变成大模型的一个音频 token（Qwen3-ASR 12.5&nbsp;Hz，两帧拼一）。下面是正式发布的 A-Para 权重（duplexjev 0.2.1）在合成语音（VoxCPM2）上的真实输出，原样展示，包括它答错的地方。",
   ph_tag:"版式预览",
@@ -352,7 +385,7 @@ const T = {
   lim3:"置信度可以用来决定是否弃答，但看不出能力缺失：一个听不出性别的通路照样很有把握。",
   lim4:"性别标签来自语料库、只有两类；这个分类器是用来探查信息流的，不是用来识别个人的工具。",
   cite_h:"引用", copy:"复制 BibTeX", copied:"已复制", selected:"已选中，按 Ctrl/Cmd+C 复制",
-  footer:"代码：Apache-2.0 · 权重：Apache-2.0，含情绪能力的连接器为 CC BY-NC 4.0 · qa100：CC-BY-4.0 · 基于 Ultravox、Qwen3 与 Qwen3-ASR 构建。",
+  footer:"代码：Apache-2.0 · 权重：Apache-2.0，含情绪能力的连接器为 CC BY-NC 4.0；完整模型为 CC BY-NC 4.0 · qa100：CC-BY-4.0 · 重音与断句的真人示例音频：MSPB（zenodo 15548258），CC BY 4.0 · 基于 Ultravox、Qwen3 与 Qwen3-ASR 构建。",
   audio_tokens:"个音频 token", illus:"示意波形"
  }
 };
@@ -378,9 +411,45 @@ function applyLang(l){
   document.querySelectorAll("[data-i18n]").forEach(e => { e.innerHTML = t(e.getAttribute("data-i18n")); });
   ["en","zh"].forEach(x => $("lang-"+x).setAttribute("aria-pressed", x === l ? "true" : "false"));
   try { localStorage.setItem("dj-lang", l); } catch(e){}
-  buildTabs(); drawAll();
+  buildTabs(); renderAbil(); drawAll();
 }
 document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
+
+// ---------- abilities ----------
+const ABIL = JSON.parse(document.getElementById("abil-data").textContent);
+const abAudio = new Audio(); let abBtn = null;
+abAudio.addEventListener("ended", () => { if (abBtn){ abBtn.setAttribute("aria-pressed","false"); abBtn.textContent = "▶"; abBtn = null; } });
+function mdBold(s){ const d = document.createElement("span"); s.split("**").forEach((part,i) => { if (i % 2){ const b = document.createElement("b"); b.textContent = part; d.append(b); } else d.append(part); }); return d; }
+function renderAbil(){
+  const box = $("abil"); box.innerHTML = "";
+  ABIL.abilities.forEach(A => {
+    const c = document.createElement("div"); c.className = "ab";
+    const h = document.createElement("h3"); h.append(A["title_"+LANG] || A.title_en);
+    if (A.badge_en){ const bd = document.createElement("span"); bd.className = "badge"; bd.textContent = A["badge_"+LANG] || A.badge_en; h.append(bd); }
+    c.append(h);
+    const p = document.createElement("p"); p.textContent = A["desc_"+LANG] || A.desc_en; c.append(p);
+    if (A.rows && A.rows.length){
+      const q = document.createElement("div"); q.className = "ab-q"; q.textContent = (LANG === "zh" ? "问：" : "Q: ") + (A["q_"+LANG] || A.q_en); c.append(q);
+      A.rows.forEach(r => {
+        const row = document.createElement("div"); row.className = "ab-row";
+        const b = document.createElement("button"); b.type = "button"; b.textContent = "▶"; b.setAttribute("aria-pressed","false"); b.setAttribute("aria-label", (LANG === "zh" ? "播放：" : "Play: ") + r.transcript.replaceAll("**",""));
+        b.addEventListener("click", () => {
+          if (abBtn === b){ abAudio.pause(); b.setAttribute("aria-pressed","false"); b.textContent = "▶"; abBtn = null; return; }
+          if (abBtn){ abBtn.setAttribute("aria-pressed","false"); abBtn.textContent = "▶"; }
+          abAudio.src = r.audio; abAudio.play().catch(() => {}); abBtn = b; b.setAttribute("aria-pressed","true"); b.textContent = "■";
+        });
+        const tx = document.createElement("div"); tx.className = "ab-tx"; tx.append(mdBold(r.transcript));
+        const sm = document.createElement("small"); sm.textContent = r["tag_"+LANG] || r.tag_en || ""; tx.append(sm);
+        const opts = r["options_"+LANG] || r.options_en, k = r.p.indexOf(Math.max(...r.p));
+        const an = document.createElement("div"); an.className = "ab-ans"; an.append("→ ");
+        const em = document.createElement("em"); em.textContent = opts[k] + "  " + Math.round(r.p[k]*100) + "%"; if (r.gold !== undefined && r.gold !== k) em.className = "miss"; an.append(em);
+        row.append(b, tx, an); c.append(row);
+      });
+    }
+    const n = document.createElement("p"); n.className = "ab-note"; n.textContent = A["note_"+LANG] || A.note_en || ""; if (n.textContent) c.append(n);
+    box.append(c);
+  });
+}
 
 // ---------- demo ----------
 function rng(seed){ let s = seed>>>0 || 1; return () => (s = (s*1664525 + 1013904223)>>>0) / 4294967296; }

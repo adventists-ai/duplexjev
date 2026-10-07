@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.02638">论文（arXiv:2610.02638）</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-引用">引用</a>
@@ -33,6 +33,8 @@
   DuplexJev-32B-Turn：qa100 96、ZJU-ML 87；VoiceBench OBQA / MMSU 85.5 / 72.1（读文字 95.4 / 79.3）。
 - **副语言能力：感知很强。** 性别 91.5、情绪 91.1，而只用转写训练的语音大模型只有瞎猜水平（约 55 / 28）；
   说话人验证仍然偏弱（*预览‡*）：官方 VoxCeleb1-H 列表（同性别、同国籍）上 EER 约 30%，专用说话人模型约 2%（[研究笔记](research/2026-10-speaker-identity_zh.md)）。
+- **重音与停顿（新）。** DuplexJev-32B-Stress 能在没见过的中英文句子上听出重读的是哪个词（“**我**没说……”和“我没说她拿了**钱**”），
+  中文 92 / 英文 88；中性语音 99% 能答“没有特别强调”；其他模型都是瞎猜水平（[研究笔记](research/2026-10-stress-understanding_zh.md)）。
 - **常见语音判断任务：达到或超过专用模型。** 话轮状态（Easy-Turn 测试集）95.3（专用 Easy-Turn 检测器 96.4；TEN、Smart Turn
   只覆盖部分类别）。话轮动作（CoDeTT）零样本 69.2 / 70.0，超过所有专用话轮模型（37.9–65.4），与 Qwen3-Omni（70.4 / 70.9）持平。
 
@@ -58,6 +60,25 @@
 | 语言 | 英语 | 1.00 |
 | 情绪 | 生气 | 1.00 |
 | 助手自己能处理吗？ | 先向用户追问 | 0.51 |
+
+<details>
+<summary><b>听懂文字之外的信息：每种能力一个例子</b></summary>
+
+DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序取平均）；带播放器的同一组卡片见
+[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。重音与断句的真人示例音频来自 MSPB（CC BY 4.0）。
+
+| 能力 | 判断什么 | 示例 → 模型回答（DuplexJev-32B-Stress） |
+|---|---|---|
+| 话轮状态 | 用户是说完了、话说到一半、只是附和，还是让助手等一下？靠语调和节奏判断，不只看文字。 | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **说完了** 100%<br>🔊 [Could you turn the air conditioning down a little and, um —](docs/audio/ex3.wav) → **没说完** 99%<br>🔊 [Mm-hmm, yeah.](docs/audio/ex2.wav) → **只是附和** 100%<br>🔊 [等一下，我想想……](docs/audio/ex5.wav) → **让对方等一下** 100% |
+| 说话时被插话 | 助手正在说话时，分清用户是真的要打断，还是只在附和：该停下来听，还是继续说。 | 🔊 [Wait, wait — stop. That's not the address I asked for.](docs/audio/ex1.wav) → **停下来听** 100%<br>🔊 [Mm-hmm, yeah.](docs/audio/ex2.wav) → **继续说** 100% |
+| 不理会旁人的声音 | 旁边有人聊天、电视声或噪声，既不该让助手开口，也不该让它停下。 | 🔊 [哎你晚上吃什么？要不我们去吃火锅吧。——行啊，那我先订个位子。](docs/audio/ab_b1.wav) → **不出声，继续等（这不是对助手说的）** 100% |
+| 情绪 | 中性、高兴、生气或伤心，从声音里听出来，而不是从文字里猜。 | 🔊 [Wait, wait — stop. That's not the address I asked for.](docs/audio/ex1.wav) → **生气** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **高兴** 93%<br>🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **中性** 100% |
+| 说话人性别 | 听出说话人的性别——转写里没有这个信息。 | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **男性** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **女性** 100% |
+| 重音（强调哪个词） 🆕 | 同样的字，重读不同的词，意思就不同。模型能听出重读落在哪个词上，也能判断“没有特别强调”。 | 🔊 [**张昊**昨晚做烤肉。](docs/audio/ab_m1.wav) → **张昊** 100%<br>🔊 [张昊**昨晚**做烤肉。](docs/audio/ab_m2.wav) → **昨晚** 100%<br>🔊 [张昊昨晚**做烤肉**。](docs/audio/ab_m3.wav) → **做烤肉** 97%<br>🔊 [我明天去北京开会。](docs/audio/ab_n0.wav) → **没有特别强调哪个词** 96% |
+| 停顿与断句 🆕 | 在哪里停顿会改变句子结构：是一样东西还是两样，谁对谁做了什么。 | 🔊 [我买了巧克力雪糕｜和果汁。](docs/audio/ab_q1.wav) → **两样（巧克力雪糕、果汁）** 96%<br>🔊 [我买了巧克力｜雪糕｜和果汁。](docs/audio/ab_q2.wav) → **三样（巧克力、雪糕、果汁）** 98% |
+| 是谁在说 *（预览‡）* | 给一段参考声音，判断是不是同一个人。模型能学会粗粒度的判断，但远不如专用说话人模型，所以没有放进发布的模型。 | 官方 VoxCeleb1-H 列表：EER 29.6%（专用 x-vector 模型约 2–4%）。详见说话人识别研究笔记。 |
+
+</details>
 
 <details>
 <summary><b>常见判断任务的完整对比</b></summary>
@@ -104,6 +125,10 @@
 
 ## 2. 最新动态
 
+- **2026-10-08** —— 🤗 [**DuplexJev-32B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress)：在 DuplexJev-32B-Turn
+  基础上**听得懂重音和停顿**。重读的是哪个词：中文留出句 92 / 英文 88；中性语音答“没有特别强调”99%；主语言、性别、情绪、话轮
+  都在误差范围内持平。每种语音来源里都配了正负样本；“靠重音选意思”的题会拉低 VoiceBench，所以没有放进训练。
+  [研究笔记](research/2026-10-stress-understanding_zh.md)。
 - **2026-10-05** —— 📄 论文已上 arXiv：[arXiv:2610.02638](https://arxiv.org/abs/2610.02638)。🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)
   和 [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) 发布：话轮升级版（连接器 + rank 16 的 LoRA，
   用公开话轮数据训练）。32B-Turn：Easy-Turn 95.3，CoDeTT 零样本 69.2 / 70.0，qa100、性别、情绪都略有提升。
@@ -131,6 +156,7 @@
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | 服务器端，加重音与停顿 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | 94.4\* | **92.1** | **91.4** | 92.1 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡、端侧 | Qwen3-4B（加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
 
 话轮升级前的 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B)（总分 87.7）和 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)（78.6）
@@ -144,7 +170,7 @@
 qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，未做话轮训练）。它对提问措辞敏感（论文口径措辞下性别 78.5、
 情绪 60.9），所以没有放进上表；详见模型卡。
 
-**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B-Turn`，显卡小就用 `DuplexJev-4B-Turn`。Turn 版可以直接替换原版（提示词、插件都一样），
+**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B-Turn`；问题依赖重音或停顿（哪个词被强调、句子怎么断）就用 `DuplexJev-32B-Stress`；显卡小就用 `DuplexJev-4B-Turn`。Turn 版可以直接替换原版（提示词、插件都一样），
 我们跑的每项评测都持平或更好（在误差范围内）。32B 模型只用了 Qwen3-VL-32B 的语言模型部分，
 目前输入是音频和文字（图像输入在计划中）。
 
