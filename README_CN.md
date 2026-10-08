@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.02638">论文（arXiv:2610.02638）</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Para">DuplexJev-32B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Para">4B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-引用">引用</a>
@@ -65,7 +65,7 @@
 <summary><b>听懂文字之外的信息：每种能力一个例子</b></summary>
 
 DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序取平均）；带播放器的同一组卡片见
-[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。重音与断句的真人示例音频来自 MSPB（CC BY 4.0）。
+[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。重音与断句的真人示例音频来自 MSPB（CC BY 4.0）。最后三行（Para 版）给的是评测分数，不是示例。
 
 | 能力 | 判断什么 | 示例 → 模型回答（DuplexJev-32B-Stress） |
 |---|---|---|
@@ -76,7 +76,9 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 说话人性别 | 听出说话人的性别——转写里没有这个信息。 | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **男性** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **女性** 100% |
 | 重音（强调哪个词） 🆕 | 同样的字，重读不同的词，意思就不同。模型能听出重读落在哪个词上，也能判断“没有特别强调”。 | 🔊 [**张昊**昨晚做烤肉。](docs/audio/ab_m1.wav) → **张昊** 100%<br>🔊 [张昊**昨晚**做烤肉。](docs/audio/ab_m2.wav) → **昨晚** 100%<br>🔊 [张昊昨晚**做烤肉**。](docs/audio/ab_m3.wav) → **做烤肉** 97%<br>🔊 [我明天去北京开会。](docs/audio/ab_n0.wav) → **没有特别强调哪个词** 96% |
 | 停顿与断句 🆕 | 在哪里停顿会改变句子结构：是一样东西还是两样，谁对谁做了什么。 | 🔊 [我买了巧克力雪糕｜和果汁。](docs/audio/ab_q1.wav) → **两样（巧克力雪糕、果汁）** 96%<br>🔊 [我买了巧克力｜雪糕｜和果汁。](docs/audio/ab_q2.wav) → **三样（巧克力、雪糕、果汁）** 98% |
-| 是谁在说 *（预览‡）* | 给一段参考声音，判断是不是同一个人。模型能学会粗粒度的判断，但远不如专用说话人模型，所以没有放进发布的模型。 | 官方 VoxCeleb1-H 列表：EER 29.6%（专用 x-vector 模型约 2–4%）。详见说话人识别研究笔记。 |
+| 非语言声音 🆕（Para） | 笑声、呼吸、咳嗽、叹气、吸鼻子、清嗓子、打喷嚏、哭声，带“都没有”选项。 | 训练没见过的真人语音（NonverbalTTS 测试集），笑 / 呼吸 / 咳嗽 / 叹气 AUC：32B-Para 0.85 / 0.73 / 0.70 / 0.74，4B-Para 0.80 / 0.76 / 0.75 / 0.81（之前 0.40–0.73；AudioSet AST 检测器 0.71–0.85）。 |
+| 说话方式 🆕（Para） | 耳语、大喊、语速很快或很慢、音调特别高或特别低，还是正常说话。 | EARS 留出说话人 7 选 1：69%（32B-Para）/ 67%（4B-Para），之前 45–55%。 |
+| 是谁在说 🆕（Para） | 给一段声音样本，判断是不是同一个人。像人一样的粗略判断，远不如专用说话人模型，不能用来识别身份。 | AISHELL-1 同性别配对：EER 18%（32B-Para）/ 9%（4B-Para）；官方 VoxCeleb1-H 列表：40% / 37%（专用 x-vector 模型约 2–4%）。 |
 
 </details>
 
@@ -89,16 +91,18 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 已知系统状态，该怎么做 | CoDeTT 中 / 英（1.8 万，零样本） | **69.2 / 70.0** | Easy-Turn 37.9（中）· Smart-Turn-v3 51.4（英）· NAMO-Turn 59.5（中）· FireRedChat 65.4（英）· GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
 | 性别 | 800 条真实语音（AISHELL-1、LibriSpeech） | **91.5** | 只用转写训练的语音大模型：约 55（瞎猜） |
 | 情绪（4 类） | 800 条（ESD、CREMA-D） | **91.1** | 只用转写训练的语音大模型：约 28（瞎猜） |
-| 是不是同一个人（*预览‡*） | 官方 VoxCeleb1-H 列表：不同人之间性别和国籍相同（2,000 个试次） | **EER 29.6%**（4B）/ 31.2%（32B） | 只靠性别：瞎猜（50）；专用说话人模型（ECAPA-TDNN）：EER 约 2% |
+| 是不是同一个人 | 官方 VoxCeleb1-H 列表：不同人之间性别和国籍相同（2,000 个试次） | **EER 36.9%**（4B-Para）/ 40.3%（32B-Para）；研究 checkpoint‡ 29.6% / 31.2% | 只靠性别：瞎猜（50）；专用说话人模型（ECAPA-TDNN）：EER 约 2% |
+| 笑 / 呼吸 / 咳嗽 / 叹气 | NonverbalTTS 测试集（真人语音，训练未见），AUC | **0.85 / 0.73 / 0.70 / 0.74**（32B-Para） | AudioSet AST 检测器 0.71 / 0.75 / 0.85 / 0.76 |
 | 口语知识问答 | VoiceBench OBQA / MMSU | **85.5 / 72.1** | 同一大模型直接读文字：95.4 / 79.3 |
 
 其他系统的数字取自各自论文（Easy-Turn 表 2、CoDeTT、Dynamic-SUPERB Phase-2）。Easy-Turn 对 Easy-Turn 检测器和我们的模型都是域内评测。
-‡ 研究预览：用公开说话人验证配对训练的 checkpoint（训练数据不含 VoxCeleb1 说话人），未并入发布的模型，详见[研究笔记](research/2026-10-speaker-identity_zh.md)。随机配对里约一半的"不同人"性别也不同，只靠性别猜就能到 74%，所以只报困难配对。详见[第 5 节](#5-性能)。
+‡ 研究 checkpoint：只训练说话人验证（训练数据不含 VoxCeleb1 说话人），未发布；Para 版为了保住其他各项能力，在这一项上让了一些分，详见[研究笔记](research/2026-10-speaker-identity_zh.md)。随机配对里约一半的"不同人"性别也不同，只靠性别猜就能到 74%，所以只报困难配对。详见[第 5 节](#5-性能)。
 
 </details>
 
-**模型：**🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)（一张 80 GB 显卡）·
-🤗 [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn)（约 10 GB），用 vLLM 部署（[第 4 节](#4-快速上手)）。
+**模型：**🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)（一张 80 GB 显卡）·
+🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)（约 10 GB），用 vLLM 部署（[第 4 节](#4-快速上手)）。
+新增：还能听出**笑声、呼吸、咳嗽、叹气**，听出**怎么说**（耳语、大喊），并判断两段声音是不是**同一个人**——[试一试](#试试新能力)。
 
 ## 1. 简介
 
@@ -106,7 +110,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 现成 ASR 编码器的隐状态经连接器送入冻结的大模型；运行时声明的每个问题——*用户说完了吗？先说哪句垫话？说话的是谁？*——
 都读成**单个 token 上的闭集概率分布**：不做 ASR 解码，也不做文本解码。同一通电话的多个问题、乃至多通电话的问题，
 可以在同一次前向计算里一起完成。所有发布的模型都可以直接用 vLLM 部署（[第 3 节](#3-模型)）；推荐
-**[DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)**，显卡小用 **[DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn)**。
+**[DuplexJev-32B-Para](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)**，显卡小用 **[DuplexJev-4B-Para](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)**。
 
 ```
 音频 ──► Qwen3-ASR-0.6B 编码器（冻结）
@@ -125,6 +129,11 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 ## 2. 最新动态
 
+- **2026-10-09** —— 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 和
+  [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：一个模型里副语言能力最全的版本。在话轮、性别、
+  情绪、重音、停顿之外，还能听出**笑声、呼吸、咳嗽、叹气**（训练未见的真人语音上 AUC 0.70–0.85，之前 0.40–0.73），识别**说话方式**
+  （耳语、大喊、快慢……），并像人一样粗略判断**是不是同一个人**。4B-Para 也是主语言最强的 4B（qa100 79，VoiceBench 57.8 / 41.8），
+  现已成为 `duplexjev` 包（0.4）的默认模型。
 - **2026-10-08** —— 🤗 [**DuplexJev-32B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress)：在 DuplexJev-32B-Turn
   基础上**听得懂重音和停顿**。重读的是哪个词：中文留出句 92 / 英文 88；中性语音答“没有特别强调”99%；主语言、性别、情绪、话轮
   都在误差范围内持平。每种语音来源里都配了正负样本；“靠重音选意思”的题会拉低 VoiceBench，所以没有放进训练。同时发布
@@ -156,10 +165,23 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 | 服务器端，能力最全 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | 95 | 87 | 94.0\* | **92.1** | 89.5 | 91.4 | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | 小显卡，能力最全；`duplexjev` 默认模型 | 同 4B-Turn（再加一个 rank 16 LoRA） | 4.2 B | 约 10 GB | **79** | 50 | 91.5\* | 89.5 | 91.5 | **82.0** | CC BY-NC 4.0 |
+| 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | 服务器端，加重音与停顿 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡、端侧 | Qwen3-4B（加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | 小显卡，加重音与停顿 | 同 4B-Turn（再加一个 rank 16 LoRA） | 4.2 B | 约 10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
+
+**Para 版新增的能力**（AUC，0.5 为瞎猜；训练未见的真人语音：NonverbalTTS 测试集、第三方中文自然对话样本；说话人 EER 用 AISHELL-1 同性别配对）：
+
+| | 笑 | 呼吸 | 咳嗽 | 叹气 | 对话中的笑 / 呼吸 | 说话方式（7 类） | 是否同一人 EER |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
+| **32B-Para** | **0.85** | **0.73** | **0.70** | **0.74** | **0.80 / 0.78** | **69%** | 18% |
+| **4B-Para** | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
+
+代价很小，模型卡上都列了（32B-Para：情绪比 32B-Turn 低 1.6、Easy-Turn 低 1.2；4B-Para：ZJU-ML 比 4B-Turn 低 2、Easy-Turn 低 1）。
+说话人判断很粗略，像人一样，不能用来识别身份。
 
 Stress 版增加了重音和停顿理解（哪个词被重读：中文留出句 32B 92 / 4B 95，见[研究笔记](research/2026-10-stress-understanding_zh.md)）。32B-Stress 其余各项都与 32B-Turn 在误差内持平；**4B-Stress 用约 4 分 VoiceBench 换来这项能力**（42.0 / 38.2 对 46.4 / 41.7），所以小显卡默认仍推荐 4B-Turn。
 
@@ -175,7 +197,9 @@ Stress 版增加了重音和停顿理解（哪个词被重读：中文留出句 
 qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，未做话轮训练）。它对提问措辞敏感（论文口径措辞下性别 78.5、
 情绪 60.9），所以没有放进上表；详见模型卡。
 
-**怎么选。** 有 80 GB 显卡就用 `DuplexJev-32B-Turn`；问题依赖重音或停顿（哪个词被强调、句子怎么断）就用 `DuplexJev-32B-Stress`；显卡小就用 `DuplexJev-4B-Turn`（重音比主语言约 4 分 VoiceBench 更重要时用 `DuplexJev-4B-Stress`）。Turn 版可以直接替换原版（提示词、插件都一样），
+**怎么选。** 想一个模型听全声音里的信息（非语言声音、说话方式、说话人、重音、情绪、性别、话轮）就用 **Para** 版：
+80 GB 显卡用 `DuplexJev-32B-Para`，小显卡用 `DuplexJev-4B-Para`。最看重情绪和话轮的最后一分，用 `DuplexJev-32B-Turn` / `4B-Turn`；
+重音和停顿是主要需求，用 `DuplexJev-32B-Stress` / `4B-Stress`。Turn 版可以直接替换原版（提示词、插件都一样），
 我们跑的每项评测都持平或更好（在误差范围内）。32B 模型只用了 Qwen3-VL-32B 的语言模型部分，
 目前输入是音频和文字（图像输入在计划中）。
 
@@ -185,7 +209,7 @@ qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，
 
 ## 4. 快速上手
 
-**不需要显卡**——直接调我们的试用 API（DuplexJev-4B；有限流，不保存音频）：
+**不需要显卡**——直接调我们的试用 API（有限流，不保存音频）：
 
 ```bash
 pip install duplexjev
@@ -209,7 +233,7 @@ duplexjev quick call_zh.wav --api https://api.adventists.cn/duplexjev --lang zh
 
 ```bash
 pip install "vllm[audio]>=0.29" duplexjev-vllm
-vllm serve adventists-ai/DuplexJev-32B --max-model-len 4096      # 小显卡换成 adventists-ai/DuplexJev-4B
+vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096   # 大显卡换成 adventists-ai/DuplexJev-32B-Para
 duplexjev quick call.wav --vllm http://localhost:8000/v1 --lang zh   # 用默认判断表问自己的服务
 duplexjev gateway --vllm http://localhost:8000/v1 --port 8020        # 在前面套上这个网页 demo 和 HTTP API
 ```
@@ -231,6 +255,25 @@ dj.decide(open("call_018.wav", "rb").read(), {
 同一段音频的多个问题并发发送，在 vLLM 的前缀缓存里共用音频部分。用音频的语言提问（中文语音用中文问题和选项）。
 提示词格式和插件说明见[模型卡](https://huggingface.co/adventists-ai/DuplexJev-32B)和 [`vllm_plugin/`](vllm_plugin)。
 想用 PyTorch 包加载连接器 checkpoint，见 [docs/connectors_zh.md](docs/connectors_zh.md#pytorch-包)。
+
+### 试试新能力
+
+用 Para 模型（`vllm serve adventists-ai/DuplexJev-4B-Para`，或本地 `pip install "duplexjev[speech]"`）时，`duplexjev quick`
+的默认判断表多了两行：*非语言声音* 和 *说话方式*。也可以直接问（下面是模型训练时用的问法；记得保留“没有 / 都没有”选项）：
+
+```python
+dj.decide(clip_zh, {
+    "sound":  ("除了说话，这段音频里还有哪种声音？", ["笑声", "呼吸声", "咳嗽", "叹气", "都没有"]),
+    "laugh":  ("这段话里有没有笑声？", ["有", "没有"]),
+    "style":  ("说话人是用什么方式在说话？", ["小声耳语", "大声喊着说", "正常音量说话"]),
+    "stress": ("说话人是否重读（强调）了某个词？", ["张昊", "昨晚", "做烤肉", "没有强调任何词"]),
+}, lang="zh")
+```
+
+是不是同一个人：把一段声音样本和新的语音拼成一个文件，中间隔约 0.8 秒静音，问
+`"静音前是某人的一段声音样本，静音后是另一段语音。两段是同一个人吗？"`，选项 `["是不同的人", "是同一个人"]`
+（英文：`"Before the silence is a voice sample of someone; after it is another clip. Are they the same speaker?"`，`["different speakers", "same speaker"]`）。
+现成脚本：[`examples/para_abilities.py`](examples/para_abilities.py)。
 
 ## 5. 性能
 

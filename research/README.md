@@ -9,6 +9,7 @@ DuplexJev 背后那些没写进论文的实验和取舍：试过什么、哪些�
 
 | date | note | 中文 |
 |---|---|---|
+| 2026-10-09 | [One model, more of the voice: non-verbal sounds, speaking style and speaker on top of stress](2026-10-para-abilities.md) | [一个模型听出更多：非语言声音、说话方式和说话人](2026-10-para-abilities_zh.md) |
 | 2026-10-08 | [Teaching a speech-decision LLM to hear stress: data, two gates, negatives and the "source shortcut"](2026-10-stress-understanding.md) | [让语音判断大模型听懂重音](2026-10-stress-understanding_zh.md) |
 | 2026-10-06 | [Can a speech-decision LLM tell who is speaking? Shortcuts, probes and ten ablations](2026-10-speaker-identity.md) | [语音判断大模型能听出“是谁在说”吗？](2026-10-speaker-identity_zh.md) |
 | 2026-10-05 | [A rank-16 LoRA makes a speech-decision LLM a competitive turn-taking detector](2026-10-turn-taking-lora.md) | [一个 rank 16 的 LoRA，让话轮能力追上专用检测器](2026-10-turn-taking-lora_zh.md) |

@@ -27,7 +27,7 @@ def test_decide_one_clip(decider, clips):
 
 def test_packed_equals_one_row_per_question(decider, clips):
     for c in clips:
-        assert maxdiff(decider.decide(c, QS), decider.decide(c, QS, mode="batch")) < 1e-4
+        assert maxdiff(decider.decide(c, QS), decider.decide(c, QS, mode="batch")) < 5e-4  # fp32 CPU kernels differ by platform
 
 
 def test_decide_batch_routes_groups_to_clips(decider, clips):

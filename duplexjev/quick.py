@@ -1,14 +1,15 @@
 """One call from an audio clip to a table of decisions.
 
     from duplexjev import quick
-    quick("call.wav")                                   # default table of 8 decisions, printed and returned
+    quick("call.wav")                                   # default table of 10 decisions, printed and returned
     quick("call_zh.wav", lang="zh")                     # Chinese speech: Chinese questions
     quick("call.wav", questions=my_table)               # your own fixed option groups
 
 Where the model runs (first match wins):
     api="https://…/duplexjev"   a DuplexJev gateway (our hosted trial API or your own `duplexjev gateway`)
-    vllm="http://host:8000/v1"  your own `vllm serve adventists-ai/DuplexJev-4B`
-    model="adventists-ai/…"     local PyTorch with a connector checkpoint (needs `duplexjev[speech]` and a GPU)
+    vllm="http://host:8000/v1"  your own `vllm serve adventists-ai/DuplexJev-4B-Para`
+    model="adventists-ai/…"     local PyTorch: a complete model (default DuplexJev-4B-Para) or a connector checkpoint
+                                (needs `duplexjev[speech]` and a GPU)
     none of these               $DUPLEXJEV_API, then $DUPLEXJEV_VLLM, then the local default model
 """
 from __future__ import annotations
@@ -19,7 +20,7 @@ from typing import Any
 
 from .table import default_table, format_table
 
-DEFAULT_LOCAL_MODEL = "adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B"
+DEFAULT_LOCAL_MODEL = "adventists-ai/DuplexJev-4B-Para"
 _cache: dict = {}
 
 

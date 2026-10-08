@@ -103,6 +103,70 @@ def _build_processor(name_or_path: str, cfg):
     )
 
 
+FULL_ARCH = "DuplexJevForConditionalGeneration"
+
+
+def _local_dir(name_or_path: str) -> str:
+    """A local directory for ``name_or_path`` (downloads a Hugging Face repo when needed)."""
+    import os
+
+    if os.path.isdir(name_or_path):
+        return name_or_path
+    from huggingface_hub import snapshot_download
+
+    return snapshot_download(name_or_path, allow_patterns=["*.json", "*.txt", "*.safetensors", "*.jinja", "LICENSE*"])
+
+
+def _is_full_model(name_or_path: str) -> bool:
+    """True for a complete DuplexJev model (encoder + connector + LLM in one repo, e.g. DuplexJev-4B-Para)."""
+    import json
+    import os
+
+    try:
+        if os.path.isdir(name_or_path):
+            path = os.path.join(name_or_path, "config.json")
+        else:
+            from huggingface_hub import hf_hub_download
+
+            path = hf_hub_download(name_or_path, "config.json")
+        return FULL_ARCH in (json.load(open(path)).get("architectures") or [])
+    except Exception:  # noqa: BLE001 - not a full model (or no network): fall back to the connector path
+        return False
+
+
+def _load_full(name_or_path: str, *, dmap, dtype, dkw: str, **kwargs):
+    """Load a complete DuplexJev model with the vendored Ultravox code (no remote code needed)."""
+    import json
+    import os
+
+    import transformers
+
+    from . import _uv
+
+    path = _local_dir(name_or_path)
+    c = json.load(open(os.path.join(path, "config.json")))
+    c.pop("architectures", None)
+    c.update(text_model_id=None, audio_model_id=None)
+    cfg = _uv.UltravoxConfig(**c)
+    model = _uv.UltravoxModel.from_pretrained(path, config=cfg, device_map=dmap, **{dkw: dtype}, **kwargs)
+    tok = transformers.AutoTokenizer.from_pretrained(path)
+    tok.padding_side = "left"
+    if tok.pad_token is None:
+        tok.pad_token = tok.eos_token
+    fe = transformers.WhisperFeatureExtractor.from_pretrained(path)
+    ds = 8 if "qwen3_asr" in str(c.get("audio_config", {}).get("model_type", "")) else 2  # Qwen3-ASR encoder: 8x
+    pc = {"encoder_ds_factor": ds, "audio_context_size": 3000, "audio_padding": "longest"}
+    if os.path.exists(os.path.join(path, "processor_config.json")):
+        pc.update({k: v for k, v in json.load(open(os.path.join(path, "processor_config.json"))).items() if k in pc})
+    processor = _uv.UltravoxProcessor(
+        audio_processor=transformers.WhisperProcessor(feature_extractor=fe, tokenizer=tok),
+        tokenizer=tok,
+        stack_factor=cfg.stack_factor,
+        **pc,
+    )
+    return model, processor
+
+
 # ---------------------------------------------------------------------------------------------------------- engine
 class Decider:
     """Answer Jev-style option groups about speech with zero decode steps.
@@ -143,7 +207,8 @@ class Decider:
         audio_model: str | None = None,
         **kwargs,
     ) -> "Decider":
-        """Load a speech checkpoint (Ultravox format: encoder + connector, pointing to its frozen LLM).
+        """Load a speech checkpoint: a complete DuplexJev model (e.g. ``adventists-ai/DuplexJev-4B-Para``) or an
+        Ultravox-format checkpoint (encoder + connector, pointing to its frozen LLM).
 
         ``device="auto"`` shards the model over all visible GPUs (needs ``accelerate``).
         ``text_model`` / ``audio_model`` point the checkpoint at a local copy of *the same* LLM or encoder it was
@@ -158,6 +223,9 @@ class Decider:
         if dtype is None:
             dtype = torch.bfloat16 if str(device).startswith("cuda") or device == "auto" else torch.float32
         dmap = "auto" if device == "auto" else {"": device}
+        if not (text_model or audio_model) and _is_full_model(name_or_path):
+            model, processor = _load_full(name_or_path, dmap=dmap, dtype=dtype, dkw=dkw, **kwargs)
+            return cls(model, processor, device=None if device == "auto" else device)
         cfg = _load_config(name_or_path, text_model=text_model, audio_model=audio_model)
         if getattr(cfg, "model_type", "") != "ultravox":
             raise ValueError(

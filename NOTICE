@@ -17,3 +17,9 @@ Datasets
   Multilingual LibriSpeech, CoVoST 2, MUSAN) is NOT redistributed; see each dataset's license.
 - ZJU audio-gender-benchmark (https://github.com/Vsky-morigen/audio-gender-benchmark) is used for evaluation only and
   is NOT redistributed here. Its main-language subset includes ODSQA audio whose redistribution terms are unclear.
+- duplexjev/_uv/: model code vendored from Ultravox (https://github.com/fixie-ai/ultravox, MIT License, Copyright (c)
+  Fixie.ai) with DuplexJev changes, and the portable Qwen3-ASR encoder code (Qwen3-ASR, Apache-2.0, Alibaba Cloud).
+- DuplexJev-32B-Para / DuplexJev-4B-Para training data (not redistributed): VocalSound (CC BY-SA 4.0),
+  NonVerbalSpeech-38K (CC BY-NC 4.0), NonverbalTTS, EARS (CC BY-NC 4.0), Expresso (CC BY-NC 4.0), VoxCeleb1,
+  AISHELL-1, LibriSpeech, ARC (CC BY-SA 4.0), OpenBookQA, CommonsenseQA. Project-page examples: VocalSound
+  (CC BY-SA 4.0), NonverbalTTS/VoxCeleb (CC BY 4.0), AISHELL-1 (Apache-2.0).

@@ -1,7 +1,8 @@
-"""The default decision table: eight judgments a voice agent needs about every user turn.
+"""The default decision table: ten judgments a voice agent needs about every user turn.
 
-Turn state, gender and emotion use the exact wordings the DuplexJev models were trained on; the others are read
-zero-shot by the frozen LLM from what it hears. Edit a copy of the table to ask your own questions:
+Turn state, gender, emotion, non-verbal sounds and speaking style use the wordings the DuplexJev models were trained
+on (the last two need a Para model such as DuplexJev-4B-Para, the default); the others are read zero-shot by the LLM
+from what it hears. Edit a copy of the table to ask your own questions:
 
     from duplexjev import default_table, Question
     table = default_table("zh") + [Question("product", "用户在问哪个产品？", ["手机", "电脑", "其他"], lang="zh")]
@@ -22,6 +23,10 @@ _EN = [
     ("gender", "What is the perceived gender of the speaker?", ["female", "male"]),
     ("language", "Which language is the user speaking?", ["Chinese", "English", "other"]),
     ("human", "Does the user want to talk to a human agent?", ["yes", "no"]),
+    ("sound", "Besides speech, which sound can be heard in this audio?",
+     ["laughter", "breathing", "coughing", "a sigh", "None of these"]),
+    ("style", "How is the speaker talking?",
+     ["whispering", "speaking very loudly / shouting", "a normal speaking voice"]),
 ]
 
 _ZH = [
@@ -34,18 +39,22 @@ _ZH = [
     ("gender", "说话人的性别是？", ["男性", "女性"]),
     ("language", "用户说的是哪种语言？", ["中文", "英文", "其他"]),
     ("human", "用户是不是想转人工？", ["是", "不是"]),
+    ("sound", "除了说话，这段音频里还有哪种声音？", ["笑声", "呼吸声", "咳嗽", "叹气", "都没有"]),
+    ("style", "说话人是用什么方式在说话？", ["小声耳语", "大声喊着说", "正常音量说话"]),
 ]
 
 LABELS = {
     "en": {"turn": "turn state", "reply": "what to do", "barge_in": "barge-in", "intent": "intent",
-           "emotion": "emotion", "gender": "gender", "language": "language", "human": "wants a human"},
+           "emotion": "emotion", "gender": "gender", "language": "language", "human": "wants a human",
+           "sound": "non-verbal sound", "style": "speaking style"},
     "zh": {"turn": "话轮状态", "reply": "该怎么做", "barge_in": "打断/抢话", "intent": "意图",
-           "emotion": "情绪", "gender": "性别", "language": "语言", "human": "转人工"},
+           "emotion": "情绪", "gender": "性别", "language": "语言", "human": "转人工",
+           "sound": "非语言声音", "style": "说话方式"},
 }
 
 
 def default_table(lang: str = "en") -> list[Question]:
-    """The eight default questions in ``"en"`` or ``"zh"`` (ask in the language of the clip)."""
+    """The ten default questions in ``"en"`` or ``"zh"`` (ask in the language of the clip)."""
     rows = {"en": _EN, "zh": _ZH}[lang]
     return [Question(qid, text, opts, lang=lang) for qid, text, opts in rows]
 

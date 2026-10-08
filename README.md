@@ -13,7 +13,7 @@
   🎧 <a href="https://api.adventists.cn/duplexjev/">Try it online</a> &nbsp;|&nbsp;
   🌐 <a href="https://adventists-ai.github.io/duplexjev/">Project page</a> &nbsp;|&nbsp;
   📄 <a href="https://arxiv.org/abs/2610.02638">Paper (arXiv:2610.02638)</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">DuplexJev-32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
+  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Para">DuplexJev-32B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Para">4B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
   📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
   📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
   📝 <a href="#10-citation">Citation</a>
@@ -71,7 +71,7 @@ is speaking and how (paralinguistics):
 <summary><b>What it hears beyond the words: one example per ability</b></summary>
 
 Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on short clips; the same cards, with a player, are on the
-[project page](https://adventists-ai.github.io/duplexjev/#abilities). Real-speech stress and phrasing clips: MSPB (CC BY 4.0).
+[project page](https://adventists-ai.github.io/duplexjev/#abilities). Real-speech stress and phrasing clips: MSPB (CC BY 4.0). The last three rows (Para models) give benchmark scores instead of examples.
 
 | ability | what it decides | examples → model answer (DuplexJev-32B-Stress) |
 |---|---|---|
@@ -82,7 +82,9 @@ Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on shor
 | Speaker gender | Perceived gender of the voice, a cue a transcript does not carry. | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **male** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **female** 100% |
 | Stress (word focus) 🆕 | Same words, different stressed word, different meaning. The model tells which word carries the stress, and also when no word is stressed. | 🔊 [**张昊**昨晚做烤肉。](docs/audio/ab_m1.wav) → **张昊 (Zhang Hao)** 100%<br>🔊 [张昊**昨晚**做烤肉。](docs/audio/ab_m2.wav) → **昨晚 (last night)** 100%<br>🔊 [张昊昨晚**做烤肉**。](docs/audio/ab_m3.wav) → **做烤肉 (made barbecue)** 97%<br>🔊 [我明天去北京开会。](docs/audio/ab_n0.wav) → **no word is particularly emphasized** 96% |
 | Pauses and phrasing 🆕 | Where the speaker pauses can change the structure of a sentence: one item or two, who did what to whom. | 🔊 [我买了巧克力雪糕｜和果汁。](docs/audio/ab_q1.wav) → **two (chocolate ice cream, juice)** 96%<br>🔊 [我买了巧克力｜雪糕｜和果汁。](docs/audio/ab_q2.wav) → **three (chocolate, ice cream, juice)** 98% |
-| Who is speaking *(preview‡)* | Same speaker or not, given a reference clip. The model learns a coarse version of this, far behind dedicated speaker models, so it is not in the released models. | Official VoxCeleb1-H list: EER 29.6% (dedicated x-vector model: ~2–4%). Details in the research note on speaker identity. |
+| Non-verbal sounds 🆕 (Para) | Laughter, breathing, coughs, sighs, sniffing, throat clearing, sneezes, crying, with a "none" option. | Unseen real speech (NonverbalTTS test), AUC laughter / breathing / cough / sigh: 32B-Para 0.85 / 0.73 / 0.70 / 0.74, 4B-Para 0.80 / 0.76 / 0.75 / 0.81 (before: 0.40–0.73; an AudioSet AST tagger: 0.71–0.85). |
+| Speaking style 🆕 (Para) | Whispering, shouting, very fast or slow, unusually high or low pitch, or a normal voice. | 7-way on held-out EARS speakers: 69% (32B-Para) / 67% (4B-Para), from 45–55%. |
+| Who is speaking 🆕 (Para) | Same speaker or not, given a voice sample. A coarse, human-like sense of "same voice", far behind dedicated speaker models; not for identifying people. | Same-gender AISHELL-1 pairs: EER 18% (32B-Para) / 9% (4B-Para); official VoxCeleb1-H list: 40% / 37% (dedicated x-vector model: ~2–4%). |
 
 </details>
 
@@ -95,18 +97,21 @@ Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on shor
 | what to do, system state given | CoDeTT zh / en (18 k, zero-shot) | **69.2 / 70.0** | Easy-Turn 37.9 (zh) · Smart-Turn-v3 51.4 (en) · NAMO-Turn 59.5 (zh) · FireRedChat 65.4 (en) · GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
 | gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
 | emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) |
-| same speaker? *(preview‡)* | official VoxCeleb1-H list: different speakers share gender and nationality (2,000 trials) | **EER 29.6%** (4B) / 31.2% (32B) | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
+| same speaker? | official VoxCeleb1-H list: different speakers share gender and nationality (2,000 trials) | **EER 36.9%** (4B-Para) / 40.3% (32B-Para); research checkpoints‡ 29.6% / 31.2% | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
+| laughter / breathing / cough / sigh | NonverbalTTS test (real speech, unseen), AUC | **0.85 / 0.73 / 0.70 / 0.74** (32B-Para) | AudioSet AST tagger 0.71 / 0.75 / 0.85 / 0.76 |
 | spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
 
 Other systems' numbers are from their papers (Easy-Turn Table 2, CoDeTT, Dynamic-SUPERB Phase-2). Easy-Turn is in-domain
-for both the Easy-Turn detector and our model. ‡ Research preview: checkpoints trained on public speaker-verification
-pairs (no VoxCeleb1 speakers), not part of the released models; see the [research note](research/2026-10-speaker-identity.md). On random pairs about half of the different-speaker pairs also differ in
+for both the Easy-Turn detector and our model. ‡ Research checkpoints trained only for speaker verification
+(no VoxCeleb1 speakers), not released; the Para models trade some of that for keeping every other ability; see the [research note](research/2026-10-speaker-identity.md). On random pairs about half of the different-speaker pairs also differ in
 gender, so a gender-only guess already reaches 74%; we therefore report hard pairs only. Details: [§5](#5-performance).
 
 </details>
 
-**Models:** 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) (one 80 GB GPU) ·
-🤗 [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) (~10 GB), served with vLLM ([§4](#4-quick-start)).
+**Models:** 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) (one 80 GB GPU) ·
+🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) (~10 GB), served with vLLM ([§4](#4-quick-start)).
+New: they also hear **laughter, breathing, coughs and sighs**, **how** someone is talking (whispering, shouting) and
+whether two clips are **the same speaker** — [try it](#try-the-new-abilities).
 
 ## 1. Introduction
 
@@ -115,8 +120,8 @@ gender, so a gender-only guess already reaches 74%; we therefore report hard pai
 LLM, and every runtime-declared question — *is the turn complete? which filler to play? who is speaking?* — is read
 as a **single-token, closed-set distribution**: no ASR decoding, no text decoding. Many questions, about one call or
 across many calls, share one forward pass. All released models are ready to serve with vLLM ([§3](#3-models)); we
-recommend **[DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)**, or
-**[DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn)** on smaller GPUs.
+recommend **[DuplexJev-32B-Para](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)**, or
+**[DuplexJev-4B-Para](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)** on smaller GPUs.
 
 ```
 audio ──► Qwen3-ASR-0.6B encoder (frozen)
@@ -138,6 +143,12 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
+- **2026-10-09** — 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) and
+  [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the widest set of paralinguistic
+  abilities in one model. On top of turn-taking, gender, emotion, stress and pauses they hear **laughter, breathing,
+  coughs and sighs** (AUC 0.70–0.85 on unseen real speech, from 0.40–0.73), recognise **speaking style** (whisper,
+  shouting, fast, slow …) and judge **same speaker or not** roughly as a person would. 4B-Para is also the strongest
+  4B on spoken QA (qa100 79, VoiceBench 57.8 / 41.8) and is now the default model of the `duplexjev` package (0.4).
 - **2026-10-08** — 🤗 [**DuplexJev-32B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress): DuplexJev-32B-Turn
   that also hears **stress and pauses**. Which word is stressed: 92 (Mandarin, held-out sentences) / 88 (English); neutral speech
   answered "no word is stressed" 99%; spoken QA, gender, emotion and turn-taking unchanged within noise. Trained with balanced
@@ -171,10 +182,25 @@ Each model is **one repository with everything needed** (audio encoder + trained
 
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 | server, widest set of abilities | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | 95 | 87 | 94.0\* | **92.1** | 89.5 | 91.4 | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | small GPU, widest set of abilities; `duplexjev` default | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | **79** | 50 | 91.5\* | 89.5 | 91.5 | **82.0** | CC BY-NC 4.0 |
+| 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | small GPU, edge | Qwen3-4B (+ rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 4.2 B | ~10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | small GPU, + stress and pauses | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
+
+**What the Para models add** (AUC, 0.5 = chance; unseen real speech from the NonverbalTTS test set and a third-party
+sample of natural Mandarin conversation; speaker EER on same-gender AISHELL-1 pairs):
+
+| | laughter | breathing | cough | sigh | laughter / breathing in conversation | speaking style (7 classes) | same speaker? EER |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
+| **32B-Para** | **0.85** | **0.73** | **0.70** | **0.74** | **0.80 / 0.78** | **69%** | 18% |
+| **4B-Para** | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
+
+The costs are small and listed on the model cards (32B-Para: emotion −1.6 and Easy-Turn −1.2 vs 32B-Turn;
+4B-Para: ZJU-ML −2, Easy-Turn −1 vs 4B-Turn). Speaker judgments are coarse, human-like, and must not be used to
+identify people.
 
 The Stress models add stress and pause understanding (which word is stressed: 92 / 95 on held-out Mandarin sentences for 32B / 4B; see the [research note](research/2026-10-stress-understanding.md)). 32B-Stress matches 32B-Turn on every other benchmark within noise. **4B-Stress trades about 4 points of VoiceBench** (42.0 / 38.2 vs 46.4 / 41.7) for it, so 4B-Turn stays the default small model.
 
@@ -193,8 +219,10 @@ Qwen3-ASR-0.6B encoder, ~58 GB, one 80 GB GPU, CC BY-NC 4.0). No turn-taking tra
 90.6; Easy-Turn 68.0 zero-shot (no turn-taking training). It is sensitive to question wording (paper-protocol wording:
 gender 78.5, emotion 60.9), so it is not in the table above; details on its model card.
 
-**Which one to use.** `DuplexJev-32B-Turn` wherever an 80 GB GPU is available; `DuplexJev-32B-Stress` if your questions
-depend on stress or pauses (which word is emphasised, how a sentence is phrased); `DuplexJev-4B-Turn` on smaller GPUs, or `DuplexJev-4B-Stress` there if stress matters more than about 4 points of spoken QA. The Turn
+**Which one to use.** The **Para** models if you want everything the voice carries (non-verbal sounds, speaking style,
+speaker, stress, emotion, gender, turn-taking) in one model — `DuplexJev-32B-Para` on an 80 GB GPU, `DuplexJev-4B-Para`
+on smaller GPUs. `DuplexJev-32B-Turn` / `4B-Turn` if the last point of emotion and turn-taking matters most;
+`DuplexJev-32B-Stress` / `4B-Stress` if stress and pauses are the main thing. The Turn
 models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
 use only the language model of Qwen3-VL-32B: their inputs are audio and text for now (image input is planned).
 
@@ -204,7 +232,7 @@ use only the language model of Qwen3-VL-32B: their inputs are audio and text for
 
 ## 4. Quick start
 
-**Without a GPU** — ask our trial API (DuplexJev-4B; rate-limited, audio is not stored):
+**Without a GPU** — ask our trial API (rate-limited, audio is not stored):
 
 ```bash
 pip install duplexjev
@@ -229,7 +257,7 @@ The same page with a recorder is at [api.adventists.cn/duplexjev](https://api.ad
 
 ```bash
 pip install "vllm[audio]>=0.29" duplexjev-vllm
-vllm serve adventists-ai/DuplexJev-32B --max-model-len 4096      # or adventists-ai/DuplexJev-4B
+vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096   # or adventists-ai/DuplexJev-32B-Para
 duplexjev quick call.wav --vllm http://localhost:8000/v1           # the default table against your server
 duplexjev gateway --vllm http://localhost:8000/v1 --port 8020      # this web demo + HTTP API in front of it
 ```
@@ -255,6 +283,27 @@ The questions about one clip are sent concurrently and share the audio prefix in
 language of the clip. The prompt format and the plugin are described on the
 [model card](https://huggingface.co/adventists-ai/DuplexJev-32B) and in [`vllm_plugin/`](vllm_plugin).
 To use a connector checkpoint with the PyTorch package instead, see [docs/connectors.md](docs/connectors.md#pytorch-package).
+
+### Try the new abilities
+
+With a Para model (`vllm serve adventists-ai/DuplexJev-4B-Para`, or locally with `pip install "duplexjev[speech]"`), the
+default table of `duplexjev quick` has two more rows, *non-verbal sound* and *speaking style*. Or ask directly
+(these are the wordings the models were trained on; always keep a "none" option):
+
+```python
+dj.decide(clip, {
+    "laugh":  ("Is there laughter in this audio?", ["Yes", "No"]),
+    "sound":  ("Besides speech, which sound can be heard in this audio?", ["laughter", "breathing", "coughing", "a sigh", "None of these"]),
+    "style":  ("How is the speaker talking?", ["whispering", "speaking very loudly / shouting", "a normal speaking voice"]),
+    "stress": ("Does the speaker stress one of these words, or none of them?", ["I", "say", "money", "None of these words is emphasized"]),
+})
+dj.decide(clip_zh, {"sound": ("除了说话，这段音频里还有哪种声音？", ["笑声", "呼吸声", "咳嗽", "叹气", "都没有"])}, lang="zh")
+```
+
+Same speaker or not: put a voice sample and the new clip in one file with about 0.8 s of silence between them and ask
+`"Before the silence is a voice sample of someone; after it is another clip. Are they the same speaker?"` with options
+`["different speakers", "same speaker"]` (Chinese: `"静音前是某人的一段声音样本，静音后是另一段语音。两段是同一个人吗？"`, `["是不同的人", "是同一个人"]`).
+Ready-made scripts: [`examples/para_abilities.py`](examples/para_abilities.py).
 
 ## 5. Performance
 
