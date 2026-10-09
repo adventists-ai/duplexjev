@@ -1,0 +1,78 @@
+--- ultravox/model/ultravox_data_proc.py.bak_chat	2026-10-09 13:34:13.974816485 +0800
++++ ultravox/model/ultravox_data_proc.py	2026-10-09 15:27:21.379635618 +0800
+@@ -1,3 +1,4 @@
++import torch
+ from typing import Any, Dict, Optional
+ 
+ import numpy as np
+@@ -95,7 +96,7 @@
+         # Process audio and text using UltravoxProcessor.
+         # Audio is expanded to be a [C x M] array, although C=1 for mono audio.
+         audio = (
+-            np.expand_dims(sample.audio, axis=0) if sample.audio is not None else None
++            np.expand_dims(sample.audio, axis=0) if sample.audio is not None and "<|audio|>" in text else None
+         )
+         inputs = self.processor(
+             text=text,
+@@ -104,6 +105,13 @@
+             sampling_rate=sample.sample_rate,
+         )
+ 
++        if audio is None and "audio_batch_size" not in inputs:  # text-only row (Claude 2026-10-09)
++            # Give it ONE dummy audio chunk that inserts zero tokens (audio_token_len 0): accelerate splits the per-chunk audio
++            # tensors across ranks along dim 0, so every row must own exactly one chunk or rows and chunks get misaligned.
++            _d = self.processor(text="<|audio|>", audios=np.zeros((1, 16000), np.float32), return_tensors="pt", sampling_rate=16000)
++            for _k in ("audio_values", "audio_lens"):
++                inputs[_k] = _d[_k]
++            inputs["audio_batch_size"] = torch.tensor([1]); inputs["audio_token_len"] = torch.tensor([0]); inputs["audio_token_start_idx"] = torch.tensor([0])
+         # Extract input_ids, attention_mask, and audio_values from the processed inputs
+         input_ids = inputs["input_ids"].squeeze_(0)
+         inputs["attention_mask"].squeeze_(0)
+@@ -141,7 +149,7 @@
+             inputs["alt_labels"] = alt_labels.tolist()
+             if __import__("os").environ.get("ML_ASR_MIXED_LOSS") == "1":
+                 _ans = (sample.messages[-1].get("content") or "").strip()
+-                if len(_ans) == 1 and "A" <= _ans <= "Z":
++                if (len(_ans) == 1 and "A" <= _ans <= "Z") or not (sample.audio_transcript or "").strip():
+                     inputs["alt_labels"] = [-100] * len(inputs["alt_labels"])
+ 
+         # Truncate the input_ids and labels if the response is longer than max_response_tokens
+--- ultravox/model/ultravox_processing.py.bak_chat	2026-10-09 15:03:51.730130954 +0800
++++ ultravox/model/ultravox_processing.py	2026-10-09 15:03:51.730130954 +0800
+@@ -54,6 +54,14 @@
+     include_alt_fields: bool = False
+ 
+     def __call__(self, features, *args, **kwargs):
++        # Claude 2026-10-09: keep audio_batch_size consistent with the audio chunks actually present (text-only rows = 0)
++        for f in features:
++            _n = len(f["audio_values"]) if "audio_values" in f else 0
++            _g = f.get("audio_batch_size")
++            if _g is None or int(torch.as_tensor(_g).reshape(-1)[0]) != _n:
++                if _g is not None:
++                    print(f"[ABS-FIX] audio_batch_size {torch.as_tensor(_g).tolist()} -> {_n}; keys={sorted(f.keys())}", flush=True)
++                f["audio_batch_size"] = torch.tensor([_n])
+         audio_values = [x for f in features for x in f.pop("audio_values", [])]
+         audio_lens = [x for f in features for x in f.pop("audio_lens", [])]
+         audio_token_len = [x for f in features for x in f.pop("audio_token_len", [])]
+--- ultravox/data/datasets.py.bak_chat	2026-10-09 15:05:11.322226627 +0800
++++ ultravox/data/datasets.py	2026-10-09 15:05:11.322226627 +0800
+@@ -37,7 +37,7 @@
+     """
+     messages = []
+ 
+-    if sys_prompt is not None:
++    if sys_prompt:  # Claude 2026-10-09: empty per-row system prompt = no system message
+         messages.append({"role": "system", "content": sys_prompt})
+ 
+     if message_history is not None:
+--- ultravox/model/ultravox_model.py  (mixed loss, CE branch)
++++ ultravox/model/ultravox_model.py
+@@
+-                _ce_loss = F.cross_entropy(_lg.reshape(-1, _lg.size(-1)), _lb.reshape(-1), ignore_index=-100)
++                # ML_ASR_CE_ROWNORM=1: average the loss within each row first, then over rows. Token averaging lets long
++                # conversation-replay rows (up to 256 tokens) swamp the 1-token decision rows.
++                if __import__("os").environ.get("ML_ASR_CE_ROWNORM") == "1":
++                    _tok = F.cross_entropy(_lg.reshape(-1, _lg.size(-1)), _lb.reshape(-1), ignore_index=-100, reduction="none").view(_lb.shape)
++                    _m = (_lb != -100).float(); _ce_loss = ((_tok * _m).sum(-1) / _m.sum(-1).clamp(min=1)).mean()
++                else:
++                    _ce_loss = F.cross_entropy(_lg.reshape(-1, _lg.size(-1)), _lb.reshape(-1), ignore_index=-100)

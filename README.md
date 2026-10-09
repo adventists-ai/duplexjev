@@ -143,6 +143,8 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
+- **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Not in a released checkpoint yet. Real examples, including the misses, on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
+- **2026-10-10** — 🤗 [**DuplexJev-4B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the same small model now also **holds a normal conversation**, multi-turn included, while keeping the decision scores of v1.0 (conversation replay in the LoRA stage, per-row loss). v1.0 stays available as revision `v1.0`. [Research note](research/2026-10-chat-replay.md).
 - **2026-10-09** — 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) and
   [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the widest set of paralinguistic
   abilities in one model. On top of turn-taking, gender, emotion, stress and pauses they hear **laughter, breathing,
@@ -183,7 +185,7 @@ Each model is **one repository with everything needed** (audio encoder + trained
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 | server, widest set of abilities | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | 95 | 87 | 94.0\* | **92.1** | 89.5 | 91.4 | CC BY-NC 4.0 |
-| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | small GPU, widest set of abilities; `duplexjev` default | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | **79** | 50 | 91.5\* | 89.5 | 91.5 | **82.0** | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | small GPU, widest set of abilities, **and normal conversation** (v1.1); `duplexjev` default | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 77 | **58** | 91.0\* | 89.2 | 90.0 | **82.5** | CC BY-NC 4.0 |
 | 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | small GPU, edge | Qwen3-4B (+ rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 4.2 B | ~10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
@@ -196,11 +198,16 @@ sample of natural Mandarin conversation; speaker EER on same-gender AISHELL-1 pa
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
 | **32B-Para** | **0.85** | **0.73** | **0.70** | **0.74** | **0.80 / 0.78** | **69%** | 18% |
-| **4B-Para** | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
+| **4B-Para** v1.1 | 0.81 | 0.77 | 0.77 | 0.71 | 0.85 / 0.74 | 67% | ≈ v1.0 (9%)¹ |
+| 4B-Para v1.0 | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
+
+¹ v1.1 was not re-run on the AISHELL-1 pairs; on VoxCeleb1 hard pairs its EER is 42.0% vs 41.8% for v1.0.
 
 The costs are small and listed on the model cards (32B-Para: emotion −1.6 and Easy-Turn −1.2 vs 32B-Turn;
 4B-Para: ZJU-ML −2, Easy-Turn −1 vs 4B-Turn). Speaker judgments are coarse, human-like, and must not be used to
 identify people.
+
+**DuplexJev-4B-Para v1.1 (2026-10-10)** is trained with conversation replay, so the same weights also hold a normal conversation. Decision scores are within 0.5–2.6 points of v1.0 (still available as revision `v1.0`); see the [research note](research/2026-10-chat-replay.md). The 32B version is training.
 
 The Stress models add stress and pause understanding (which word is stressed: 92 / 95 on held-out Mandarin sentences for 32B / 4B; see the [research note](research/2026-10-stress-understanding.md)). 32B-Stress matches 32B-Turn on every other benchmark within noise. **4B-Stress trades about 4 points of VoiceBench** (42.0 / 38.2 vs 46.4 / 41.7) for it, so 4B-Turn stays the default small model.
 

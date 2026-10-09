@@ -129,6 +129,8 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 ## 2. 最新动态
 
+- **2026-10-10** —— 🔬 研究预览：**图像 + 语音一起判断。** DuplexJev-32B-Para 的语言模型就是 Qwen3-VL 的，视觉编码器可以直接接回去；再加一层 LoRA，它能把听到的和看到的对起来（留出的合成测试集上：重读词 vs 标红词 94.1，语气 vs 表情 93.5，声音 vs 文字说明 97.5；只给图 = 50）。尚未并入发布的 checkpoint。真实案例（包括答错的）见[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。
+- **2026-10-10** —— 🤗 [**DuplexJev-4B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：同一个小模型现在也能**正常聊天**（包括多轮），判断类成绩与 v1.0 基本持平（LoRA 阶段加入对话回放、按行平均损失）。v1.0 仍可用 revision `v1.0` 下载。[研究笔记](research/2026-10-chat-replay_zh.md)。
 - **2026-10-09** —— 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 和
   [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：一个模型里副语言能力最全的版本。在话轮、性别、
   情绪、重音、停顿之外，还能听出**笑声、呼吸、咳嗽、叹气**（训练未见的真人语音上 AUC 0.70–0.85，之前 0.40–0.73），识别**说话方式**
@@ -166,7 +168,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 | 服务器端，能力最全 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | 95 | 87 | 94.0\* | **92.1** | 89.5 | 91.4 | CC BY-NC 4.0 |
-| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | 小显卡，能力最全；`duplexjev` 默认模型 | 同 4B-Turn（再加一个 rank 16 LoRA） | 4.2 B | 约 10 GB | **79** | 50 | 91.5\* | 89.5 | 91.5 | **82.0** | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | 小显卡，能力最全，**也能正常聊天**（v1.1）；`duplexjev` 默认模型 | 同 4B-Turn（再加一个 rank 16 LoRA） | 4.2 B | 约 10 GB | 77 | **58** | 91.0\* | 89.2 | 90.0 | **82.5** | CC BY-NC 4.0 |
 | 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | 服务器端，加重音与停顿 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡、端侧 | Qwen3-4B（加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
@@ -178,10 +180,15 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
 | **32B-Para** | **0.85** | **0.73** | **0.70** | **0.74** | **0.80 / 0.78** | **69%** | 18% |
-| **4B-Para** | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
+| **4B-Para** v1.1 | 0.81 | 0.77 | 0.77 | 0.71 | 0.85 / 0.74 | 67% | ≈ v1.0 (9%)¹ |
+| 4B-Para v1.0 | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
+
+¹ v1.1 没有在 AISHELL-1 配对上重测；在 VoxCeleb1 困难配对上 EER 为 42.0%（v1.0 为 41.8%）。
 
 代价很小，模型卡上都列了（32B-Para：情绪比 32B-Turn 低 1.6、Easy-Turn 低 1.2；4B-Para：ZJU-ML 比 4B-Turn 低 2、Easy-Turn 低 1）。
 说话人判断很粗略，像人一样，不能用来识别身份。
+
+**DuplexJev-4B-Para v1.1（2026-10-10）** 加入了对话回放训练，同一份权重还能正常聊天。判断类成绩与 v1.0 相差 0.5–2.6 分（v1.0 仍可用 revision `v1.0` 下载），见[研究笔记](research/2026-10-chat-replay_zh.md)。32B 版正在训练。
 
 Stress 版增加了重音和停顿理解（哪个词被重读：中文留出句 32B 92 / 4B 95，见[研究笔记](research/2026-10-stress-understanding_zh.md)）。32B-Stress 其余各项都与 32B-Turn 在误差内持平；**4B-Stress 用约 4 分 VoiceBench 换来这项能力**（42.0 / 38.2 对 46.4 / 41.7），所以小显卡默认仍推荐 4B-Turn。
 
