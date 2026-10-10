@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://huggingface.co/spaces/adventists-ai/DuplexJev-demo"><img src="https://img.shields.io/badge/%F0%9F%8E%A7%20Try%20it-in%20your%20browser-22D3A6?style=for-the-badge" alt="Try it in your browser"></a>
+  <a href="https://huggingface.co/spaces/BitKnight/DuplexJev"><img src="https://img.shields.io/badge/%F0%9F%8E%A7%20Try%20it-in%20your%20browser-22D3A6?style=for-the-badge" alt="Try it in your browser"></a>
   <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/badge/%E2%AD%90-Star%20on%20GitHub-181717?style=for-the-badge&logo=github" alt="Star on GitHub"></a>
   <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff?style=for-the-badge" alt="Pipecat plugin"></a>
 </p>
@@ -31,7 +31,7 @@
 </p>
 
 <p align="center"><img src="docs/assets/race.gif" alt="Ten decisions: DuplexJev 92 ms vs ASR → LLM 1,978 ms on the same H200" width="820"></p>
-<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 38-second video (with sound)</a> · answers shown are real model outputs</sub></p>
+<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 90-second video (with sound)</a> · answers shown are real model outputs</sub></p>
 
 | why voice teams switch | **DuplexJev** | the usual way |
 |---|:---:|---|

@@ -27,11 +27,11 @@
   <a href="https://arxiv.org/abs/2610.02638"><img src="https://img.shields.io/badge/arXiv-2610.02638-b31b1b" alt="arXiv"></a>
   <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-%E5%BC%80%E6%94%BE%E6%9D%83%E9%87%8D%204B%20%C2%B7%2032B-yellow" alt="开放权重"></a>
   <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
-  <a href="https://huggingface.co/spaces/adventists-ai/DuplexJev-demo"><img src="https://img.shields.io/badge/%F0%9F%A4%97-HF%20%E6%BC%94%E7%A4%BA-orange" alt="HF 演示"></a>
+  <a href="https://huggingface.co/spaces/BitKnight/DuplexJev"><img src="https://img.shields.io/badge/%F0%9F%A4%97-HF%20%E6%BC%94%E7%A4%BA-orange" alt="HF 演示"></a>
 </p>
 
 <p align="center"><img src="docs/assets/race.gif" alt="十个判断：DuplexJev 92 毫秒，ASR → LLM 1,978 毫秒，同一张 H200" width="820"></p>
-<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">看 38 秒视频（有声音）</a> · 画面里的答案都是模型真实输出</sub></p>
+<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch_zh.mp4">看 2 分钟中文介绍视频（有声音）</a> · 画面里的答案都是模型真实输出</sub></p>
 
 | 为什么换 | **DuplexJev** | 常规做法 |
 |---|:---:|---|
