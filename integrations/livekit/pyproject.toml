@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "livekit-plugins-duplexjev"
+dynamic = ["version"]
+description = "Audio end-of-turn detection for LiveKit Agents with DuplexJev: turn state, emotion and non-verbal sounds from one request, no transcript needed."
+readme = "README.md"
+license = { text = "BSD-2-Clause" }
+authors = [{ name = "Jie Jin", email = "jiejin@adventists.ai" }]
+requires-python = ">=3.10"
+dependencies = ["livekit-agents>=1.8,<2", "aiohttp", "numpy"]
+keywords = ["livekit", "livekit-agents", "turn-detection", "end-of-turn", "voice-agent", "speech-llm", "duplexjev"]
+classifiers = [
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: BSD License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Multimedia :: Sound/Audio :: Speech",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8", "pytest-asyncio>=0.23"]
+
+[project.urls]
+Homepage = "https://github.com/adventists-ai/duplexjev/tree/main/integrations/livekit"
+Models = "https://huggingface.co/adventists-ai/DuplexJev-4B-Para"
+Paper = "https://arxiv.org/abs/2610.02638"
+
+[tool.hatch.version]
+path = "livekit/plugins/duplexjev/version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["livekit"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/livekit", "/tests", "/examples", "README.md", "LICENSE", "CHANGELOG.md"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
