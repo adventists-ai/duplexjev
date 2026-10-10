@@ -14,7 +14,8 @@
 <p align="center">
   <b>DuplexJev：语音智能体的“反射神经”。</b><br>
   用户说完了吗？我该不该停？他生气了吗？该接哪句垫词？<br>
-  全部直接从原始语音读出，<b>一次前向</b>：<b>10 个判断 92 毫秒</b>，比 ASR → LLM 级联<b>快 21 倍</b>。
+  全部直接从原始语音读出，<b>一次前向</b>：<b>10 个判断 92 毫秒</b>，比 ASR → LLM 级联<b>快 21 倍</b>。<br>
+  👁️ <b>新：它还看得见。</b><a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> 在同一次前向里把声音和画面对照着判断（预览版）。
 </p>
 
 <p align="center">
@@ -32,7 +33,7 @@
 </p>
 
 <p align="center"><img src="docs/assets/race.gif" alt="十个判断：DuplexJev 92 毫秒，ASR → LLM 1,978 毫秒，同一张 H200" width="820"></p>
-<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch_zh.mp4">看 2 分钟中文介绍视频（有声音）</a> · 画面里的答案都是模型真实输出</sub></p>
+<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch_zh.mp4">看 2 分半中文介绍视频（有声音）</a> · 画面里的答案都是模型真实输出</sub></p>
 
 | 为什么换 | **DuplexJev** | 常规做法 |
 |---|:---:|---|
@@ -42,6 +43,7 @@
 | 👂 从声音听情绪（四分类） | **91** | 约 28（只用转写训练的语音大模型） |
 | 🎯 话轮判断，CoDeTT 英文零样本 | **70.0** | 51.4（Smart Turn v3） |
 | 🔊 重音、停顿、笑声、呼吸、叹气 | **听得到** | 转写里全丢了 |
+| 👁️ 声音 + 画面，一次前向（新，预览） | 标红词 = 重读词 **94.1** · 表情 ↔ 语气 **93.5** | 只看图 50（瞎猜） |
 | 🧩 新增一种判断 | **运行时加一行文字** | 重新采数据、重新训模型 |
 
 **30 秒看到结果：**

@@ -14,7 +14,8 @@
 <p align="center">
   <b>DuplexJev is the decision layer for voice agents.</b><br>
   Has the user finished? Should I stop talking? Are they angry? Which filler fits?<br>
-  Every answer, straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.
+  Every answer, straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.<br>
+  👁️ <b>New: it also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same single pass (preview).
 </p>
 
 <p align="center">
@@ -32,7 +33,7 @@
 </p>
 
 <p align="center"><img src="docs/assets/race.gif" alt="Ten decisions: DuplexJev 92 ms vs ASR → LLM 1,978 ms on the same H200" width="820"></p>
-<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 90-second video (with sound)</a> · answers shown are real model outputs</sub></p>
+<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 2-minute video (with sound)</a> · answers shown are real model outputs</sub></p>
 
 | why voice teams switch | **DuplexJev** | the usual way |
 |---|:---:|---|
@@ -42,6 +43,7 @@
 | 👂 emotion from the voice (4 classes) | **91** | ~28 — speech LLMs trained on transcripts |
 | 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
 | 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
+| 👁️ voice + picture, one pass (new, preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
 | 🧩 a new decision | **one line of text at runtime** | new data, new model |
 
 **Get a result in 30 seconds:**
