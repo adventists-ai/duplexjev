@@ -9,47 +9,54 @@
   <a href="README.md">English</a> &nbsp;|&nbsp; <b>中文</b>
 </p>
 
+<h1 align="center">别再先转写、再判断了。</h1>
+
 <p align="center">
-  🎧 <a href="https://api.adventists.cn/duplexjev/">在线体验</a> · <a href="https://huggingface.co/spaces/adventists-ai/DuplexJev-demo">Hugging Face 版</a> &nbsp;|&nbsp;
-  🌐 <a href="https://adventists-ai.github.io/duplexjev/#zh">项目主页</a> &nbsp;|&nbsp;
-  📄 <a href="https://arxiv.org/abs/2610.02638">论文（arXiv:2610.02638）</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Para">DuplexJev-32B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Para">4B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
-  📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
-  📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
-  📝 <a href="#10-引用">引用</a>
+  <b>DuplexJev：语音智能体的“反射神经”。</b><br>
+  用户说完了吗？我该不该停？他生气了吗？该接哪句垫词？<br>
+  全部直接从原始语音读出，<b>一次前向</b>：<b>10 个判断 92 毫秒</b>，比 ASR → LLM 级联<b>快 21 倍</b>。
 </p>
 
----
-
-<h3 align="center">直接从语音做十个判断只要 92 毫秒，比 ASR → LLM 级联快 21 倍。</h3>
+<p align="center">
+  <a href="https://api.adventists.cn/duplexjev/"><img src="https://img.shields.io/badge/%F0%9F%8E%A7%20%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-%E4%B8%8D%E7%94%A8%E6%B3%A8%E5%86%8C-22D3A6?style=for-the-badge" alt="在线体验"></a>
+  <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/badge/%E2%AD%90-%E7%82%B9%E4%B8%AA%E6%98%9F-181717?style=for-the-badge&logo=github" alt="点星"></a>
+  <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-%E6%8F%92%E4%BB%B6-6c47ff?style=for-the-badge" alt="Pipecat 插件"></a>
+</p>
 
 <p align="center">
-  <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/github/stars/adventists-ai/duplexjev?style=social" alt="GitHub stars"></a>
-  <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
   <a href="https://arxiv.org/abs/2610.02638"><img src="https://img.shields.io/badge/arXiv-2610.02638-b31b1b" alt="arXiv"></a>
-  <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-models-yellow" alt="Hugging Face models"></a>
-  <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff" alt="Pipecat plugin"></a>
+  <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-%E5%BC%80%E6%94%BE%E6%9D%83%E9%87%8D%204B%20%C2%B7%2032B-yellow" alt="开放权重"></a>
+  <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
+  <a href="https://huggingface.co/spaces/adventists-ai/DuplexJev-demo"><img src="https://img.shields.io/badge/%F0%9F%A4%97-HF%20%E6%BC%94%E7%A4%BA-orange" alt="HF 演示"></a>
 </p>
 
-给 DuplexJev 一段语音，再给它语音智能体需要判断的问题，比如*用户说完了吗？*、*我该停下来吗？*、*用户生气了吗？*它会给出每道题的答案和概率，**一次前向全部答完，不解码、不用 ASR**。
+<p align="center"><img src="docs/assets/race.gif" alt="十个判断：DuplexJev 92 毫秒，ASR → LLM 1,978 毫秒，同一张 H200" width="820"></p>
+<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">看 38 秒视频（有声音）</a> · 画面里的答案都是模型真实输出</sub></p>
 
-<p align="center"><img src="docs/assets/demo.gif" alt="一句话、八个判断、一次前向" width="720"></p>
+| 为什么换 | **DuplexJev** | 常规做法 |
+|---|:---:|---|
+| ⚡ 对一句话做十个判断（单张 H200） | **92 毫秒** | 1,978 毫秒——ASR → LLM → JSON，同卡同模型 |
+| 💸 N 个问题的成本 | **≈ 一次前向**：不解码、共享音频前缀 | N 次生成 |
+| 📚 5k token 上下文上问 50 个问题 | **5.5 秒** | 111.5 秒（每题单独调用） |
+| 👂 从声音听情绪（四分类） | **91** | 约 28（只用转写训练的语音大模型） |
+| 🎯 话轮判断，CoDeTT 英文零样本 | **70.0** | 51.4（Smart Turn v3） |
+| 🔊 重音、停顿、笑声、呼吸、叹气 | **听得到** | 转写里全丢了 |
+| 🧩 新增一种判断 | **运行时加一行文字** | 重新采数据、重新训模型 |
 
-| | **DuplexJev** | 对照 |
-|---|---:|---:|
-| 对一句话做十个判断，单张 H200 | **92 毫秒** | 1,978 毫秒（ASR → LLM 级联，同一张卡、同一个 LLM） |
-| 5k token 上下文上的 50 个问题 | **5.5 秒** | 111.5 秒（每题单独调用一次） |
-| 从声音听情绪，四分类 | **91** | 约 28（只用转写训练的语音大模型） |
-| 重音、停顿、笑声、呼吸、咳嗽、叹气 | **听得到** | 转写里全丢了 |
-| 话轮判断，CoDeTT 英文，零样本 | **70.0** | 51.4（Smart Turn v3） |
+**30 秒看到结果：**
 
 ```bash
 pip install duplexjev
 python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.adventists.cn/duplexjev').decide('your.wav'))"
 ```
 
-🔌 **在用 [Pipecat](https://github.com/pipecat-ai/pipecat)？** `pip install pipecat-duplexjev` 就能接上基于音频的话轮检测，同一次前向还能顺带给出情绪和非语言声音（[integrations/pipecat](integrations/pipecat)）。
-⭐ 如果 DuplexJev 对你有用，点个星能帮更多开发者找到它。
+**自部署：**`vllm serve adventists-ai/DuplexJev-4B-Para`（约 10 GB 显存），配 `duplexjev-vllm` 插件（[第 4 节](#4-快速上手)）·
+**Pipecat：**`pip install pipecat-duplexjev`，基于音频的话轮检测，同一次前向顺带给出情绪和非语言声音。
+
+> 🏢 **要用在产品里？** 呼叫中心、车载助手、智能硬件、语音 Agent 平台：权重为 CC BY-NC 4.0，我们提供**商用授权和托管的
+> Speech-to-Decision API**。联系 **jiejin@adventists.ai**。
+
+⭐ **点个星**关注后续能力：图像 + 语音联合判断、开源全双工管线都在路上。
 
 ### DuplexJev 是一个 Speech-to-Decision（语音到判断）模型。
 
@@ -185,7 +192,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 - **2026-09-28** —— 第一个完整模型 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) 和 vLLM 插件
   [`duplexjev-vllm`](https://pypi.org/project/duplexjev-vllm/) 发布。
 
-即将推出：Speech-to-Decision 商用 API（2026-10-10）、开源全双工 Jev 对话流水线（2026-10-15）。
+即将推出：开源全双工 Jev 对话流水线（2026-10-20 前后）。商用授权与托管 Speech-to-Decision API：jiejin@adventists.ai。
 
 ## 3. 模型
 

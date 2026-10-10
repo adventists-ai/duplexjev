@@ -9,50 +9,54 @@
   <b>English</b> &nbsp;|&nbsp; <a href="README_CN.md">中文</a>
 </p>
 
+<h1 align="center">Stop transcribing to decide.</h1>
+
 <p align="center">
-  🎧 <a href="https://huggingface.co/spaces/adventists-ai/DuplexJev-demo">Try it on Hugging Face</a> · <a href="https://api.adventists.cn/duplexjev/">(China mirror)</a> &nbsp;|&nbsp;
-  🌐 <a href="https://adventists-ai.github.io/duplexjev/">Project page</a> &nbsp;|&nbsp;
-  📄 <a href="https://arxiv.org/abs/2610.02638">Paper (arXiv:2610.02638)</a> &nbsp;|&nbsp;
-  🤗 <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Para">DuplexJev-32B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Para">4B-Para</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">32B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Stress">32B-Stress</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Turn">4B-Turn</a> · <a href="https://huggingface.co/adventists-ai/DuplexJev-4B-Stress">4B-Stress</a> &nbsp;|&nbsp;
-  📦 <a href="https://pypi.org/project/duplexjev/">PyPI</a> &nbsp;|&nbsp;
-  📊 <a href="https://huggingface.co/datasets/adventists-ai/qa100">qa100</a> &nbsp;|&nbsp;
-  📝 <a href="#10-citation">Citation</a>
+  <b>DuplexJev is the decision layer for voice agents.</b><br>
+  Has the user finished? Should I stop talking? Are they angry? Which filler fits?<br>
+  Every answer, straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.
 </p>
 
----
-
-<h3 align="center">Ten decisions from raw speech in 92 ms: 21× faster than an ASR → LLM cascade.</h3>
+<p align="center">
+  <a href="https://huggingface.co/spaces/adventists-ai/DuplexJev-demo"><img src="https://img.shields.io/badge/%F0%9F%8E%A7%20Try%20it-in%20your%20browser-22D3A6?style=for-the-badge" alt="Try it in your browser"></a>
+  <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/badge/%E2%AD%90-Star%20on%20GitHub-181717?style=for-the-badge&logo=github" alt="Star on GitHub"></a>
+  <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff?style=for-the-badge" alt="Pipecat plugin"></a>
+</p>
 
 <p align="center">
-  <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/github/stars/adventists-ai/duplexjev?style=social" alt="GitHub stars"></a>
-  <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
   <a href="https://arxiv.org/abs/2610.02638"><img src="https://img.shields.io/badge/arXiv-2610.02638-b31b1b" alt="arXiv"></a>
-  <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-models-yellow" alt="Hugging Face models"></a>
-  <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff" alt="Pipecat plugin"></a>
+  <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-open%20weights%204B%20%C2%B7%2032B-yellow" alt="Hugging Face models"></a>
+  <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
+  <a href="https://adventists-ai.github.io/duplexjev/"><img src="https://img.shields.io/badge/project-page-0b7285" alt="Project page"></a>
 </p>
 
-Give DuplexJev a speech clip and the questions your voice agent needs answered, such as *has the user finished?*,
-*should I stop talking?* or *are they angry?* It returns every answer with a probability, all in **one forward pass,
-with zero decoding and no ASR**.
+<p align="center"><img src="docs/assets/race.gif" alt="Ten decisions: DuplexJev 92 ms vs ASR → LLM 1,978 ms on the same H200" width="820"></p>
+<p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 38-second video (with sound)</a> · answers shown are real model outputs</sub></p>
 
-<p align="center"><img src="docs/assets/demo.gif" alt="One utterance, eight decisions, one forward pass" width="720"></p>
+| why voice teams switch | **DuplexJev** | the usual way |
+|---|:---:|---|
+| ⚡ ten decisions about one utterance (one H200) | **92 ms** | 1,978 ms — ASR → LLM → JSON, same GPU and LLM |
+| 💸 cost of N questions | **≈ one forward pass** — no decoding, shared audio prefix | N generations |
+| 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
+| 👂 emotion from the voice (4 classes) | **91** | ~28 — speech LLMs trained on transcripts |
+| 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
+| 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
+| 🧩 a new decision | **one line of text at runtime** | new data, new model |
 
-| | **DuplexJev** | baseline |
-|---|---:|---:|
-| ten decisions about one utterance, one H200 | **92 ms** | 1,978 ms (ASR → LLM cascade, same GPU and LLM) |
-| 50 questions over a 5k-token context | **5.5 s** | 111.5 s (one call per question) |
-| emotion, 4 classes, from the voice | **91** | ~28 (speech LLMs trained on transcripts) |
-| stress, pauses, laughter, breathing, coughs, sighs | **heard** | lost in the transcript |
-| turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 (Smart Turn v3) |
+**Get a result in 30 seconds:**
 
 ```bash
 pip install duplexjev
 python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.adventists.cn/duplexjev').decide('your.wav'))"
 ```
 
-🔌 **Building with [Pipecat](https://github.com/pipecat-ai/pipecat)?** `pip install pipecat-duplexjev` gives you audio
-end-of-turn detection, with emotion and non-verbal sounds from the same pass ([integrations/pipecat](integrations/pipecat)).
-⭐ If DuplexJev is useful to you, a star helps other builders find it.
+**Self-host:** `vllm serve adventists-ai/DuplexJev-4B-Para` (~10 GB GPU) with the `duplexjev-vllm` plugin ([§4](#4-quick-start)) ·
+**Pipecat:** `pip install pipecat-duplexjev` — audio end-of-turn detection, plus emotion and non-verbal sounds from the same pass.
+
+> 🏢 **Building a product?** Contact centres, in-car assistants, devices, voice-agent platforms: weights are CC BY-NC 4.0, and we offer
+> **commercial licences and a hosted Speech-to-Decision API**. Email **jiejin@adventists.ai**.
+
+⭐ **Star the repo** to follow new abilities — image + voice and an open full-duplex pipeline are next.
 
 ### DuplexJev is a speech-to-decision model.
 
@@ -205,7 +209,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 - **2026-09-28** — First complete model, 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B), and the
   vLLM plugin [`duplexjev-vllm`](https://pypi.org/project/duplexjev-vllm/).
 
-Coming next: Speech-to-Decision commercial API (2026-10-10), open-source full-duplex Jev dialogue pipeline (2026-10-15).
+Coming next: open-source full-duplex Jev dialogue pipeline (around 2026-10-20). Commercial licences and the hosted Speech-to-Decision API: jiejin@adventists.ai.
 
 ## 3. Models
 
