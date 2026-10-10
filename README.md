@@ -21,6 +21,39 @@
 
 ---
 
+<h3 align="center">Ten decisions from raw speech in 92 ms: 21× faster than an ASR → LLM cascade.</h3>
+
+<p align="center">
+  <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/github/stars/adventists-ai/duplexjev?style=social" alt="GitHub stars"></a>
+  <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
+  <a href="https://arxiv.org/abs/2610.02638"><img src="https://img.shields.io/badge/arXiv-2610.02638-b31b1b" alt="arXiv"></a>
+  <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-models-yellow" alt="Hugging Face models"></a>
+  <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff" alt="Pipecat plugin"></a>
+</p>
+
+Give DuplexJev a speech clip and the questions your voice agent needs answered, such as *has the user finished?*,
+*should I stop talking?* or *are they angry?* It returns every answer with a probability, all in **one forward pass,
+with zero decoding and no ASR**.
+
+<p align="center"><img src="docs/assets/demo.gif" alt="One utterance, eight decisions, one forward pass" width="720"></p>
+
+| | **DuplexJev** | baseline |
+|---|---:|---:|
+| ten decisions about one utterance, one H200 | **92 ms** | 1,978 ms (ASR → LLM cascade, same GPU and LLM) |
+| 50 questions over a 5k-token context | **5.5 s** | 111.5 s (one call per question) |
+| emotion, 4 classes, from the voice | **91** | ~28 (speech LLMs trained on transcripts) |
+| stress, pauses, laughter, breathing, coughs, sighs | **heard** | lost in the transcript |
+| turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 (Smart Turn v3) |
+
+```bash
+pip install duplexjev
+python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.adventists.cn/duplexjev').decide('your.wav'))"
+```
+
+🔌 **Building with [Pipecat](https://github.com/pipecat-ai/pipecat)?** `pip install pipecat-duplexjev` gives you audio
+end-of-turn detection, with emotion and non-verbal sounds from the same pass ([integrations/pipecat](integrations/pipecat)).
+⭐ If DuplexJev is useful to you, a star helps other builders find it.
+
 ### DuplexJev is a speech-to-decision model.
 
 **Input:** an audio clip and the questions you need decided, each with its options. **Output:** for every question,
@@ -35,16 +68,13 @@ is speaking and how (paralinguistics):
   oracle transcript (qa100, paper). DuplexJev-32B-Turn: qa100 96, ZJU-ML 87; VoiceBench OBQA / MMSU 85.5 / 72.1
   (95.4 / 79.3 from text).
 - **Paralinguistics, strong perception.** Gender 91.5, emotion 91.1, where speech LLMs trained on transcripts sit at
-  chance (~55 / ~28); speaker verification is still weak *(preview‡)*: EER about 30% on the official VoxCeleb1-H list (same gender and
-  nationality), against about 2% for dedicated speaker models ([research note](research/2026-10-speaker-identity.md)).
+  chance (~55 / ~28).
 - **Stress and pauses (new).** DuplexJev-32B-Stress finds the stressed word ("**I** didn't say…" vs "I didn't say she took the
   **money**") on unseen Mandarin and English sentences, 92 / 88, and answers "no word is stressed" on 99% of neutral speech;
   the other models are at chance ([research note](research/2026-10-stress-understanding.md)).
 - **Common decision tasks, on par with or above dedicated models.** Turn state on the Easy-Turn test set 95.3 (the
   dedicated Easy-Turn detector 96.4; TEN and Smart Turn cover only some states). Turn action on CoDeTT 69.2 / 70.0
   zero-shot, above every dedicated turn model (37.9–65.4) and level with Qwen3-Omni (70.4 / 70.9).
-
-<sub>‡ Research preview: checkpoints trained on public speaker-verification pairs, not in the released models.</sub>
 
 <p align="center">
   <picture>

@@ -21,6 +21,36 @@
 
 ---
 
+<h3 align="center">直接从语音做十个判断只要 92 毫秒，比 ASR → LLM 级联快 21 倍。</h3>
+
+<p align="center">
+  <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/github/stars/adventists-ai/duplexjev?style=social" alt="GitHub stars"></a>
+  <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
+  <a href="https://arxiv.org/abs/2610.02638"><img src="https://img.shields.io/badge/arXiv-2610.02638-b31b1b" alt="arXiv"></a>
+  <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-models-yellow" alt="Hugging Face models"></a>
+  <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff" alt="Pipecat plugin"></a>
+</p>
+
+给 DuplexJev 一段语音，再给它语音智能体需要判断的问题，比如*用户说完了吗？*、*我该停下来吗？*、*用户生气了吗？*它会给出每道题的答案和概率，**一次前向全部答完，不解码、不用 ASR**。
+
+<p align="center"><img src="docs/assets/demo.gif" alt="一句话、八个判断、一次前向" width="720"></p>
+
+| | **DuplexJev** | 对照 |
+|---|---:|---:|
+| 对一句话做十个判断，单张 H200 | **92 毫秒** | 1,978 毫秒（ASR → LLM 级联，同一张卡、同一个 LLM） |
+| 5k token 上下文上的 50 个问题 | **5.5 秒** | 111.5 秒（每题单独调用一次） |
+| 从声音听情绪，四分类 | **91** | 约 28（只用转写训练的语音大模型） |
+| 重音、停顿、笑声、呼吸、咳嗽、叹气 | **听得到** | 转写里全丢了 |
+| 话轮判断，CoDeTT 英文，零样本 | **70.0** | 51.4（Smart Turn v3） |
+
+```bash
+pip install duplexjev
+python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.adventists.cn/duplexjev').decide('your.wav'))"
+```
+
+🔌 **在用 [Pipecat](https://github.com/pipecat-ai/pipecat)？** `pip install pipecat-duplexjev` 就能接上基于音频的话轮检测，同一次前向还能顺带给出情绪和非语言声音（[integrations/pipecat](integrations/pipecat)）。
+⭐ 如果 DuplexJev 对你有用，点个星能帮更多开发者找到它。
+
 ### DuplexJev 是一个 Speech-to-Decision（语音到判断）模型。
 
 **输入：**一段音频，加上你需要判断的问题（每题带选项）。**输出：**每道题选中的选项和它的概率。所有问题在一次前向里一起回答，
@@ -31,14 +61,11 @@
 
 - **主语言能力：接近直接读文字的大模型。** 语音选择题 90 分，同一大模型读标准转写 91 分（qa100，论文）。
   DuplexJev-32B-Turn：qa100 96、ZJU-ML 87；VoiceBench OBQA / MMSU 85.5 / 72.1（读文字 95.4 / 79.3）。
-- **副语言能力：感知很强。** 性别 91.5、情绪 91.1，而只用转写训练的语音大模型只有瞎猜水平（约 55 / 28）；
-  说话人验证仍然偏弱（*预览‡*）：官方 VoxCeleb1-H 列表（同性别、同国籍）上 EER 约 30%，专用说话人模型约 2%（[研究笔记](research/2026-10-speaker-identity_zh.md)）。
+- **副语言能力：感知很强。** 性别 91.5、情绪 91.1，而只用转写训练的语音大模型只有瞎猜水平（约 55 / 28）。
 - **重音与停顿（新）。** DuplexJev-32B-Stress 能在没见过的中英文句子上听出重读的是哪个词（“**我**没说……”和“我没说她拿了**钱**”），
   中文 92 / 英文 88；中性语音 99% 能答“没有特别强调”；其他模型都是瞎猜水平（[研究笔记](research/2026-10-stress-understanding_zh.md)）。
 - **常见语音判断任务：达到或超过专用模型。** 话轮状态（Easy-Turn 测试集）95.3（专用 Easy-Turn 检测器 96.4；TEN、Smart Turn
   只覆盖部分类别）。话轮动作（CoDeTT）零样本 69.2 / 70.0，超过所有专用话轮模型（37.9–65.4），与 Qwen3-Omni（70.4 / 70.9）持平。
-
-<sub>‡ 研究预览：用公开说话人验证配对训练的 checkpoint，未并入发布的模型。</sub>
 
 <p align="center">
   <picture>
