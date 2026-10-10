@@ -42,7 +42,7 @@ th{color:var(--mut);font-weight:500;font-size:13px}.ans{font-weight:600}
 
 <div class="card">
   <details>
-    <summary id="qsum">题目表（可修改：每行 <code>名称 | 问题 | 选项1, 选项2, …</code>）</summary>
+    <summary id="qsum">题目表（可修改：每行 <code>名称 | 问题 | 选项1; 选项2; …</code>）</summary>
     <textarea id="qs" spellcheck="false"></textarea>
     <div class="row"><button id="reset">恢复默认</button><span class="probs" id="keyhint"></span></div>
   </details>
@@ -57,8 +57,8 @@ th{color:var(--mut);font-weight:500;font-size:13px}.ans{font-weight:600}
 <script>
 const $ = id => document.getElementById(id);
 const T = {
-  zh:{sub:"录一段话或上传音频，一次前向同时给出 8 个判断。",rec:"● 录音",stop:"■ 停止",up:"上传音频",go:"判断",busy:"判断中…",qsum:"题目表（可修改：每行 名称 | 问题 | 选项1, 选项2, …）",reset:"恢复默认",h:["判断","答案","置信度"],clip:s=>`音频 ${s.toFixed(1)} 秒`,ms:(n,ms,c)=>`<b>${n}</b> 个判断，模型耗时 <b>${ms}</b> ms（含网络 ${c} ms）`,long:"只取前 15 秒",bad:"题目表格式有误：",key:"这个服务需要 API key："},
-  en:{sub:"Record or upload a clip; one forward pass answers 8 decisions at once.",rec:"● Record",stop:"■ Stop",up:"Upload audio",go:"Decide",busy:"Deciding…",qsum:"Question table (editable: one per line, name | question | option 1, option 2, …)",reset:"Reset",h:["decision","answer","confidence"],clip:s=>`clip ${s.toFixed(1)} s`,ms:(n,ms,c)=>`<b>${n}</b> decisions, model time <b>${ms}</b> ms (${c} ms with network)`,long:"only the first 15 s are used",bad:"cannot parse the table: ",key:"This service needs an API key:"}
+  zh:{sub:"录一段话或上传音频，一次前向同时给出 8 个判断。",rec:"● 录音",stop:"■ 停止",up:"上传音频",go:"判断",busy:"判断中…",qsum:"题目表（可修改：每行 名称 | 问题 | 选项1; 选项2; …）",reset:"恢复默认",h:["判断","答案","置信度"],clip:s=>`音频 ${s.toFixed(1)} 秒`,ms:(n,ms,c)=>`<b>${n}</b> 个判断，模型耗时 <b>${ms}</b> ms（含网络 ${c} ms）`,long:"只取前 15 秒",bad:"题目表格式有误：",key:"这个服务需要 API key："},
+  en:{sub:"Record or upload a clip; one forward pass answers 8 decisions at once.",rec:"● Record",stop:"■ Stop",up:"Upload audio",go:"Decide",busy:"Deciding…",qsum:"Question table (editable: one per line, name | question | option 1; option 2; …)",reset:"Reset",h:["decision","answer","confidence"],clip:s=>`clip ${s.toFixed(1)} s`,ms:(n,ms,c)=>`<b>${n}</b> decisions, model time <b>${ms}</b> ms (${c} ms with network)`,long:"only the first 15 s are used",bad:"cannot parse the table: ",key:"This service needs an API key:"}
 };
 let lang = "zh", wav = null, labels = {}, defaults = {}, rec = null, chunks = [], apiKey = "";
 const setLang = l => { lang = l; const t = T[l];
@@ -67,12 +67,12 @@ const setLang = l => { lang = l; const t = T[l];
   ["h1","h2","h3"].forEach((h,i)=>$(h).textContent = t.h[i]); loadTable(); };
 async function loadTable(){
   if(!defaults[lang]){ const r = await fetch(`v1/table?lang=${lang}`); const j = await r.json(); defaults[lang]=j.questions; labels[lang]=j.labels; }
-  $("qs").value = defaults[lang].map(q=>`${q.id} | ${q.text} | ${q.options.join(", ")}`).join("\n");
+  $("qs").value = defaults[lang].map(q=>`${q.id} | ${q.text} | ${q.options.join("; ")}`).join("\n");
 }
 function parseTable(){
   return $("qs").value.split("\n").map(s=>s.trim()).filter(Boolean).map(line=>{
     const p = line.split("|").map(s=>s.trim()); if(p.length!==3) throw new Error(line);
-    const opts = p[2].split(/[,，]/).map(s=>s.trim()).filter(Boolean); if(opts.length<2) throw new Error(line);
+    const opts = p[2].split(/[;；]/).map(s=>s.trim()).filter(Boolean); if(opts.length<2) throw new Error(line);
     return {id:p[0], text:p[1], options:opts, lang};
   });
 }
