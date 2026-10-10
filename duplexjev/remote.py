@@ -100,8 +100,11 @@ class VLLMClient:
             raise ValueError(f"{q.id}: at most {len(self.letter_ids)} options over the vLLM client")
         text = HEAD[q.lang] + "\n\n" + q.render(perm)
         r = _post(self.base_url + "/chat/completions", {
-            "model": self.model, "max_tokens": 1, "temperature": 0, "logprobs": True, "top_logprobs": n,
+            "model": self.model, "max_tokens": 1, "temperature": 0, "logprobs": True, "top_logprobs": 20,
             "allowed_token_ids": self.letter_ids[:n],
+            # Training rendered Qwen3's empty <think></think> block; without it the next token is "<think>".
+            # vLLM >= 0.2x reports top_logprobs before allowed_token_ids is applied, so ask for 20 and keep the letters.
+            "chat_template_kwargs": {"enable_thinking": False},
             "messages": [{"role": "user", "content": [
                 {"type": "text", "text": text},
                 {"type": "input_audio", "input_audio": {"data": audio_b64, "format": fmt}}]}],

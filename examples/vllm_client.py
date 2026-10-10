@@ -50,11 +50,11 @@ class DuplexJevClient:
         audio = base64.b64encode(wav_bytes).decode()
         ids = self.letter_ids[:len(options)]
         r = self.client.chat.completions.create(
-            model=self.model, max_tokens=1, temperature=0, logprobs=True, top_logprobs=len(options),
+            model=self.model, max_tokens=1, temperature=0, logprobs=True, top_logprobs=20,
             messages=[{"role": "user", "content": [
                 {"type": "text", "text": prompt(question, options, lang)},
                 {"type": "input_audio", "input_audio": {"data": audio, "format": "wav"}}]}],
-            extra_body={"allowed_token_ids": ids})
+            extra_body={"allowed_token_ids": ids, "chat_template_kwargs": {"enable_thinking": False}})
         lp = {t.token: t.logprob for t in r.choices[0].logprobs.content[0].top_logprobs}
         z = [lp.get(LETTERS[k], -1e9) for k in range(len(options))]
         m = max(z)
