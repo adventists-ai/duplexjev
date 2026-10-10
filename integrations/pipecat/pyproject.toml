@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pipecat-duplexjev"
+version = "0.1.0"
+description = "Audio end-of-turn detection for Pipecat with DuplexJev: turn state, emotion and non-verbal sounds from one forward pass, no transcript needed."
+readme = "README.md"
+license = { text = "BSD-2-Clause" }
+authors = [{ name = "Jie Jin", email = "jiejin@adventists.ai" }]
+requires-python = ">=3.10"
+dependencies = ["pipecat-ai>=1.0", "numpy"]
+keywords = ["pipecat", "turn-detection", "end-of-turn", "voice-agent", "speech-llm", "duplexjev"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: BSD License",
+  "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
+
+[project.urls]
+Homepage = "https://github.com/adventists-ai/duplexjev/tree/main/integrations/pipecat"
+Models = "https://huggingface.co/adventists-ai/DuplexJev-4B-Para"
+Paper = "https://arxiv.org/abs/2610.02638"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pipecat_duplexjev"]
