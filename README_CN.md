@@ -21,6 +21,7 @@
   <a href="https://api.adventists.cn/duplexjev/"><img src="https://img.shields.io/badge/%F0%9F%8E%A7%20%E5%9C%A8%E7%BA%BF%E4%BD%93%E9%AA%8C-%E4%B8%8D%E7%94%A8%E6%B3%A8%E5%86%8C-22D3A6?style=for-the-badge" alt="在线体验"></a>
   <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/badge/%E2%AD%90-%E7%82%B9%E4%B8%AA%E6%98%9F-181717?style=for-the-badge&logo=github" alt="点星"></a>
   <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-%E6%8F%92%E4%BB%B6-6c47ff?style=for-the-badge" alt="Pipecat 插件"></a>
+  <a href="integrations/livekit"><img src="https://img.shields.io/badge/LiveKit-%E6%8F%92%E4%BB%B6-1f6feb?style=for-the-badge" alt="LiveKit 插件"></a>
 </p>
 
 <p align="center">
@@ -51,7 +52,7 @@ python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.
 ```
 
 **自部署：**`vllm serve adventists-ai/DuplexJev-4B-Para`（约 10 GB 显存），配 `duplexjev-vllm` 插件（[第 4 节](#4-快速上手)）·
-**Pipecat：**`pip install pipecat-duplexjev`，基于音频的话轮检测，同一次前向顺带给出情绪和非语言声音。
+**Pipecat：**`pip install pipecat-duplexjev` · **LiveKit Agents：**`pip install livekit-plugins-duplexjev`（[integrations/livekit](integrations/livekit)）：基于音频的话轮检测，同一次前向顺带给出情绪和非语言声音。
 
 > 🏢 **要用在产品里？** AI降临派的全双工对话接口已服务 **300 多款 AI 硬件、10 万多台终端**。
 > 呼叫中心、车载助手、智能硬件、语音 Agent 平台：权重为 CC BY-NC 4.0，我们提供**商用授权和托管的

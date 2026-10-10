@@ -21,6 +21,7 @@
   <a href="https://huggingface.co/spaces/BitKnight/DuplexJev"><img src="https://img.shields.io/badge/%F0%9F%8E%A7%20Try%20it-in%20your%20browser-22D3A6?style=for-the-badge" alt="Try it in your browser"></a>
   <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/badge/%E2%AD%90-Star%20on%20GitHub-181717?style=for-the-badge&logo=github" alt="Star on GitHub"></a>
   <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff?style=for-the-badge" alt="Pipecat plugin"></a>
+  <a href="integrations/livekit"><img src="https://img.shields.io/badge/LiveKit-plugin-1f6feb?style=for-the-badge" alt="LiveKit plugin"></a>
 </p>
 
 <p align="center">
@@ -51,7 +52,7 @@ python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.
 ```
 
 **Self-host:** `vllm serve adventists-ai/DuplexJev-4B-Para` (~10 GB GPU) with the `duplexjev-vllm` plugin ([§4](#4-quick-start)) ·
-**Pipecat:** `pip install pipecat-duplexjev` — audio end-of-turn detection, plus emotion and non-verbal sounds from the same pass.
+**Pipecat:** `pip install pipecat-duplexjev` · **LiveKit Agents:** `pip install livekit-plugins-duplexjev` ([integrations/livekit](integrations/livekit)) — audio end-of-turn detection, plus emotion and non-verbal sounds from the same pass.
 
 > 🏢 **Building a product?** Our full-duplex voice API already runs on **300+ AI hardware products and 100,000+ devices**.
 > Contact centres, in-car assistants, devices, voice-agent platforms: weights are CC BY-NC 4.0, and we offer
