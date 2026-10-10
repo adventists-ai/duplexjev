@@ -36,7 +36,7 @@
 | why voice teams switch | **DuplexJev** | the usual way |
 |---|:---:|---|
 | ⚡ ten decisions about one utterance (one H200) | **92 ms** | 1,978 ms — ASR → LLM → JSON, same GPU and LLM |
-| 💸 cost of N questions | **≈ one forward pass** — no decoding, shared audio prefix | N generations |
+| 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
 | 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
 | 👂 emotion from the voice (4 classes) | **91** | ~28 — speech LLMs trained on transcripts |
 | 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
@@ -53,7 +53,8 @@ python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.
 **Self-host:** `vllm serve adventists-ai/DuplexJev-4B-Para` (~10 GB GPU) with the `duplexjev-vllm` plugin ([§4](#4-quick-start)) ·
 **Pipecat:** `pip install pipecat-duplexjev` — audio end-of-turn detection, plus emotion and non-verbal sounds from the same pass.
 
-> 🏢 **Building a product?** Contact centres, in-car assistants, devices, voice-agent platforms: weights are CC BY-NC 4.0, and we offer
+> 🏢 **Building a product?** Our full-duplex voice API already runs on **300+ AI hardware products and 100,000+ devices**.
+> Contact centres, in-car assistants, devices, voice-agent platforms: weights are CC BY-NC 4.0, and we offer
 > **commercial licences and a hosted Speech-to-Decision API**. Email **jiejin@adventists.ai**.
 
 ⭐ **Star the repo** to follow new abilities — image + voice and an open full-duplex pipeline are next.

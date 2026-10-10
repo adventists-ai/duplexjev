@@ -36,7 +36,7 @@
 | 为什么换 | **DuplexJev** | 常规做法 |
 |---|:---:|---|
 | ⚡ 对一句话做十个判断（单张 H200） | **92 毫秒** | 1,978 毫秒——ASR → LLM → JSON，同卡同模型 |
-| 💸 N 个问题的成本 | **≈ 一次前向**：不解码、共享音频前缀 | N 次生成 |
+| 💸 成本 | **N 个问题 ≈ 一次前向** · 4B 版**每百万次判断不到 0.5 美元** | 每个问题一次生成 |
 | 📚 5k token 上下文上问 50 个问题 | **5.5 秒** | 111.5 秒（每题单独调用） |
 | 👂 从声音听情绪（四分类） | **91** | 约 28（只用转写训练的语音大模型） |
 | 🎯 话轮判断，CoDeTT 英文零样本 | **70.0** | 51.4（Smart Turn v3） |
@@ -53,7 +53,8 @@ python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.
 **自部署：**`vllm serve adventists-ai/DuplexJev-4B-Para`（约 10 GB 显存），配 `duplexjev-vllm` 插件（[第 4 节](#4-快速上手)）·
 **Pipecat：**`pip install pipecat-duplexjev`，基于音频的话轮检测，同一次前向顺带给出情绪和非语言声音。
 
-> 🏢 **要用在产品里？** 呼叫中心、车载助手、智能硬件、语音 Agent 平台：权重为 CC BY-NC 4.0，我们提供**商用授权和托管的
+> 🏢 **要用在产品里？** AI降临派的全双工对话接口已服务 **300 多款 AI 硬件、10 万多台终端**。
+> 呼叫中心、车载助手、智能硬件、语音 Agent 平台：权重为 CC BY-NC 4.0，我们提供**商用授权和托管的
 > Speech-to-Decision API**。联系 **jiejin@adventists.ai**。
 
 ⭐ **点个星**关注后续能力：图像 + 语音联合判断、开源全双工管线都在路上。
