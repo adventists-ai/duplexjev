@@ -15,11 +15,12 @@
   <b>DuplexJev is the decision layer for voice agents.</b><br>
   Has the user finished? Should I stop talking? Are they angry? Which filler fits?<br>
   Every answer, straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.<br>
-  👁️ <b>New: it also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same single pass (preview).
+  👁️ <b>New: it also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same single pass (preview) — <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">try it with a photo + your voice</a>.
 </p>
 
 <p align="center">
   <a href="https://huggingface.co/spaces/BitKnight/DuplexJev"><img src="https://img.shields.io/badge/%F0%9F%8E%A7%20Try%20it-in%20your%20browser-22D3A6?style=for-the-badge" alt="Try it in your browser"></a>
+  <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision"><img src="https://img.shields.io/badge/%F0%9F%91%81%EF%B8%8F%20Try%20Vision-photo%20%2B%20voice-0EA5E9?style=for-the-badge" alt="Try the vision demo"></a>
   <a href="https://github.com/adventists-ai/duplexjev/stargazers"><img src="https://img.shields.io/badge/%E2%AD%90-Star%20on%20GitHub-181717?style=for-the-badge&logo=github" alt="Star on GitHub"></a>
   <a href="integrations/pipecat"><img src="https://img.shields.io/badge/Pipecat-plugin-6c47ff?style=for-the-badge" alt="Pipecat plugin"></a>
   <a href="integrations/livekit"><img src="https://img.shields.io/badge/LiveKit-plugin-1f6feb?style=for-the-badge" alt="LiveKit plugin"></a>
@@ -356,7 +357,7 @@ Ready-made scripts: [`examples/para_abilities.py`](examples/para_abilities.py).
 
 [DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) puts Qwen3-VL's vision encoder back
 in front of the DuplexJev-32B-Para language model, so one question can use what it **hears** and what it **sees**
-(one 80 GB GPU):
+(one 80 GB GPU). Try it in the browser: [DuplexJev-Vision Space](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision).
 
 ```python
 # pip install "duplexjev[vision]>=0.5"
