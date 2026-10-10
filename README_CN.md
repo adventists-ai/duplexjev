@@ -167,7 +167,8 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 ## 2. 最新动态
 
-- **2026-10-10** —— 🔬 研究预览：**图像 + 语音一起判断。** DuplexJev-32B-Para 的语言模型就是 Qwen3-VL 的，视觉编码器可以直接接回去；再加一层 LoRA，它能把听到的和看到的对起来（留出的合成测试集上：重读词 vs 标红词 94.1，语气 vs 表情 93.5，声音 vs 文字说明 97.5；只给图 = 50）。尚未并入发布的 checkpoint。真实案例（包括答错的）见[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。
+- **2026-10-10** —— 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（研究预览）：同一道题可以同时用上**听到的和看到的**。没见过的说话人的真实照片配他们自己的声音：64.4（只给图 50），其中开心的声音 81.7。`pip install "duplexjev[vision]>=0.5"`，或用 `duplexjev-vllm>=0.3` 通过 `vllm serve` 部署（每道题约 0.05 秒）。见[语音 + 图像一起判断](#语音--图像一起判断研究预览)。
+- **2026-10-10** —— 🔬 研究预览：**图像 + 语音一起判断。** DuplexJev-32B-Para 的语言模型就是 Qwen3-VL 的，视觉编码器可以直接接回去；再加一层 LoRA，它能把听到的和看到的对起来（留出的合成测试集上：重读词 vs 标红词 94.1，语气 vs 表情 93.5，声音 vs 文字说明 97.5；只给图 = 50）。真实案例见[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。
 - **2026-10-10** —— 🤗 [**DuplexJev-4B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：同一个小模型现在也能**正常聊天**（包括多轮），判断类成绩与 v1.0 基本持平（LoRA 阶段加入对话回放、按行平均损失）。v1.0 仍可用 revision `v1.0` 下载。[研究笔记](research/2026-10-chat-replay_zh.md)。
 - **2026-10-09** —— 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 和
   [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：一个模型里副语言能力最全的版本。在话轮、性别、
@@ -246,7 +247,7 @@ qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，
 80 GB 显卡用 `DuplexJev-32B-Para`，小显卡用 `DuplexJev-4B-Para`。最看重情绪和话轮的最后一分，用 `DuplexJev-32B-Turn` / `4B-Turn`；
 重音和停顿是主要需求，用 `DuplexJev-32B-Stress` / `4B-Stress`。Turn 版可以直接替换原版（提示词、插件都一样），
 我们跑的每项评测都持平或更好（在误差范围内）。32B 模型只用了 Qwen3-VL-32B 的语言模型部分，
-目前输入是音频和文字（图像输入在计划中）。
+输入是音频和文字。要同时输入语音和图像，用 [DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（研究预览）。
 
 > **研究用 checkpoint。** 这些模型背后还有几十个连接器 checkpoint，覆盖其他编码器（MOSS、Whisper、SenseVoice）、
 > 大模型（Qwen3 0.6B–32B、Falcon-H1、SmolLM3）和两种连接器类型，配合 `duplexjev` PyTorch 包使用。
@@ -319,6 +320,29 @@ dj.decide(clip_zh, {
 `"静音前是某人的一段声音样本，静音后是另一段语音。两段是同一个人吗？"`，选项 `["是不同的人", "是同一个人"]`
 （英文：`"Before the silence is a voice sample of someone; after it is another clip. Are they the same speaker?"`，`["different speakers", "same speaker"]`）。
 现成脚本：[`examples/para_abilities.py`](examples/para_abilities.py)。
+
+### 语音 + 图像一起判断（研究预览）
+
+[DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) 把 Qwen3-VL 的视觉编码器接回
+DuplexJev-32B-Para 的语言模型前面，同一道题可以同时用上**听到的**和**看到的**（单张 80 GB 显卡）：
+
+```python
+# pip install "duplexjev[vision]>=0.5"
+from duplexjev.vision import VisionDecider
+vd = VisionDecider.from_pretrained("adventists-ai/DuplexJev-32B-Vision")
+vd.decide(audio="clip.wav", image="face.jpg", questions=[
+    {"id": "match", "text": "Does the face in the picture show the same emotion as the speaker's voice?", "options": ["Yes", "No"]}])
+vd.chat(image="photo.jpg", text="图片里写了什么？")
+```
+
+也可以用 vLLM 部署（`pip install "duplexjev-vllm>=0.3"`），一张图配 3 秒语音，每道题约 0.05 秒：
+
+```bash
+vllm serve adventists-ai/DuplexJev-32B-Vision --max-model-len 8192 --limit-mm-per-prompt '{"image": 1, "audio": 1, "video": 0}'
+python examples/vllm_vision_client.py clip.wav face.jpg
+```
+
+留出集成绩：重读词 vs 标红词 94.1，表情 vs 语气 93.5，声音 vs 文字说明 97.5（只给图：50）；没见过的说话人的真实照片配他们自己的声音 64.4，其中开心的声音 81.7。真实照片的案例见[项目主页](https://adventists-ai.github.io/duplexjev/#ab-vision)。
 
 ## 5. 性能
 

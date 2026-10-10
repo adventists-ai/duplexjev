@@ -181,7 +181,8 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
-- **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Not in a released checkpoint yet. Real examples, including the misses, on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
+- **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
+- **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Real examples on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
 - **2026-10-10** — 🤗 [**DuplexJev-4B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the same small model now also **holds a normal conversation**, multi-turn included, while keeping the decision scores of v1.0 (conversation replay in the LoRA stage, per-row loss). v1.0 stays available as revision `v1.0`. [Research note](research/2026-10-chat-replay.md).
 - **2026-10-09** — 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) and
   [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the widest set of paralinguistic
@@ -269,7 +270,8 @@ speaker, stress, emotion, gender, turn-taking) in one model — `DuplexJev-32B-P
 on smaller GPUs. `DuplexJev-32B-Turn` / `4B-Turn` if the last point of emotion and turn-taking matters most;
 `DuplexJev-32B-Stress` / `4B-Stress` if stress and pauses are the main thing. The Turn
 models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
-use only the language model of Qwen3-VL-32B: their inputs are audio and text for now (image input is planned).
+use only the language model of Qwen3-VL-32B: their inputs are audio and text. For speech + image, use
+[DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview).
 
 > **Research checkpoints.** Behind these models are several dozen connector checkpoints for other encoders (MOSS, Whisper,
 > SenseVoice), LLMs (Qwen3 0.6B–32B, Falcon-H1, SmolLM3) and both connector types, used with the `duplexjev` PyTorch
@@ -349,6 +351,32 @@ Same speaker or not: put a voice sample and the new clip in one file with about 
 `"Before the silence is a voice sample of someone; after it is another clip. Are they the same speaker?"` with options
 `["different speakers", "same speaker"]` (Chinese: `"静音前是某人的一段声音样本，静音后是另一段语音。两段是同一个人吗？"`, `["是不同的人", "是同一个人"]`).
 Ready-made scripts: [`examples/para_abilities.py`](examples/para_abilities.py).
+
+### Speech + image together (research preview)
+
+[DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) puts Qwen3-VL's vision encoder back
+in front of the DuplexJev-32B-Para language model, so one question can use what it **hears** and what it **sees**
+(one 80 GB GPU):
+
+```python
+# pip install "duplexjev[vision]>=0.5"
+from duplexjev.vision import VisionDecider
+vd = VisionDecider.from_pretrained("adventists-ai/DuplexJev-32B-Vision")
+vd.decide(audio="clip.wav", image="face.jpg", questions=[
+    {"id": "match", "text": "Does the face in the picture show the same emotion as the speaker's voice?", "options": ["Yes", "No"]}])
+vd.chat(image="photo.jpg", text="What is written in the picture?")
+```
+
+Or serve it with vLLM (`pip install "duplexjev-vllm>=0.3"`), about 0.05 s per question with a picture and a 3 s clip:
+
+```bash
+vllm serve adventists-ai/DuplexJev-32B-Vision --max-model-len 8192 --limit-mm-per-prompt '{"image": 1, "audio": 1, "video": 0}'
+python examples/vllm_vision_client.py clip.wav face.jpg
+```
+
+Held-out results: stressed word vs. the red word 94.1, face vs. voice 93.5, sound vs. caption 97.5 (picture alone: 50);
+real photos of unseen speakers with their own voice 64.4, happy voices 81.7. Examples with real photos are on the
+[project page](https://adventists-ai.github.io/duplexjev/#ab-vision).
 
 ## 5. Performance
 

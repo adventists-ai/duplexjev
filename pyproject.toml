@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "duplexjev"
-version = "0.4.1"
+version = "0.5.0"
 description = "Jev-style typed decisions about speech with zero decode steps: one forward pass answers many option groups about many clips."
 readme = "PYPI.md"
 license = {text = "Apache-2.0"}
@@ -25,6 +25,7 @@ classifiers = [
 speech = ["torch>=2.1", "scipy", "accelerate", "peft", "transformers>=4.51,<4.56"]
 server = ["fastapi", "uvicorn", "pydantic>=2"]
 all = ["torch>=2.1", "scipy", "accelerate", "peft", "transformers>=4.51,<4.56", "fastapi", "uvicorn", "pydantic>=2"]
+vision = ["torch>=2.1", "transformers>=4.57", "pillow", "safetensors", "huggingface_hub"]
 dev = ["pytest", "httpx"]
 
 [project.scripts]

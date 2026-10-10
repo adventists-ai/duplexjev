@@ -15,7 +15,7 @@ from .quick import quick
 from .table import default_table, format_table
 
 __all__ = ["Decider", "Question", "load_audio", "quick", "default_table", "format_table"]
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 
 
 def __getattr__(name):  # torch is only imported when the local engine is used
