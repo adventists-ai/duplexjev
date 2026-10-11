@@ -9,7 +9,8 @@
 
 The model is Qwen3-VL-32B's vision encoder and the DuplexJev-32B-Para language model with one more LoRA (merged), plus
 the DuplexJev-32B-Para audio encoder and connector (in ``audio/``). Audio and image are both optional. Answers are read
-as one constrained token, averaged over option orders, like ``duplexjev.Decider``. Needs transformers >= 4.57.
+as one constrained token, averaged over option orders, like ``duplexjev.Decider``. Needs transformers >= 5 (tested with 5.17); install with ``pip install "duplexjev[vision]"`` in its own environment
+(the ``speech`` extra pins transformers < 4.56).
 """
 from __future__ import annotations
 
