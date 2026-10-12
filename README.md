@@ -121,8 +121,8 @@ Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on shor
 | Speaker gender | Perceived gender of the voice, a cue a transcript does not carry. | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **male** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **female** 100% |
 | Stress (word focus) 🆕 | Same words, different stressed word, different meaning. The model tells which word carries the stress, and also when no word is stressed. | 🔊 [**张昊**昨晚做烤肉。](docs/audio/ab_m1.wav) → **张昊 (Zhang Hao)** 100%<br>🔊 [张昊**昨晚**做烤肉。](docs/audio/ab_m2.wav) → **昨晚 (last night)** 100%<br>🔊 [张昊昨晚**做烤肉**。](docs/audio/ab_m3.wav) → **做烤肉 (made barbecue)** 97%<br>🔊 [我明天去北京开会。](docs/audio/ab_n0.wav) → **no word is particularly emphasized** 96% |
 | Pauses and phrasing 🆕 | Where the speaker pauses can change the structure of a sentence: one item or two, who did what to whom. | 🔊 [我买了巧克力雪糕｜和果汁。](docs/audio/ab_q1.wav) → **two (chocolate ice cream, juice)** 96%<br>🔊 [我买了巧克力｜雪糕｜和果汁。](docs/audio/ab_q2.wav) → **three (chocolate, ice cream, juice)** 98% |
-| Non-verbal sounds 🆕 (Para) | Laughter, breathing, coughs, sighs, sniffing, throat clearing, sneezes, crying, with a "none" option. | Unseen real speech (NonverbalTTS test), AUC laughter / breathing / cough / sigh: 32B-Para 0.85 / 0.73 / 0.70 / 0.74, 4B-Para 0.80 / 0.76 / 0.75 / 0.81 (before: 0.40–0.73; an AudioSet AST tagger: 0.71–0.85). |
-| Speaking style 🆕 (Para) | Whispering, shouting, very fast or slow, unusually high or low pitch, or a normal voice. | 7-way on held-out EARS speakers: 69% (32B-Para) / 67% (4B-Para), from 45–55%. |
+| Non-verbal sounds 🆕 (Para) | Laughter, breathing, coughs, sighs, sniffing, throat clearing, sneezes, crying, with a "none" option. | Unseen real speech (NonverbalTTS test), AUC laughter / breathing / cough / sigh: 32B-Para 0.88 / 0.81 / 0.85 / 0.80, 4B-Para 0.80 / 0.76 / 0.75 / 0.81 (before: 0.40–0.73; an AudioSet AST tagger: 0.71–0.85). |
+| Speaking style 🆕 (Para) | Whispering, shouting, very fast or slow, unusually high or low pitch, or a normal voice. | 7-way on held-out EARS speakers: 82% (32B-Para) / 67% (4B-Para), from 45–55%. |
 | Who is speaking 🆕 (Para) | Same speaker or not, given a voice sample. A coarse, human-like sense of "same voice", far behind dedicated speaker models; not for identifying people. | Same-gender AISHELL-1 pairs: EER 18% (32B-Para) / 9% (4B-Para); official VoxCeleb1-H list: 40% / 37% (dedicated x-vector model: ~2–4%). |
 
 </details>
@@ -137,7 +137,7 @@ Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on shor
 | gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
 | emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) |
 | same speaker? | official VoxCeleb1-H list: different speakers share gender and nationality (2,000 trials) | **EER 36.9%** (4B-Para) / 40.3% (32B-Para); research checkpoints‡ 29.6% / 31.2% | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
-| laughter / breathing / cough / sigh | NonverbalTTS test (real speech, unseen), AUC | **0.85 / 0.73 / 0.70 / 0.74** (32B-Para) | AudioSet AST tagger 0.71 / 0.75 / 0.85 / 0.76 |
+| laughter / breathing / cough / sigh | NonverbalTTS test (real speech, unseen), AUC | **0.88 / 0.81 / 0.85 / 0.80** (32B-Para) | AudioSet AST tagger 0.71 / 0.75 / 0.85 / 0.76 |
 | spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
 
 Other systems' numbers are from their papers (Easy-Turn Table 2, CoDeTT, Dynamic-SUPERB Phase-2). Easy-Turn is in-domain
@@ -182,6 +182,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
+- **2026-10-12** — 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): now the best overall DuplexJev model (total 92.6 vs 92.2 for 32B-Turn) and much better at non-verbal sounds (cough AUC 0.70 → 0.85, breathing 0.73 → 0.81), speaking style (69% → 82%) and stress (DEBATE 87 → 93, StressPresso 84 → 96). Same prompts and plugin; v1.0 stays available as revision `v1.0`.
 - **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
 - **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Real examples on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
 - **2026-10-10** — 🤗 [**DuplexJev-4B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the same small model now also **holds a normal conversation**, multi-turn included, while keeping the decision scores of v1.0 (conversation replay in the LoRA stage, per-row loss). v1.0 stays available as revision `v1.0`. [Research note](research/2026-10-chat-replay.md).
@@ -224,10 +225,10 @@ Each model is **one repository with everything needed** (audio encoder + trained
 
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 | server, widest set of abilities | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | 95 | 87 | 94.0\* | **92.1** | 89.5 | 91.4 | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 v1.1 | server, widest set of abilities, best overall | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | **88** | 94.8\* | **92.9** | **91.5** | **92.6** | CC BY-NC 4.0 |
 | ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | small GPU, widest set of abilities, **and normal conversation** (v1.1); `duplexjev` default | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 77 | **58** | 91.0\* | 89.2 | 90.0 | **82.5** | CC BY-NC 4.0 |
-| 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
+| 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | 91.5 | 91.1 | 92.2 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | 92.1 | 91.4 | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | small GPU, edge | Qwen3-4B (+ rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 4.2 B | ~10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | small GPU, + stress and pauses | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
 
@@ -237,13 +238,15 @@ sample of natural Mandarin conversation; speaker EER on same-gender AISHELL-1 pa
 | | laughter | breathing | cough | sigh | laughter / breathing in conversation | speaking style (7 classes) | same speaker? EER |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
-| **32B-Para** | **0.85** | **0.73** | **0.70** | **0.74** | **0.80 / 0.78** | **69%** | 18% |
+| **32B-Para** v1.1 | **0.88** | **0.81** | **0.85** | 0.80 | 0.83 / 0.65 | **82%** | ≈ v1.0 (18%)² |
+| 32B-Para v1.0 | 0.85 | 0.73 | 0.70 | 0.74 | 0.80 / 0.78 | 69% | 18% |
 | **4B-Para** v1.1 | 0.81 | 0.77 | 0.77 | 0.71 | 0.85 / 0.74 | 67% | ≈ v1.0 (9%)¹ |
 | 4B-Para v1.0 | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
 
 ¹ v1.1 was not re-run on the AISHELL-1 pairs; on VoxCeleb1 hard pairs its EER is 42.0% vs 41.8% for v1.0.
+² 32B-Para v1.1 was not re-run on the AISHELL-1 pairs; on VoxCeleb1 random / hard pairs its EER is 28.2% / 39.6% (v1.0: 37.4% / 45.7%).
 
-The costs are small and listed on the model cards (32B-Para: emotion −1.6 and Easy-Turn −1.2 vs 32B-Turn;
+The costs are small and listed on the model cards (32B-Para v1.1: Easy-Turn −0.5 vs 32B-Turn, every other main score equal or higher;
 4B-Para: ZJU-ML −2, Easy-Turn −1 vs 4B-Turn). Speaker judgments are coarse, human-like, and must not be used to
 identify people.
 
@@ -268,7 +271,7 @@ gender 78.5, emotion 60.9), so it is not in the table above; details on its mode
 
 **Which one to use.** The **Para** models if you want everything the voice carries (non-verbal sounds, speaking style,
 speaker, stress, emotion, gender, turn-taking) in one model — `DuplexJev-32B-Para` on an 80 GB GPU, `DuplexJev-4B-Para`
-on smaller GPUs. `DuplexJev-32B-Turn` / `4B-Turn` if the last point of emotion and turn-taking matters most;
+on smaller GPUs. `DuplexJev-32B-Turn` / `4B-Turn` if the last point of turn-taking (and, on 4B, emotion) matters most;
 `DuplexJev-32B-Stress` / `4B-Stress` if stress and pauses are the main thing. The Turn
 models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
 use only the language model of Qwen3-VL-32B: their inputs are audio and text. For speech + image, use

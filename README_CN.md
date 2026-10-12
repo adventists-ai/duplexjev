@@ -115,8 +115,8 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 说话人性别 | 听出说话人的性别——转写里没有这个信息。 | 🔊 [帮我导航到最近的充电站。](docs/audio/ex4.wav) → **男性** 100%<br>🔊 [太好了，谢谢你！](docs/audio/ex6.wav) → **女性** 100% |
 | 重音（强调哪个词） 🆕 | 同样的字，重读不同的词，意思就不同。模型能听出重读落在哪个词上，也能判断“没有特别强调”。 | 🔊 [**张昊**昨晚做烤肉。](docs/audio/ab_m1.wav) → **张昊** 100%<br>🔊 [张昊**昨晚**做烤肉。](docs/audio/ab_m2.wav) → **昨晚** 100%<br>🔊 [张昊昨晚**做烤肉**。](docs/audio/ab_m3.wav) → **做烤肉** 97%<br>🔊 [我明天去北京开会。](docs/audio/ab_n0.wav) → **没有特别强调哪个词** 96% |
 | 停顿与断句 🆕 | 在哪里停顿会改变句子结构：是一样东西还是两样，谁对谁做了什么。 | 🔊 [我买了巧克力雪糕｜和果汁。](docs/audio/ab_q1.wav) → **两样（巧克力雪糕、果汁）** 96%<br>🔊 [我买了巧克力｜雪糕｜和果汁。](docs/audio/ab_q2.wav) → **三样（巧克力、雪糕、果汁）** 98% |
-| 非语言声音 🆕（Para） | 笑声、呼吸、咳嗽、叹气、吸鼻子、清嗓子、打喷嚏、哭声，带“都没有”选项。 | 训练没见过的真人语音（NonverbalTTS 测试集），笑 / 呼吸 / 咳嗽 / 叹气 AUC：32B-Para 0.85 / 0.73 / 0.70 / 0.74，4B-Para 0.80 / 0.76 / 0.75 / 0.81（之前 0.40–0.73；AudioSet AST 检测器 0.71–0.85）。 |
-| 说话方式 🆕（Para） | 耳语、大喊、语速很快或很慢、音调特别高或特别低，还是正常说话。 | EARS 留出说话人 7 选 1：69%（32B-Para）/ 67%（4B-Para），之前 45–55%。 |
+| 非语言声音 🆕（Para） | 笑声、呼吸、咳嗽、叹气、吸鼻子、清嗓子、打喷嚏、哭声，带“都没有”选项。 | 训练没见过的真人语音（NonverbalTTS 测试集），笑 / 呼吸 / 咳嗽 / 叹气 AUC：32B-Para 0.88 / 0.81 / 0.85 / 0.80，4B-Para 0.80 / 0.76 / 0.75 / 0.81（之前 0.40–0.73；AudioSet AST 检测器 0.71–0.85）。 |
+| 说话方式 🆕（Para） | 耳语、大喊、语速很快或很慢、音调特别高或特别低，还是正常说话。 | EARS 留出说话人 7 选 1：82%（32B-Para）/ 67%（4B-Para），之前 45–55%。 |
 | 是谁在说 🆕（Para） | 给一段声音样本，判断是不是同一个人。像人一样的粗略判断，远不如专用说话人模型，不能用来识别身份。 | AISHELL-1 同性别配对：EER 18%（32B-Para）/ 9%（4B-Para）；官方 VoxCeleb1-H 列表：40% / 37%（专用 x-vector 模型约 2–4%）。 |
 
 </details>
@@ -131,7 +131,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 性别 | 800 条真实语音（AISHELL-1、LibriSpeech） | **91.5** | 只用转写训练的语音大模型：约 55（瞎猜） |
 | 情绪（4 类） | 800 条（ESD、CREMA-D） | **91.1** | 只用转写训练的语音大模型：约 28（瞎猜） |
 | 是不是同一个人 | 官方 VoxCeleb1-H 列表：不同人之间性别和国籍相同（2,000 个试次） | **EER 36.9%**（4B-Para）/ 40.3%（32B-Para）；研究 checkpoint‡ 29.6% / 31.2% | 只靠性别：瞎猜（50）；专用说话人模型（ECAPA-TDNN）：EER 约 2% |
-| 笑 / 呼吸 / 咳嗽 / 叹气 | NonverbalTTS 测试集（真人语音，训练未见），AUC | **0.85 / 0.73 / 0.70 / 0.74**（32B-Para） | AudioSet AST 检测器 0.71 / 0.75 / 0.85 / 0.76 |
+| 笑 / 呼吸 / 咳嗽 / 叹气 | NonverbalTTS 测试集（真人语音，训练未见），AUC | **0.88 / 0.81 / 0.85 / 0.80**（32B-Para） | AudioSet AST 检测器 0.71 / 0.75 / 0.85 / 0.76 |
 | 口语知识问答 | VoiceBench OBQA / MMSU | **85.5 / 72.1** | 同一大模型直接读文字：95.4 / 79.3 |
 
 其他系统的数字取自各自论文（Easy-Turn 表 2、CoDeTT、Dynamic-SUPERB Phase-2）。Easy-Turn 对 Easy-Turn 检测器和我们的模型都是域内评测。
@@ -168,6 +168,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 ## 2. 最新动态
 
+- **2026-10-12** —— 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：现在是总分最高的 DuplexJev 模型（92.6，32B-Turn 为 92.2），非语言声音（咳嗽 AUC 0.70 → 0.85、呼吸 0.73 → 0.81）、说话方式（69% → 82%）和重音（DEBATE 87 → 93、StressPresso 84 → 96）都明显提升。提示词和插件不变；v1.0 仍可用 revision `v1.0` 下载。
 - **2026-10-10** —— 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（研究预览）：同一道题可以同时用上**听到的和看到的**。没见过的说话人的真实照片配他们自己的声音：64.4（只给图 50），其中开心的声音 81.7。`pip install "duplexjev[vision]>=0.5"`，或用 `duplexjev-vllm>=0.3` 通过 `vllm serve` 部署（每道题约 0.05 秒）。见[语音 + 图像一起判断](#语音--图像一起判断研究预览)。
 - **2026-10-10** —— 🔬 研究预览：**图像 + 语音一起判断。** DuplexJev-32B-Para 的语言模型就是 Qwen3-VL 的，视觉编码器可以直接接回去；再加一层 LoRA，它能把听到的和看到的对起来（留出的合成测试集上：重读词 vs 标红词 94.1，语气 vs 表情 93.5，声音 vs 文字说明 97.5；只给图 = 50）。真实案例见[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。
 - **2026-10-10** —— 🤗 [**DuplexJev-4B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：同一个小模型现在也能**正常聊天**（包括多轮），判断类成绩与 v1.0 基本持平（LoRA 阶段加入对话回放、按行平均损失）。v1.0 仍可用 revision `v1.0` 下载。[研究笔记](research/2026-10-chat-replay_zh.md)。
@@ -207,10 +208,10 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 | 服务器端，能力最全 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | 95 | 87 | 94.0\* | **92.1** | 89.5 | 91.4 | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 v1.1 | 服务器端，能力最全，总分最高 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | **88** | 94.8\* | **92.9** | **91.5** | **92.6** | CC BY-NC 4.0 |
 | ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | 小显卡，能力最全，**也能正常聊天**（v1.1）；`duplexjev` 默认模型 | 同 4B-Turn（再加一个 rank 16 LoRA） | 4.2 B | 约 10 GB | 77 | **58** | 91.0\* | 89.2 | 90.0 | **82.5** | CC BY-NC 4.0 |
-| 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | **91.5** | **91.1** | **92.2** | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | 服务器端，加重音与停顿 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | 94.4\* | **92.1** | **91.4** | — | CC BY-NC 4.0 |
+| 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 服务器端，效果最好 | Qwen3-VL-32B（语言模型部分，加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | **95.3**\* | 91.5 | 91.1 | 92.2 | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | 服务器端，加重音与停顿 | 同 32B-Turn（再加一个 rank 16 LoRA） | 33.0 B | 一张 80 GB 显卡 | **96** | 87 | 94.4\* | 92.1 | 91.4 | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 小显卡、端侧 | Qwen3-4B（加 rank 16 LoRA）+ Qwen3-ASR-0.6B 编码器 | 4.2 B | 约 10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | 小显卡，加重音与停顿 | 同 4B-Turn（再加一个 rank 16 LoRA） | 4.2 B | 约 10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
 
@@ -219,13 +220,15 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | | 笑 | 呼吸 | 咳嗽 | 叹气 | 对话中的笑 / 呼吸 | 说话方式（7 类） | 是否同一人 EER |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
-| **32B-Para** | **0.85** | **0.73** | **0.70** | **0.74** | **0.80 / 0.78** | **69%** | 18% |
+| **32B-Para** v1.1 | **0.88** | **0.81** | **0.85** | 0.80 | 0.83 / 0.65 | **82%** | ≈ v1.0（18%）² |
+| 32B-Para v1.0 | 0.85 | 0.73 | 0.70 | 0.74 | 0.80 / 0.78 | 69% | 18% |
 | **4B-Para** v1.1 | 0.81 | 0.77 | 0.77 | 0.71 | 0.85 / 0.74 | 67% | ≈ v1.0 (9%)¹ |
 | 4B-Para v1.0 | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
 
 ¹ v1.1 没有在 AISHELL-1 配对上重测；在 VoxCeleb1 困难配对上 EER 为 42.0%（v1.0 为 41.8%）。
+² 32B-Para v1.1 没有在 AISHELL-1 配对上重测；在 VoxCeleb1 随机 / 困难配对上 EER 为 28.2% / 39.6%（v1.0 为 37.4% / 45.7%）。
 
-代价很小，模型卡上都列了（32B-Para：情绪比 32B-Turn 低 1.6、Easy-Turn 低 1.2；4B-Para：ZJU-ML 比 4B-Turn 低 2、Easy-Turn 低 1）。
+代价很小，模型卡上都列了（32B-Para v1.1：Easy-Turn 比 32B-Turn 低 0.5，其余主要分数持平或更高；4B-Para：ZJU-ML 比 4B-Turn 低 2、Easy-Turn 低 1）。
 说话人判断很粗略，像人一样，不能用来识别身份。
 
 **DuplexJev-4B-Para v1.1（2026-10-10）** 加入了对话回放训练，同一份权重还能正常聊天。判断类成绩与 v1.0 相差 0.5–2.6 分（v1.0 仍可用 revision `v1.0` 下载），见[研究笔记](research/2026-10-chat-replay_zh.md)。32B 版正在训练。
@@ -245,7 +248,7 @@ qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6；Easy-Turn 68.0（零样本，
 情绪 60.9），所以没有放进上表；详见模型卡。
 
 **怎么选。** 想一个模型听全声音里的信息（非语言声音、说话方式、说话人、重音、情绪、性别、话轮）就用 **Para** 版：
-80 GB 显卡用 `DuplexJev-32B-Para`，小显卡用 `DuplexJev-4B-Para`。最看重情绪和话轮的最后一分，用 `DuplexJev-32B-Turn` / `4B-Turn`；
+80 GB 显卡用 `DuplexJev-32B-Para`，小显卡用 `DuplexJev-4B-Para`。最看重话轮（4B 上还有情绪）的最后一分，用 `DuplexJev-32B-Turn` / `4B-Turn`；
 重音和停顿是主要需求，用 `DuplexJev-32B-Stress` / `4B-Stress`。Turn 版可以直接替换原版（提示词、插件都一样），
 我们跑的每项评测都持平或更好（在误差范围内）。32B 模型只用了 Qwen3-VL-32B 的语言模型部分，
 输入是音频和文字。要同时输入语音和图像，用 [DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（研究预览）。
