@@ -29,6 +29,7 @@
 <p align="center">
   <a href="https://arxiv.org/abs/2610.02638"><img src="https://img.shields.io/badge/arXiv-2610.02638-b31b1b" alt="arXiv"></a>
   <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-open%20weights%204B%20%C2%B7%2032B-yellow" alt="Hugging Face models"></a>
+  <a href="https://www.modelscope.cn/organization/AdventistsAI"><img src="https://img.shields.io/badge/ModelScope-mirror-624aff" alt="ModelScope"></a>
   <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
   <a href="https://adventists-ai.github.io/duplexjev/"><img src="https://img.shields.io/badge/project-page-0b7285" alt="Project page"></a>
 </p>
@@ -182,6 +183,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
+- **2026-10-12** — All ten DuplexJev models are now also on **[ModelScope](https://www.modelscope.cn/organization/AdventistsAI)** (same weights, sha256-checked), for faster downloads in mainland China.
 - **2026-10-12** — 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): now the best overall DuplexJev model (total 92.6 vs 92.2 for 32B-Turn) and much better at non-verbal sounds (cough AUC 0.70 → 0.85, breathing 0.73 → 0.81), speaking style (69% → 82%) and stress (DEBATE 87 → 93, StressPresso 84 → 96). Same prompts and plugin; v1.0 stays available as revision `v1.0`.
 - **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
 - **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Real examples on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
@@ -222,6 +224,9 @@ Coming next: open-source full-duplex Jev dialogue pipeline (around 2026-10-20). 
 
 Each model is **one repository with everything needed** (audio encoder + trained connector + LLM) and runs on
 [vLLM](https://github.com/vllm-project/vllm) with a small plugin ([§4](#4-quick-start)).
+Every model is mirrored on [ModelScope](https://www.modelscope.cn/organization/AdventistsAI) under the same name (same weights; latest version only):
+`pip install modelscope && modelscope download --model AdventistsAI/DuplexJev-32B-Para --local_dir ./DuplexJev-32B-Para`,
+then use the local directory in place of the Hugging Face id, e.g. `vllm serve ./DuplexJev-32B-Para`.
 
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|

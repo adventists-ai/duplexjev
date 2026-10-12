@@ -28,6 +28,7 @@
 <p align="center">
   <a href="https://arxiv.org/abs/2610.02638"><img src="https://img.shields.io/badge/arXiv-2610.02638-b31b1b" alt="arXiv"></a>
   <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-%E5%BC%80%E6%94%BE%E6%9D%83%E9%87%8D%204B%20%C2%B7%2032B-yellow" alt="开放权重"></a>
+  <a href="https://www.modelscope.cn/organization/AdventistsAI"><img src="https://img.shields.io/badge/ModelScope-%E5%9B%BD%E5%86%85%E9%95%9C%E5%83%8F-624aff" alt="ModelScope 魔搭"></a>
   <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
   <a href="https://huggingface.co/spaces/BitKnight/DuplexJev"><img src="https://img.shields.io/badge/%F0%9F%A4%97-HF%20%E6%BC%94%E7%A4%BA-orange" alt="HF 演示"></a>
   <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision"><img src="https://img.shields.io/badge/%F0%9F%91%81%EF%B8%8F-%E8%A7%86%E8%A7%89%E7%89%88%E6%BC%94%E7%A4%BA-0EA5E9" alt="视觉版演示"></a>
@@ -168,6 +169,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 ## 2. 最新动态
 
+- **2026-10-12** —— 全部 10 个 DuplexJev 模型已上线 **[魔搭 ModelScope](https://www.modelscope.cn/organization/AdventistsAI)**（权重与 Hugging Face 一致，已逐文件核对 sha256），国内下载更快。
 - **2026-10-12** —— 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：现在是总分最高的 DuplexJev 模型（92.6，32B-Turn 为 92.2），非语言声音（咳嗽 AUC 0.70 → 0.85、呼吸 0.73 → 0.81）、说话方式（69% → 82%）和重音（DEBATE 87 → 93、StressPresso 84 → 96）都明显提升。提示词和插件不变；v1.0 仍可用 revision `v1.0` 下载。
 - **2026-10-10** —— 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（研究预览）：同一道题可以同时用上**听到的和看到的**。没见过的说话人的真实照片配他们自己的声音：64.4（只给图 50），其中开心的声音 81.7。`pip install "duplexjev[vision]>=0.5"`，或用 `duplexjev-vllm>=0.3` 通过 `vllm serve` 部署（每道题约 0.05 秒）。见[语音 + 图像一起判断](#语音--图像一起判断研究预览)。
 - **2026-10-10** —— 🔬 研究预览：**图像 + 语音一起判断。** DuplexJev-32B-Para 的语言模型就是 Qwen3-VL 的，视觉编码器可以直接接回去；再加一层 LoRA，它能把听到的和看到的对起来（留出的合成测试集上：重读词 vs 标红词 94.1，语气 vs 表情 93.5，声音 vs 文字说明 97.5；只给图 = 50）。真实案例见[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。
@@ -205,6 +207,9 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 每个模型都是**一个包含全部组件的仓库**（音频编码器 + 训练好的连接器 + 大模型），装一个小插件就能用
 [vLLM](https://github.com/vllm-project/vllm) 部署（见[第 4 节](#4-快速上手)）。
+所有模型在[魔搭 ModelScope](https://www.modelscope.cn/organization/AdventistsAI) 上有同名镜像（权重相同，只放最新版）：
+`pip install modelscope && modelscope download --model AdventistsAI/DuplexJev-32B-Para --local_dir ./DuplexJev-32B-Para`，
+之后把命令里的 Hugging Face 模型名换成本地目录即可，例如 `vllm serve ./DuplexJev-32B-Para`。
 
 | 模型 | 适用 | 基座 | 参数 | 显存 | qa100 | ZJU-ML | Easy-Turn | 性别 | 情绪 | 总分 | 许可 |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
