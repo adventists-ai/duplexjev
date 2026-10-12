@@ -41,6 +41,17 @@ LiveKit Turn Detector v1 9.9% / 4.5% false cutoffs at 300 / 600 ms; JoinIn Baton
 Leaderboard: third-party models appear as an adapter file + committed results under `output/` + an entry in
 `scripts/export_web_data.py`. No written submission process -- open an issue first.
 
+
+**Fast mode (score point only).** eot-bench's official numbers read only the prediction 0.2 s into each pause, so
+`eot_bench/run_scorepoints.py` asks the model once per pause (en: 1,105 calls instead of 11,191) and writes a
+`predictions.parquet` on the same grid as a full run (template: any committed run for that language, e.g.
+`smart_turn_audio_adapter__cb4f57229a`). Use the full `predict` above for a leaderboard submission.
+
+```bash
+PYTHONPATH=/path/to/duplexjev/benchmarks/turn_detection:. .venv/bin/python -m eot_bench.run_scorepoints --lang en \
+  --template $R/en/smart_turn_audio_adapter__cb4f57229a --out $R/en/duplexjev_4b_para --workers 32 --min-interval 0
+```
+
 ## 2. Pipecat Smart Turn test set
 
 `pipecat-ai/smart-turn-data-v3.2-test`: 31,527 single-utterance clips, complete vs incomplete (balanced), 23
