@@ -47,6 +47,21 @@ aggregators = LLMContextAggregatorPair(context, user_params=LLMUserAggregatorPar
 ))
 ```
 
+**Give it the assistant's last message** (new in 0.3.0). Turn-taking is clearly better when the model knows what the
+bot had just said (a question invites a short answer; "ok" after a question ends the turn). Put the tracker after
+your LLM service:
+
+```python
+from pipecat_duplexjev import DuplexJevContextTracker
+
+pipeline = Pipeline([transport.input(), stt, aggregators.user(), llm,
+                     DuplexJevContextTracker(turn),       # tells the analyzer what the bot is saying
+                     tts, transport.output(), aggregators.assistant()])
+```
+
+or call `turn.set_assistant_said(text)` yourself. It needs a gateway from `duplexjev>=0.6`. On LiveKit eot-bench
+(English, DuplexJev-32B-Para v1.2) this cuts false cut-offs at a 300 ms budget from 23.5% to 19.7%.
+
 A complete snippet is in [`examples/wiring.py`](examples/wiring.py). [`examples/live_check.py`](examples/live_check.py)
 feeds real clips through the analyzer, frame by frame, the way a transport does:
 
@@ -60,10 +75,10 @@ ex5.wav: INCOMPLETE p(finished)=0.28  turn='hesitating or asking to wait'       
 
 The default URL is our free trial API. It is rate limited (30 requests per minute) and served from mainland China,
 so the network round trip from elsewhere can be over a second. For a live bot, serve the model next to your agent.
-DuplexJev-4B-Para needs about 10 GB of GPU memory:
+DuplexJev-4B-Para needs about 10 GB of GPU memory; for the best turn-taking use DuplexJev-32B-Para (v1.2, one 80 GB GPU):
 
 ```bash
-pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.4.1"
+pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
 vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096 --port 8000 &
 duplexjev gateway --vllm http://localhost:8000/v1 --port 8420
 ```

@@ -40,6 +40,18 @@ session = AgentSession(
 )
 ```
 
+**Give it the agent's last message** (new in 0.2.0). Turn-taking is clearly better when the model knows what the
+agent had just said. Keep a reference to the detector and attach it to the session once:
+
+```python
+detector = duplexjev.TurnDetector(api_url="http://localhost:8420")
+session = AgentSession(..., turn_handling={"turn_detection": detector})
+detector.attach(session)        # follows conversation_item_added; or detector.set_assistant_said(text)
+```
+
+It needs a gateway from `duplexjev>=0.6`. On LiveKit eot-bench (English, DuplexJev-32B-Para v1.2) this cuts false
+cut-offs at a 300 ms budget from 23.5% to 19.7%.
+
 `AgentSession(turn_detection=duplexjev.TurnDetector(), ...)` works too (LiveKit marks that argument as deprecated).
 A complete agent is in [`examples/agent.py`](examples/agent.py).
 
@@ -54,10 +66,10 @@ commits the turn, as with any turn detector, because the LLM needs the text.
 
 ## Run the model yourself (recommended for real-time)
 
-The default URL is our free trial API (rate limited to 30 requests per minute; the round trip from outside mainland China adds network latency). For a live agent, serve the model next to it (DuplexJev-4B-Para needs about 10 GB of GPU memory):
+The default URL is our free trial API (rate limited to 30 requests per minute; the round trip from outside mainland China adds network latency). For a live agent, serve the model next to it (DuplexJev-4B-Para needs about 10 GB of GPU memory; for the best turn-taking use DuplexJev-32B-Para v1.2 on one 80 GB GPU):
 
 ```bash
-pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.4.1"
+pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
 vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096 --port 8000 &
 duplexjev gateway --vllm http://localhost:8000/v1 --port 8420
 ```

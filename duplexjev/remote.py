@@ -21,6 +21,14 @@ from typing import Any, Sequence
 from .question import LETTERS, Question, as_questions
 
 HEAD = {"en": "The user said: <|audio|>", "zh": "用户说：<|audio|>"}
+# What the assistant said just before the user's turn (turn-taking context; tail-truncated to SAID_MAX characters).
+SAID = {"en": 'The assistant had just said: "{c}"', "zh": "助手刚才说的是：“{c}”"}
+SAID_MAX = 300
+
+
+def said_prefix(assistant_said: str | None, lang: str) -> str:
+    s = " ".join((assistant_said or "").split())[-SAID_MAX:]
+    return SAID["zh" if lang == "zh" else "en"].format(c=s) + "\n\n" if s else ""
 
 
 def audio_bytes(audio: Any) -> tuple[bytes, str]:
@@ -93,12 +101,12 @@ class VLLMClient:
                 raise RuntimeError(f"letter {c!r} is not a single token for {model}: {ids}")
             self.letter_ids.append(ids[0])
 
-    def ask(self, audio_b64: str, fmt: str, q: Question, seed: int = 0) -> dict:
+    def ask(self, audio_b64: str, fmt: str, q: Question, seed: int = 0, assistant_said: str | None = None) -> dict:
         perm = q.permutation(seed)
         n = len(q.options)
         if n > len(self.letter_ids):
             raise ValueError(f"{q.id}: at most {len(self.letter_ids)} options over the vLLM client")
-        text = HEAD[q.lang] + "\n\n" + q.render(perm)
+        text = said_prefix(assistant_said, q.lang) + HEAD[q.lang] + "\n\n" + q.render(perm)
         r = _post(self.base_url + "/chat/completions", {
             "model": self.model, "max_tokens": 1, "temperature": 0, "logprobs": True, "top_logprobs": 20,
             "allowed_token_ids": self.letter_ids[:n],
@@ -115,12 +123,13 @@ class VLLMClient:
         best = max(probs, key=probs.get)
         return {"answer": best, "confidence": probs[best], "probs": probs}
 
-    def decide(self, audio: Any, questions, *, seed: int = 0) -> dict:
+    def decide(self, audio: Any, questions, *, seed: int = 0, assistant_said: str | None = None) -> dict:
+        """``assistant_said``: the assistant's previous message, which sharpens turn-taking decisions."""
         qs = as_questions(questions if isinstance(questions, (list, tuple)) else [questions])
         data, fmt = audio_bytes(audio)
         b64 = base64.b64encode(data).decode()
         with ThreadPoolExecutor(min(16, len(qs))) as ex:
-            futs = {q.id: ex.submit(self.ask, b64, fmt, q, seed) for q in qs}
+            futs = {q.id: ex.submit(self.ask, b64, fmt, q, seed, assistant_said) for q in qs}
             return {k: f.result() for k, f in futs.items()}
 
 
@@ -132,9 +141,11 @@ class ApiClient:
         self.headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
         self.timeout = timeout
 
-    def decide(self, audio: Any, questions=None, *, lang: str = "en") -> dict:
+    def decide(self, audio: Any, questions=None, *, lang: str = "en", assistant_said: str | None = None) -> dict:
         data, fmt = audio_bytes(audio)
         payload = {"audio_b64": base64.b64encode(data).decode(), "format": fmt, "lang": lang}
+        if assistant_said:
+            payload["assistant_said"] = assistant_said
         if questions is not None:
             payload["questions"] = [q.to_dict() for q in as_questions(questions)]
         r = _post(self.url + "/v1/decide", payload, self.headers, self.timeout)

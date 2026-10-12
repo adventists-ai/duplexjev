@@ -8,6 +8,10 @@ exposed on ``last_answers`` / ``on_answers``.
 This module implements LiveKit's *streaming* (audio) turn-detector protocol: ``AgentSession`` pushes every input
 audio frame into the stream, calls ``predict()`` once the VAD has seen ~200 ms of silence, and waits up to
 ``prediction_timeout`` for the resulting ``TurnDetectionEvent``.
+
+Turn-taking is markedly better when the model also knows what the agent had just said. Call
+``detector.attach(session)`` once after creating the ``AgentSession`` (it follows ``conversation_item_added``), or
+set it yourself with ``detector.set_assistant_said(text)``.
 """
 
 from __future__ import annotations
@@ -173,6 +177,27 @@ class TurnDetector:
         """Answers of the latest successful request: ``{id: {"answer", "confidence", "probs"}}``."""
         self.last_server_ms: float | None = None
         """Server-side model time of the latest request, in milliseconds."""
+        self.assistant_said: str = ""
+        """The agent's previous message, sent with every request (last 300 characters)."""
+
+    def set_assistant_said(self, text: str | None) -> None:
+        """What the agent said just before the user's current turn."""
+        self.assistant_said = " ".join((text or "").split())[-300:]
+
+    def attach(self, session: Any) -> None:
+        """Keep ``assistant_said`` up to date from an ``AgentSession``'s ``conversation_item_added`` events."""
+
+        def _on_item(ev: Any) -> None:
+            item = getattr(ev, "item", None)
+            if getattr(item, "role", None) != "assistant":
+                return
+            text = getattr(item, "text_content", None)
+            if callable(text):
+                text = text()
+            if text:
+                self.set_assistant_said(text)
+
+        session.on("conversation_item_added", _on_item)
 
     def _as_question(self, q: str | dict[str, Any]) -> dict[str, Any]:
         if isinstance(q, str):
@@ -366,6 +391,8 @@ class TurnDetectorStream:
         det = self._detector
         payload = {"audio_b64": base64.b64encode(wav).decode(), "format": "wav", "lang": det._lang,
                    "questions": det._questions}
+        if det.assistant_said:
+            payload["assistant_said"] = det.assistant_said
         try:
             async with self._http().post(
                 det._decide_url, json=payload, headers=det._headers,

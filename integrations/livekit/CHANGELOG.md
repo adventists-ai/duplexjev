@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 (2026-10-13)
+
+- Turn-taking context: `detector.attach(session)` (or `detector.set_assistant_said(text)`) sends the agent's previous
+  message with every request. Needs a gateway from `duplexjev>=0.6`. On LiveKit eot-bench (English,
+  DuplexJev-32B-Para v1.2) false cut-offs at a 300 ms budget drop from 23.5% to 19.7%.
+
 ## 0.1.1 (2026-10-12)
 
 - The turn probability is now P(finished) + P(backchannel): a short "ok" / "yeah" with nobody else talking also

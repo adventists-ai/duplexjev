@@ -61,3 +61,36 @@ def test_complete_and_incomplete(server):
 def test_server_down_does_not_raise():
     a = DuplexJevTurnAnalyzer(url="http://127.0.0.1:9", sample_rate=16000)
     assert a._predict_endpoint(np.zeros(1600, np.float32)) == {"prediction": 0, "probability": 0.0}
+
+
+def test_assistant_said_is_sent(server):
+    a = DuplexJevTurnAnalyzer(url=server, sample_rate=16000)
+    a._predict_endpoint(np.zeros(16000, np.float32))
+    assert "assistant_said" not in Fake.last
+    a.set_assistant_said("  What   time works for you? " + "x" * 400)
+    a._predict_endpoint(np.zeros(16000, np.float32))
+    assert len(Fake.last["assistant_said"]) == 300 and Fake.last["assistant_said"].endswith("x")
+
+
+def test_context_tracker():
+    import asyncio
+    from pipecat.frames.frames import LLMFullResponseEndFrame, LLMFullResponseStartFrame, TextFrame
+    from pipecat.processors.frame_processor import FrameDirection
+    from pipecat_duplexjev import DuplexJevContextTracker
+
+    a = DuplexJevTurnAnalyzer(url="http://127.0.0.1:9", sample_rate=16000)
+    t = DuplexJevContextTracker(a)
+    sent = []
+
+    async def push(frame, direction=FrameDirection.DOWNSTREAM):
+        sent.append(frame)
+
+    t.push_frame = push
+
+    async def run():
+        for f in [LLMFullResponseStartFrame(), TextFrame("Sure, "), TextFrame("what time works?"),
+                  LLMFullResponseEndFrame()]:
+            await t.process_frame(f, FrameDirection.DOWNSTREAM)
+
+    asyncio.run(run())
+    assert a.assistant_said == "Sure, what time works?" and len(sent) == 4

@@ -3,6 +3,9 @@
 DuplexJev reads turn state (finished / still talking / backchannel / asking to wait) straight from the audio as one
 constrained token of a speech LLM, so no transcript and no decoding are needed. Optional extra questions (emotion,
 non-verbal sounds, intent, ...) are answered in the same forward pass and exposed on ``last_answers``.
+
+Turn-taking is markedly better when the model also knows what the assistant had just said: put a
+``DuplexJevContextTracker(analyzer)`` after your LLM in the pipeline (or call ``analyzer.set_assistant_said(text)``).
 """
 from __future__ import annotations
 
@@ -17,6 +20,8 @@ from typing import Any, Callable
 import numpy as np
 from loguru import logger
 from pipecat.audio.turn.smart_turn.base_smart_turn import BaseSmartTurn, SmartTurnParams, SmartTurnTimeoutException
+from pipecat.frames.frames import Frame, LLMFullResponseEndFrame, LLMFullResponseStartFrame, TextFrame
+from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
 DEFAULT_URL = "https://api.adventists.cn/duplexjev"
 
@@ -101,6 +106,11 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
         self._questions = [TURN_QUESTION[lang]] + [self._as_question(q) for q in (extra_questions or [])]
         self.last_answers: dict = {}
         self.last_server_ms: float | None = None
+        self.assistant_said: str = ""
+
+    def set_assistant_said(self, text: str | None) -> None:
+        """What the assistant said just before the user's current turn; sent with every request (last 300 chars)."""
+        self.assistant_said = " ".join((text or "").split())[-300:]
 
     def _as_question(self, q) -> dict:
         if isinstance(q, str):
@@ -115,6 +125,8 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
     def _request(self, wav: bytes) -> dict:
         payload = {"audio_b64": base64.b64encode(wav).decode(), "format": "wav", "lang": self._lang,
                    "questions": self._questions}
+        if self.assistant_said:
+            payload["assistant_said"] = self.assistant_said
         req = urllib.request.Request(self._url, data=json.dumps(payload).encode(), headers=self._headers)
         timeout = self._timeout if self._timeout is not None else self.params.stop_secs
         try:
@@ -146,3 +158,28 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
         turn = answers.get("turn", {})
         p = p_finished(turn.get("probs", {}), self._lang)
         return {"prediction": 1 if p >= self._threshold else 0, "probability": p}
+
+
+class DuplexJevContextTracker(FrameProcessor):
+    """Pass-through processor that tells a ``DuplexJevTurnAnalyzer`` what the assistant just said.
+
+    Place it after the LLM service: it collects the text of each LLM response and hands it to the analyzer when the
+    response ends, so the next end-of-turn decision is made knowing the assistant's previous message.
+    """
+
+    def __init__(self, analyzer: DuplexJevTurnAnalyzer, **kwargs):
+        super().__init__(**kwargs)
+        self._analyzer = analyzer
+        self._parts: list[str] = []
+
+    async def process_frame(self, frame: Frame, direction: FrameDirection):
+        await super().process_frame(frame, direction)
+        if direction == FrameDirection.DOWNSTREAM:
+            if isinstance(frame, LLMFullResponseStartFrame):
+                self._parts = []
+            elif isinstance(frame, TextFrame):
+                self._parts.append(frame.text)
+            elif isinstance(frame, LLMFullResponseEndFrame) and self._parts:
+                self._analyzer.set_assistant_said("".join(self._parts))
+                self._parts = []
+        await self.push_frame(frame, direction)

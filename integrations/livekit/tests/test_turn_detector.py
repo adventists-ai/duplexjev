@@ -172,3 +172,36 @@ async def test_agent_session_accepts_it(gateway):
     det = duplexjev.TurnDetector(api_url=gateway.url)
     session = AgentSession(turn_handling={"turn_detection": det})
     assert session.turn_detection is det
+
+
+async def test_assistant_said_is_sent_and_attach_follows_session(gateway):
+    det = duplexjev.TurnDetector(api_url=gateway.url)
+    stream = det.stream()
+    push(stream, 1.0)
+    await asyncio.wait_for(stream.predict(), 2)
+    assert "assistant_said" not in gateway.requests[-1]
+
+    handlers = {}
+
+    class FakeSession:
+        def on(self, name, fn):
+            handlers[name] = fn
+
+    class Item:
+        def __init__(self, role, text):
+            self.role, self.text_content = role, text
+
+    class Ev:
+        def __init__(self, item):
+            self.item = item
+
+    det.attach(FakeSession())
+    handlers["conversation_item_added"](Ev(Item("user", "hello")))
+    assert det.assistant_said == ""
+    handlers["conversation_item_added"](Ev(Item("assistant", "Sure,  what time\nworks for you?")))
+    assert det.assistant_said == "Sure, what time works for you?"
+    await asyncio.wait_for(stream.predict(), 2)
+    assert gateway.requests[-1]["assistant_said"] == "Sure, what time works for you?"
+    det.set_assistant_said("y" * 500)
+    assert len(det.assistant_said) == 300
+    await stream.aclose()

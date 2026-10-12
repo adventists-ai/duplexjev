@@ -1,5 +1,5 @@
 """Pipecat integration for DuplexJev speech decision models."""
-from .turn import DEFAULT_URL, PRESETS, TURN_QUESTION, DuplexJevTurnAnalyzer
+from .turn import DEFAULT_URL, PRESETS, TURN_QUESTION, DuplexJevContextTracker, DuplexJevTurnAnalyzer, p_finished
 
-__all__ = ["DuplexJevTurnAnalyzer", "DEFAULT_URL", "PRESETS", "TURN_QUESTION"]
-__version__ = "0.1.0"
+__all__ = ["DuplexJevTurnAnalyzer", "DuplexJevContextTracker", "p_finished", "DEFAULT_URL", "PRESETS", "TURN_QUESTION"]
+__version__ = "0.3.0"

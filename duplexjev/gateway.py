@@ -5,7 +5,8 @@
 
     GET  /                 web demo (record or upload a clip, see the decision table)
     GET  /v1/table?lang=zh the default decision table
-    POST /v1/decide        {"audio_b64": ..., "format": "wav", "lang": "zh", "questions": [...optional]}
+    POST /v1/decide        {"audio_b64": ..., "format": "wav", "lang": "zh", "questions": [...optional],
+                            "assistant_said": "...optional: the assistant's previous message"}
                            -> {"answers": {id: {answer, confidence, probs}}, "ms": 123.4, "model": "..."}
 
 Limits: clip size (--max-mb), number of questions (--max-questions), requests per minute per client IP
@@ -43,6 +44,7 @@ def create_app(vllm_url: str, *, max_mb: float = 4.0, max_questions: int = 16, r
         format: str = "wav"
         lang: str = "en"
         questions: Optional[List[dict]] = None
+        assistant_said: Optional[str] = None  # the assistant's previous message (turn-taking context)
 
     def _limit(req: Request):
         ip = req.headers.get("x-real-ip") or req.headers.get("x-forwarded-for", "").split(",")[0].strip() or \
@@ -92,7 +94,7 @@ def create_app(vllm_url: str, *, max_mb: float = 4.0, max_questions: int = 16, r
         qs = [Question(q.id, q.text, q.options, lang=q.lang) for q in qs]
         t = time.perf_counter()
         try:
-            answers = client.decide(audio, qs)
+            answers = client.decide(audio, qs, assistant_said=(body.assistant_said or "")[-2000:] or None)
         except Exception as e:  # decoding errors, too-long audio etc. come back from vLLM as HTTP 400
             raise HTTPException(400, f"model server rejected the request: {str(e)[:200]}")
         return {"answers": answers, "ms": round((time.perf_counter() - t) * 1000, 1), "model": client.model}
