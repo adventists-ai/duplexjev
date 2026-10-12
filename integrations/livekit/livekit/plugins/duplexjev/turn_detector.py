@@ -377,7 +377,9 @@ class TurnDetectorStream:
                 data = await resp.json()
             answers: dict[str, Any] = data["answers"]
             probs = answers["turn"]["probs"]
-            p_finished = float(probs.get(TURN_QUESTION[det._lang]["options"][0], 0.0))
+            o = TURN_QUESTION[det._lang]["options"]
+            # finished + backchannel: a short "ok" / "yeah" with nobody else talking also ends the turn
+            p_finished = float(probs.get(o[0], 0.0)) + float(probs.get(o[2], 0.0))
         except asyncio.CancelledError:
             raise
         except Exception as e:  # network or server error: never block the conversation

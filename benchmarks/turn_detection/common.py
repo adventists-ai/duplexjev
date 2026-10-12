@@ -66,7 +66,9 @@ def p_finished(x16k: np.ndarray, lang: str, *, retries: int = 3, timeout: float 
         try:
             r = _session.post(GATEWAY + "/v1/decide", json=payload, timeout=timeout)
             r.raise_for_status()
-            return float(r.json()["answers"]["turn"]["probs"].get(q["options"][0], 0.0))
+            probs = r.json()["answers"]["turn"]["probs"]
+            # P(finished) + P(backchannel), as in the LiveKit / Pipecat plugins (>= 0.1.1 / 0.2.0)
+            return float(probs.get(q["options"][0], 0.0)) + float(probs.get(q["options"][2], 0.0))
         except Exception:
             if attempt == retries - 1:
                 raise
