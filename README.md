@@ -184,7 +184,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 ## 2. News
 
 - **2026-10-12** — All ten DuplexJev models are now also on **[ModelScope](https://www.modelscope.cn/organization/AdventistsAI)** (same weights, sha256-checked), for faster downloads in mainland China.
-- **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **20.0%** when the model also gets the assistant's previous message, as the plugins send it (full eot-bench run; Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
+- **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **20.0%** when the model also gets the assistant's previous message, as the plugins send it (full eot-bench run; Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. The [trial API](https://api.adventists.cn/duplexjev/) now serves 32B-Para v1.2 too. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
 - **2026-10-12** — 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): now the best overall DuplexJev model (total 92.6 vs 92.2 for 32B-Turn) and much better at non-verbal sounds (cough AUC 0.70 → 0.85, breathing 0.73 → 0.81), speaking style (69% → 82%) and stress (DEBATE 87 → 93, StressPresso 84 → 96). Same prompts and plugin; v1.0 stays available as revision `v1.0`.
 - **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
 - **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Real examples on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
@@ -440,9 +440,9 @@ Both benchmarks ask the hard live question: the user has *just* gone quiet — f
 - Code: [`benchmarks/turn_detection/`](benchmarks/turn_detection); the context row uses
   [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py).
 
-> **Reproducing these numbers.** They come from **DuplexJev-32B-Para v1.2 on your own GPU**, not from the free trial
-> API (the trial API runs the smaller DuplexJev-4B-Para, which has not had the v1.2 turn-taking update, so
-> it scores clearly worse here). To get the published setup:
+> **Reproducing these numbers.** They come from **DuplexJev-32B-Para v1.2**. Since 2026-10-13 the free trial API
+> serves the same model, so the plugin defaults already use it, but it is rate limited (30 requests per minute) and
+> served from mainland China, so for live agents and benchmark runs serve it yourself:
 >
 > ```bash
 > pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3 (2026-10-13)
+
+- The free trial API now serves DuplexJev-32B-Para v1.2; the startup hint and README say so.
+
 ## 0.3.2 (2026-10-13)
 
 - Sends an `X-DuplexJev-Client: livekit-plugins-duplexjev/<version>` header (no personal data), so trial-API usage can be counted per integration.

@@ -22,8 +22,9 @@ Tested with `pipecat-ai` 1.12.0. Maintained by Adventists.ai (AI降临派).
 > **Getting the published turn-taking numbers.** LiveKit eot-bench (English, false cut-offs at 300 ms): **20.0%** for
 > DuplexJev-32B-Para v1.2 with the agent's previous message, 23.5% audio only, vs 35.2% for Smart Turn v3.2. That needs
 > DuplexJev-32B-Para **v1.2 on your own GPU** behind `duplexjev gateway` >= 0.6 (see *Run the model yourself*), the
-> default `readout="turn"`, and the agent's previous message (below). The free trial API runs the smaller DuplexJev-4B-Para
-> (no v1.2 turn-taking update): use it to try the plugin, not to judge turn-taking quality.
+> default `readout="turn"`, and the agent's previous message (below). Since 2026-10-13 the free trial API serves the same
+> DuplexJev-32B-Para v1.2, but it is rate limited (30 requests per minute) and served from mainland China: fine for trying
+> the plugin, self-host for a live bot or a benchmark run.
 
 ## Install
 
@@ -80,8 +81,8 @@ ex5.wav: INCOMPLETE p(finished)=0.28  turn='hesitating or asking to wait'       
 ## Run the model yourself (recommended for real-time)
 
 The default URL is our free trial API. It is rate limited (30 requests per minute), served from mainland China
-(the network round trip from elsewhere can be over a second), and runs the smaller DuplexJev-4B-Para
-without the v1.2 turn-taking update. For a live bot, serve the model next to your agent. For turn-taking, use
+(the network round trip from elsewhere can be over a second); since 2026-10-13 it serves DuplexJev-32B-Para v1.2.
+For a live bot, serve the model next to your agent. For turn-taking, use
 DuplexJev-32B-Para v1.2 on one 80 GB GPU (the eot-bench numbers above):
 
 ```bash

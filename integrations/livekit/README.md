@@ -20,8 +20,9 @@ Tested with `livekit-agents` 1.8.6. Maintained by Adventists.ai (AI降临派).
 > **Getting the published turn-taking numbers.** LiveKit eot-bench (English, false cut-offs at 300 ms): **20.0%** for
 > DuplexJev-32B-Para v1.2 with the agent's previous message, 23.5% audio only, vs 35.2% for Smart Turn v3.2. That needs
 > DuplexJev-32B-Para **v1.2 on your own GPU** behind `duplexjev gateway` >= 0.6 (see *Run the model yourself*), the
-> default `readout="turn"`, and the agent's previous message (below). The free trial API runs the smaller DuplexJev-4B-Para
-> (no v1.2 turn-taking update): use it to try the plugin, not to judge turn-taking quality.
+> default `readout="turn"`, and the agent's previous message (below). Since 2026-10-13 the free trial API serves the same
+> DuplexJev-32B-Para v1.2, but it is rate limited (30 requests per minute) and served from mainland China: fine for trying
+> the plugin, self-host for a live agent or a benchmark run.
 
 ## Install
 
@@ -72,7 +73,7 @@ commits the turn, as with any turn detector, because the LLM needs the text.
 
 ## Run the model yourself (recommended for real-time)
 
-The default URL is our free trial API (rate limited to 30 requests per minute; the round trip from outside mainland China adds network latency; it runs the smaller DuplexJev-4B-Para without the v1.2 turn-taking update). For a live agent, serve the model next to it. For turn-taking, use DuplexJev-32B-Para v1.2 on one 80 GB GPU (the eot-bench numbers above):
+The default URL is our free trial API (rate limited to 30 requests per minute; the round trip from outside mainland China adds network latency; since 2026-10-13 it serves DuplexJev-32B-Para v1.2). For a live agent, serve the model next to it. For turn-taking, use DuplexJev-32B-Para v1.2 on one 80 GB GPU (the eot-bench numbers above):
 
 ```bash
 pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"

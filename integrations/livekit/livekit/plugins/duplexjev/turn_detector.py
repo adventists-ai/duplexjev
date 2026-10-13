@@ -172,9 +172,9 @@ class TurnDetector:
             )
         self._prediction_timeout = prediction_timeout
         if self._base_url == DEFAULT_URL:
-            logger.info("Using the free DuplexJev trial API (DuplexJev-4B-Para, rate limited). "
-                        "For the turn-taking quality reported on eot-bench, serve DuplexJev-32B-Para v1.2 behind "
-                        "`duplexjev gateway` >= 0.6 and pass its URL; see the README.")
+            logger.info("Using the free DuplexJev trial API (DuplexJev-32B-Para v1.2, 30 requests per minute, served "
+                        "from mainland China). For a live agent, serve the model yourself behind `duplexjev gateway` "
+                        ">= 0.6 and pass its URL; see the README.")
         self._fallback_probability = fallback_probability
         self._http_session = http_session
 
