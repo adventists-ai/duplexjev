@@ -76,7 +76,7 @@ python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.
 - **主语言能力：接近直接读文字的大模型。** 语音选择题 90 分，同一大模型读标准转写 91 分（qa100，论文）。
   DuplexJev-32B-Turn：qa100 96、ZJU-ML 87；VoiceBench OBQA / MMSU 85.5 / 72.1（读文字 95.4 / 79.3）。
 - **副语言能力：感知很强。** 性别 91.5、情绪 91.1，而只用转写训练的语音大模型只有瞎猜水平（约 55 / 28）。
-- **“怎么说”远超通用语音大模型。** 与 Qwen3-Omni-30B-A3B 同题同评分：情绪 **90.5 vs 45.2**，哪个词重读 **91 vs 63–73**，说话方式 **79 vs 50**。在公开基准 LISTEN（EACL 2026，专门检验音频大模型是在“听”还是只在“读字”）上，字面不带情绪时 **51 vs 33**，只有非语言声音时 **26 vs 18**（论文中 Gemini 2.5 Pro 为 16）（[§5](#与通用语音大模型比副语言)）。
+- **“怎么说”远超通用语音大模型。** 与 Qwen3-Omni-30B-A3B 同题同评分：情绪 **90.5 vs 45.2**，哪个词重读 **91 vs 63–73**，说话方式 **79 vs 50**（这几项测试集与我们的训练语料同源，说话人或句子不重叠；Qwen3-Omni 为零样本）。在公开基准 LISTEN（EACL 2026，专门检验音频大模型是在“听”还是只在“读字”）上，字面不带情绪时 **51 vs 33**，只有非语言声音时 **26 vs 18**（论文中 Gemini 2.5 Pro 为 16）（[§5](#与通用语音大模型比副语言)）。
 - **重音与停顿（新）。** DuplexJev-32B-Stress 能在没见过的中英文句子上听出重读的是哪个词（“**我**没说……”和“我没说她拿了**钱**”），
   中文 92 / 英文 88；中性语音 99% 能答“没有特别强调”；其他模型都是瞎猜水平（[研究笔记](research/2026-10-stress-understanding_zh.md)）。
 - **常见语音判断任务：达到或超过专用模型。** 话轮状态（Easy-Turn 测试集）95.3（专用 Easy-Turn 检测器 96.4；TEN、Smart Turn
@@ -133,8 +133,8 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 已知系统状态，该怎么做 | CoDeTT 中 / 英（1.8 万，零样本） | **69.2 / 70.0** | Easy-Turn 37.9（中）· Smart-Turn-v3 51.4（英）· NAMO-Turn 59.5（中）· FireRedChat 65.4（英）· GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
 | 性别 | 800 条真实语音（AISHELL-1、LibriSpeech） | **91.5** | 只用转写训练的语音大模型：约 55（瞎猜） |
 | 情绪（4 类） | 800 条（ESD、CREMA-D） | **91.1** | 只用转写训练的语音大模型：约 28（瞎猜）· Qwen3-Omni-30B 45.2（同题，其中 400 条）† |
-| 情绪：字面中性 | LISTEN 中性文本，只给音频（TESS、SAVEE、RAVDESS、ESD、CREMA-D） | **51.0** | Qwen3-Omni-30B 32.8（同题）· 论文：Gemini 2.5 Pro 34.9、Qwen3-Omni 29.3 |
-| 情绪：完全没有字 | LISTEN 副语言（IEMOCAP 笑、叹气、呼吸） | **26.9** | Qwen3-Omni-30B 18.2（同题）· 论文：Qwen3-Omni 21.0、Gemini 2.5 Pro 15.7 |
+| 情绪：字面中性 | LISTEN 中性文本，只给音频（TESS、SAVEE、RAVDESS、ESD、CREMA-D） | **51.0**（全部 4,286 题；对比的 400 题上 50.7） | Qwen3-Omni-30B 32.8（同样的 400 题）· 论文：Gemini 2.5 Pro 34.9、Qwen3-Omni 29.3 |
+| 情绪：完全没有字 | LISTEN 副语言（IEMOCAP 笑、叹气、呼吸） | **26.9**（全部 975 题；对比的 400 题上 26.0） | Qwen3-Omni-30B 18.2（同样的 400 题）· 论文：Qwen3-Omni 21.0、Gemini 2.5 Pro 15.7 |
 | 是不是同一个人 | 官方 VoxCeleb1-H 列表：不同人之间性别和国籍相同（2,000 个试次） | **EER 36.9%**（4B-Para）/ 40.3%（32B-Para）；研究 checkpoint‡ 29.6% / 31.2% | 只靠性别：瞎猜（50）；专用说话人模型（ECAPA-TDNN）：EER 约 2% |
 | 笑 / 呼吸 / 咳嗽 / 叹气 | NonverbalTTS 测试集（真人语音，训练未见），AUC | **0.88 / 0.81 / 0.85 / 0.80**（32B-Para） | AudioSet AST 检测器 0.71 / 0.75 / 0.85 / 0.76 |
 | 口语知识问答 | VoiceBench OBQA / MMSU | **85.5 / 72.1** | 同一大模型直接读文字：95.4 / 79.3 |
@@ -405,6 +405,7 @@ DuplexJev-32B-Turn 的话轮判断达到专用检测器的水平；同一次前�
 
 - † 测试集与我们的训练语料同源（说话人或句子不重叠）；Qwen3-Omni 为零样本。LISTEN、StressTest、NonverbalTTS 是公开基准；
   LISTEN 的语料除 ESD、CREMA-D 外都不在我们的情绪训练数据里。
+- 这里的 NonverbalTTS AUC 是两个模型都答过的 400 题上的结果，所以和上面全测试集那一行不同。
 - LISTEN 最多有 16 种情绪标签，DuplexJev 只训练过四种（中性、高兴、生气、伤心）。
 - 读出方式核对：让 Qwen3-Omni 改为自由生成文字作答（600 题），分数变化 −9 到 +4，差距不是单 token 读出造成的。
 - 在中文自然对话（MagicData 样例：笑声、呼吸、重音）上，两者持平。字面本身就带情绪时（LISTEN 情绪一致），Qwen3-Omni 领先：它读字，DuplexJev 听声音。
