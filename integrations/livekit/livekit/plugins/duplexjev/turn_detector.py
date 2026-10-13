@@ -122,7 +122,8 @@ class TurnDetector:
         on_answers: optional callback ``f(answers: dict)`` called after every successful prediction.
         readout: ``"turn"`` (turn-state question, default) or ``"act"``: ask "What should the assistant do now?" and
             report P(reply now) + P(short acknowledgement); slightly better on eot-bench with the agent's previous
-            message (18.4% vs 19.7% false cut-offs at 300 ms, English, 32B-Para v1.2).
+            message (18.4% vs 19.7% false cut-offs at 300 ms, English, 32B-Para v1.2, fast mode; the default
+            ``"turn"`` scores 20.0% in a full eot-bench run).
         window_s: seconds of the current user turn sent with each request (the most recent ones).
         trim_silence: drop the quiet audio before the user started talking, keeping 0.3 s of pre-roll.
         prediction_timeout: how long LiveKit waits for a prediction before committing without one. Defaults to
@@ -168,6 +169,10 @@ class TurnDetector:
                 HOSTED_PREDICTION_TIMEOUT if self._base_url == DEFAULT_URL else SELF_HOSTED_PREDICTION_TIMEOUT
             )
         self._prediction_timeout = prediction_timeout
+        if self._base_url == DEFAULT_URL:
+            logger.info("Using the free DuplexJev trial API (DuplexJev-4B-Para, rate limited, no assistant context). "
+                        "For the turn-taking quality reported on eot-bench, serve DuplexJev-32B-Para v1.2 behind "
+                        "`duplexjev gateway` >= 0.6 and pass its URL; see the README.")
         self._fallback_probability = fallback_probability
         self._http_session = http_session
 
