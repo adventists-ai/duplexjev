@@ -401,7 +401,7 @@ DuplexJev-32B-Turn 的话轮判断达到专用检测器的水平；同一次前�
   [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py)。
 
 > **想测出上表的成绩，请这样跑。** 这些数来自**自己部署的 DuplexJev-32B-Para v1.2**，不是免费试用 API。试用 API 跑的是
-> 较小的 DuplexJev-4B-Para，网关也是旧版、会忽略助手上一句话，话轮效果接近 Smart Turn。复现步骤：
+> 较小的 DuplexJev-4B-Para，没有经过 v1.2 的话轮训练，话轮成绩会明显低于上表。复现步骤：
 >
 > ```bash
 > pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
