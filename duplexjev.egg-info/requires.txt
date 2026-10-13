@@ -26,3 +26,13 @@ scipy
 accelerate
 peft
 transformers<4.56,>=4.51
+
+[vision]
+torch>=2.1
+torchvision
+transformers>=5.0
+accelerate
+peft
+pillow
+safetensors
+huggingface_hub

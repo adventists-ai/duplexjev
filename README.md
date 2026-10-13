@@ -42,7 +42,8 @@
 | ⚡ ten decisions about one utterance (one H200) | **92 ms** | 1,978 ms — ASR → LLM → JSON, same GPU and LLM |
 | 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
 | 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
-| 👂 emotion from the voice (4 classes) | **91** | ~28 — speech LLMs trained on transcripts |
+| 👂 emotion from the voice (4 classes) | **91** | 45 — Qwen3-Omni-30B, same questions · ~28 — speech LLMs trained on transcripts |
+| 🎭 emotion when the words are neutral ([LISTEN](https://arxiv.org/abs/2510.10444), EACL 2026) | **51** | 33 — Qwen3-Omni-30B · 35 — Gemini 2.5 Pro (paper) |
 | 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
 | 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
 | 👁️ voice + picture, one pass (new, preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
@@ -79,6 +80,12 @@ is speaking and how (paralinguistics):
   (95.4 / 79.3 from text).
 - **Paralinguistics, strong perception.** Gender 91.5, emotion 91.1, where speech LLMs trained on transcripts sit at
   chance (~55 / ~28).
+- **Far ahead of a general speech LLM on how things are said.** Same questions and scoring against Qwen3-Omni-30B-A3B:
+  emotion **90.5 vs 45.2**, which word is stressed **91 vs 63–73**, speaking style **79 vs 50** (these test sets come
+  from corpora in our training data, held-out speakers or sentences; Qwen3-Omni is zero-shot). On the public LISTEN
+  benchmark (EACL 2026), built to test whether audio LLMs *listen* or just read the words, DuplexJev-32B-Para leads where
+  the words carry no emotion (**51 vs 33**) and on non-verbal sounds alone (**26 vs 18**; Gemini 2.5 Pro 16 in the paper)
+  ([§5](#paralinguistics-vs-a-general-speech-llm)).
 - **Stress and pauses (new).** DuplexJev-32B-Stress finds the stressed word ("**I** didn't say…" vs "I didn't say she took the
   **money**") on unseen Mandarin and English sentences, 92 / 88, and answers "no word is stressed" on 99% of neutral speech;
   the other models are at chance ([research note](research/2026-10-stress-understanding.md)).
@@ -136,7 +143,9 @@ Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on shor
 | turn state: finished / unfinished / backchannel / wait | Easy-Turn test (800) | **95.3** | Easy-Turn detector 96.4 · TEN Turn Detection and Smart Turn v2 cover only 3 / 2 of the 4 states |
 | what to do, system state given | CoDeTT zh / en (18 k, zero-shot) | **69.2 / 70.0** | Easy-Turn 37.9 (zh) · Smart-Turn-v3 51.4 (en) · NAMO-Turn 59.5 (zh) · FireRedChat 65.4 (en) · GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
 | gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
-| emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) |
+| emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) · Qwen3-Omni-30B 45.2 (same questions, 400 of the items)† |
+| emotion, neutral words | LISTEN neutral-text, audio only (TESS, SAVEE, RAVDESS, ESD, CREMA-D) | **51.0** (all 4,286; 50.7 on the 400 compared) | Qwen3-Omni-30B 32.8 (same 400 items) · paper: Gemini 2.5 Pro 34.9, Qwen3-Omni 29.3 |
+| emotion, no words at all | LISTEN paralinguistic (IEMOCAP laughs, sighs, breaths) | **26.9** (all 975; 26.0 on the 400 compared) | Qwen3-Omni-30B 18.2 (same 400 items) · paper: Qwen3-Omni 21.0, Gemini 2.5 Pro 15.7 |
 | same speaker? | official VoxCeleb1-H list: different speakers share gender and nationality (2,000 trials) | **EER 36.9%** (4B-Para) / 40.3% (32B-Para); research checkpoints‡ 29.6% / 31.2% | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
 | laughter / breathing / cough / sigh | NonverbalTTS test (real speech, unseen), AUC | **0.88 / 0.81 / 0.85 / 0.80** (32B-Para) | AudioSet AST tagger 0.71 / 0.75 / 0.85 / 0.76 |
 | spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
@@ -417,6 +426,34 @@ decisions about one clip cost about as much as one.
 - **Nothing else got worse.** For 32B: qa100 90 → 96, gender 89.4 → 91.5, emotion 90.6 → 91.1, VoiceBench MMSU
   70.8 → 72.1. How it was done (public data only, a rank-16 LoRA, one recipe for 4B and 32B):
   [research note](research/2026-10-turn-taking-lora.md).
+
+### Paralinguistics vs. a general speech LLM
+
+Same items, same prompt, options rotated and averaged, highest-probability letter, for both models
+(DuplexJev-32B-Para v1.2 and Qwen3-Omni-30B-A3B-Instruct, bf16, one H200).
+
+| ability | test | DuplexJev-32B-Para | Qwen3-Omni-30B |
+|---|---|---:|---:|
+| emotion, 4-way | ESD + CREMA-D (400)† | **90.5** | 45.2 |
+| emotion, neutral words | LISTEN neutral-text (400) · unseen corpora only: TESS, SAVEE, RAVDESS (213) | **50.7** · **39.9** | 32.8 · 27.2 |
+| emotion, no words | LISTEN paralinguistic (400) | **26.0** | 18.2 |
+| emotion, words match | LISTEN matched (IEMOCAP, MELD, MSP-Podcast, MOSEI, OMG; 400) | 34.8 | **43.0** |
+| emotion vs. sarcastic words | LISTEN mismatched (MUStARD, 400) | 39.2 | 40.5 |
+| which word is stressed, zh / en | held-out sentences (400 / 187)† | **91.5 / 91.4** | 62.5 / 73.3 |
+| meaning from stress | DEBATE held-out (400)† | **88.5** | 43.8 |
+| meaning from stress | StressTest (218) | **72.0** | 69.7 |
+| speaking style (whisper, shout, fast, …) | EARS held-out speakers (220)† | **78.6** | 49.5 |
+| laughter / breathing / cough / sigh, AUC | NonverbalTTS test (400) | 0.93 / **0.86** / 0.86 / 0.85 | **0.96** / 0.65 / **0.87** / **0.87** |
+
+- † Test sets from corpora that are also in our training data (held-out speakers or sentences); Qwen3-Omni is zero-shot.
+  LISTEN, StressTest and NonverbalTTS are public benchmarks; LISTEN corpora are not in our emotion training data except
+  ESD and CREMA-D.
+- NonverbalTTS AUCs here are on the 400 items both models answered, so they differ from the full-test-set row above.
+- LISTEN asks up to 16 emotion labels; DuplexJev was trained on four (neutral, happy, angry, sad).
+- Readout check: asking Qwen3-Omni to answer in free text instead (600 items) moves its scores by −9 to +4, so the gaps
+  are not an artefact of the single-token readout.
+- On natural Mandarin conversation (MagicData samples: laughter, breathing, stress), the two are level. Where the words
+  themselves carry the emotion (LISTEN matched), Qwen3-Omni is ahead: it reads the words, DuplexJev answers from the voice.
 
 ### Live end of turn: LiveKit eot-bench and Pipecat Smart Turn
 
