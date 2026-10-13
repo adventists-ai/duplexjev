@@ -1,14 +1,14 @@
 # Turn-detection benchmarks: LiveKit eot-bench and Pipecat Smart Turn
 
 Two public benchmarks, run against a local `duplexjev gateway` (the same HTTP API the LiveKit and Pipecat plugins use).
-P(finished) is the probability of the first option of the turn question ("finished, the assistant can reply" /
-"话说完了，可以接话"), exactly as in `livekit-plugins-duplexjev` and `pipecat-duplexjev`. Nothing here needs the
-transcript.
+The end-of-turn score is P(finished) + P(backchannel) on the 4-option turn question ("finished, the assistant can
+reply" / "话说完了，可以接话", plus "just a backchannel"), exactly as in `livekit-plugins-duplexjev` and
+`pipecat-duplexjev`. Nothing here needs the user's transcript.
 
 ## 0. Serve the model (one GPU)
 
 ```bash
-pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.4.1"
+pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
 vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096 --port 8000      # also try -32B-Turn / -32B-Para
 duplexjev gateway --vllm http://localhost:8000/v1 --port 8420 --rate 1000000     # lift the default 30 req/min limit
 export DUPLEXJEV_GATEWAY=http://localhost:8420
@@ -51,6 +51,33 @@ Leaderboard: third-party models appear as an adapter file + committed results un
 PYTHONPATH=/path/to/duplexjev/benchmarks/turn_detection:. .venv/bin/python -m eot_bench.run_scorepoints --lang en \
   --template $R/en/smart_turn_audio_adapter__cb4f57229a --out $R/en/duplexjev_4b_para --workers 32 --min-interval 0
 ```
+
+**With the assistant's last turn (plugin configuration, used for our reported numbers).**
+`eot_bench/duplexjev_ctx_adapter.py` (`DuplexJevContextAdapter`) also sends the last assistant message in the
+eot-bench `messages` (last 300 characters) as `assistant_said`, which is what the LiveKit plugin does after
+`detector.attach(session)`. The user's words are never sent. Needs `duplexjev gateway` >= 0.6; `DUPLEXJEV_CONTEXT=0`
+turns the context off (audio only).
+
+```bash
+export DUPLEXJEV_GATEWAY=http://localhost:8420 DUPLEXJEV_MODEL_LABEL="DuplexJev-32B-Para v1.2" DUPLEXJEV_CONCURRENCY=48
+for L in en zh; do
+  .venv/bin/eot-harness predict --path livekit/eot-bench-data --name $L --split validation \
+    --adapter eot_bench.duplexjev_ctx_adapter:DuplexJevContextAdapter --batch-size 96 --output-dir output
+done
+```
+
+Results, DuplexJev-32B-Para v1.2, full mode (every decision point, not the fast mode), one vLLM + gateway per
+language on one H200 each, about 10 minutes. `eot_bench/scores_32b_para_v1.2/{en,zh}/` has `summary.json` and
+`manifest.json`.
+
+| eot-bench, full mode | false cutoffs @ 300 ms | @ 600 ms | mean wait @ 5% cutoffs | @ 10% | AUC |
+|---|---:|---:|---:|---:|---:|
+| English (11,191 points) | 20.0% | 9.4% | 821 ms | 569 ms | 0.933 |
+| Chinese (9,441 points) | 37.7% | 12.2% | 953 ms | 660 ms | 0.797 |
+
+For reference (eot-bench README): English 300 ms -- LiveKit Turn Detector v1 9.9%, JoinIn Baton 12.3%, Deepgram
+Flux 12.9%, ultraVAD 27.7%, SmartTurn v3.2 35.2%; Chinese 300 ms -- LiveKit v1 20.6%, SmartTurn v3.2 42.9%. The
+eot-bench audio is not in our training data.
 
 ## 2. Pipecat Smart Turn test set
 
