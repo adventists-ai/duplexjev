@@ -441,8 +441,8 @@ Both benchmarks ask the hard live question: the user has *just* gone quiet — f
   [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py).
 
 > **Reproducing these numbers.** They come from **DuplexJev-32B-Para v1.2 on your own GPU**, not from the free trial
-> API (the trial API runs the smaller DuplexJev-4B-Para behind an older gateway that ignores the assistant's
-> message, so its turn-taking is closer to Smart Turn). To get the published setup:
+> API (the trial API runs the smaller DuplexJev-4B-Para, which has not had the v1.2 turn-taking update, so
+> it scores clearly worse here). To get the published setup:
 >
 > ```bash
 > pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
