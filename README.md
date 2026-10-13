@@ -184,6 +184,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 ## 2. News
 
 - **2026-10-12** — All ten DuplexJev models are now also on **[ModelScope](https://www.modelscope.cn/organization/AdventistsAI)** (same weights, sha256-checked), for faster downloads in mainland China.
+- **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **18.4%** when the model also gets the assistant's previous message (Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
 - **2026-10-12** — 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): now the best overall DuplexJev model (total 92.6 vs 92.2 for 32B-Turn) and much better at non-verbal sounds (cough AUC 0.70 → 0.85, breathing 0.73 → 0.81), speaking style (69% → 82%) and stress (DEBATE 87 → 93, StressPresso 84 → 96). Same prompts and plugin; v1.0 stays available as revision `v1.0`.
 - **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
 - **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Real examples on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
@@ -230,7 +231,7 @@ then use the local directory in place of the Hugging Face id, e.g. `vllm serve .
 
 | model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 v1.1 | server, widest set of abilities, best overall | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | **88** | 94.8\* | **92.9** | **91.5** | **92.6** | CC BY-NC 4.0 |
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 v1.2 | server, widest set of abilities (now with accents), best live turn-taking, best overall | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | 95 | 87 | **95.5**\* | **93.9** | 90.1 | **92.3** | CC BY-NC 4.0 |
 | ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | small GPU, widest set of abilities, **and normal conversation** (v1.1); `duplexjev` default | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 77 | **58** | 91.0\* | 89.2 | 90.0 | **82.5** | CC BY-NC 4.0 |
 | 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | 91.5 | 91.1 | 92.2 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | 92.1 | 91.4 | — | CC BY-NC 4.0 |
@@ -243,7 +244,8 @@ sample of natural Mandarin conversation; speaker EER on same-gender AISHELL-1 pa
 | | laughter | breathing | cough | sigh | laughter / breathing in conversation | speaking style (7 classes) | same speaker? EER |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
-| **32B-Para** v1.1 | **0.88** | **0.81** | **0.85** | 0.80 | 0.83 / 0.65 | **82%** | ≈ v1.0 (18%)² |
+| **32B-Para** v1.2 | 0.87 | **0.81** | 0.84 | 0.75 | 0.80 / 0.56 | 79% | — |
+| 32B-Para v1.1 | **0.88** | **0.81** | **0.85** | 0.80 | 0.83 / 0.65 | **82%** | ≈ v1.0 (18%)² |
 | 32B-Para v1.0 | 0.85 | 0.73 | 0.70 | 0.74 | 0.80 / 0.78 | 69% | 18% |
 | **4B-Para** v1.1 | 0.81 | 0.77 | 0.77 | 0.71 | 0.85 / 0.74 | 67% | ≈ v1.0 (9%)¹ |
 | 4B-Para v1.0 | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
@@ -251,7 +253,7 @@ sample of natural Mandarin conversation; speaker EER on same-gender AISHELL-1 pa
 ¹ v1.1 was not re-run on the AISHELL-1 pairs; on VoxCeleb1 hard pairs its EER is 42.0% vs 41.8% for v1.0.
 ² 32B-Para v1.1 was not re-run on the AISHELL-1 pairs; on VoxCeleb1 random / hard pairs its EER is 28.2% / 39.6% (v1.0: 37.4% / 45.7%).
 
-The costs are small and listed on the model cards (32B-Para v1.1: Easy-Turn −0.5 vs 32B-Turn, every other main score equal or higher;
+The costs are small and listed on the model cards (32B-Para v1.2: emotion −1 vs 32B-Turn and slightly lower English stress, sighs and speaker pairs than v1.1;
 4B-Para: ZJU-ML −2, Easy-Turn −1 vs 4B-Turn). Speaker judgments are coarse, human-like, and must not be used to
 identify people.
 
@@ -276,7 +278,7 @@ gender 78.5, emotion 60.9), so it is not in the table above; details on its mode
 
 **Which one to use.** The **Para** models if you want everything the voice carries (non-verbal sounds, speaking style,
 speaker, stress, emotion, gender, turn-taking) in one model — `DuplexJev-32B-Para` on an 80 GB GPU, `DuplexJev-4B-Para`
-on smaller GPUs. `DuplexJev-32B-Turn` / `4B-Turn` if the last point of turn-taking (and, on 4B, emotion) matters most;
+on smaller GPUs. `DuplexJev-32B-Para` v1.2 is also the best for live turn-taking; `DuplexJev-4B-Turn` if the last point of turn-taking and emotion on a small GPU matters most;
 `DuplexJev-32B-Stress` / `4B-Stress` if stress and pauses are the main thing. The Turn
 models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
 use only the language model of Qwen3-VL-32B: their inputs are audio and text. For speech + image, use
@@ -415,6 +417,25 @@ decisions about one clip cost about as much as one.
 - **Nothing else got worse.** For 32B: qa100 90 → 96, gender 89.4 → 91.5, emotion 90.6 → 91.1, VoiceBench MMSU
   70.8 → 72.1. How it was done (public data only, a rank-16 LoRA, one recipe for 4B and 32B):
   [research note](research/2026-10-turn-taking-lora.md).
+
+### Live end of turn: LiveKit eot-bench and Pipecat Smart Turn
+
+Both benchmarks ask the hard live question: the user has *just* gone quiet — finished, or only pausing?
+
+| model | eot-bench en: false cut-offs at 300 / 600 ms | eot-bench zh | Smart Turn v3.2 test, accuracy en / zh |
+|---|---:|---:|---:|
+| LiveKit Turn Detector v1 (uses the transcript) | 9.9 / 4.5% | 20.6 / 8.7% | – |
+| **DuplexJev-32B-Para v1.2**, with the assistant's previous message | **18.4 / 7.9%** | **37.3 / 12.3%** | – |
+| **DuplexJev-32B-Para v1.2**, audio only | 23.5 / 11.1% | 40.0 / 12.8% | **94.0 / 91.1**° |
+| DuplexJev-32B-Turn, audio only | 29.8 / 13.9% | 44.9 / 14.5% | 65.2 / 84.6 |
+| Smart Turn v3.2 | 35.2 / 14.8% | 42.9 / 13.2% | 94.7 / 90.5 |
+
+- eot-bench: validation set, decision 0.2 s into each pause, official `compute-metrics` / `compare-models`; its audio is
+  not in our training data. Other rows are from the eot-bench repository. The context row puts
+  `The assistant had just said: "..."` before the audio, which the new plugins do automatically.
+- ° The Smart Turn v3.2 *training* set is in the v1.2 training mix, so this column is in-distribution for v1.2 (as it
+  is for Smart Turn itself).
+- Code for the audio-only rows: [`benchmarks/turn_detection/`](benchmarks/turn_detection).
 
 ### Speed and spoken knowledge
 
