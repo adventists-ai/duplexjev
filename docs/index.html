@@ -210,9 +210,10 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
       <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Turn">32B-Turn</a>
       <a href="https://huggingface.co/adventists-ai/DuplexJev-32B">32B</a>
       <a href="https://huggingface.co/adventists-ai/DuplexJev-4B">4B</a>
+      <a href="https://www.modelscope.cn/organization/AdventistsAI" data-i18n="l_ms"></a>
     </nav>
     <aside class="news" aria-labelledby="news-h"><h2 id="news-h" data-i18n="news_h"></h2>
-      <ul><li data-i18n="n1"></li><li data-i18n="n2"></li><li data-i18n="n3"></li></ul>
+      <ul><li data-i18n="n0"></li><li data-i18n="n0m"></li><li data-i18n="n1"></li><li data-i18n="n2"></li></ul>
     </aside>
     <p class="lede" data-i18n="lede"></p>
   </header>
@@ -348,6 +349,9 @@ const T = {
   s4:"things it hears beyond the words: emotion, stress, pauses, laughter, breathing, turn state …",
   l_models:"Weights 🤗",
   news_h:"New",
+  n0:"<time>2026-10-13</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.2</b></a>: accent judgments (English accents, Mandarin dialect regions) and sharper end-of-turn right after a pause. On LiveKit eot-bench, false cut-offs at a 300 ms budget: 18.4% with the assistant’s previous message, 23.5% audio only (Smart Turn v3.2: 35.2%). Plugins send that message from <code>pipecat-duplexjev 0.3</code> / <code>livekit-plugins-duplexjev 0.2</code>.",
+  n0m:"<time>2026-10-12</time>All ten models are also on <a href=\"https://www.modelscope.cn/organization/AdventistsAI\"><b>ModelScope</b></a> (same weights) for faster downloads in mainland China.",
+  l_ms:"ModelScope mirror",
   n1:"<time>2026-10-10</time><b>Image + voice together</b> (research preview): DuplexJev-32B-Para plus Qwen3-VL’s vision encoder checks what it hears against what it sees — stressed word vs. red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 (image alone: 50). <a href=\"#ab-vision\">Examples</a>",
   n2:"<time>2026-10-10</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para\"><b>DuplexJev-4B-Para v1.1</b></a> also holds a normal conversation, multi-turn included; decision scores within 0.5–2.6 points of v1.0. <a href=\"https://github.com/adventists-ai/duplexjev/blob/main/research/2026-10-chat-replay.md\">Research note</a>",
   n3:"<time>2026-10-09</time><b>Para models</b>: laughter, breathing, coughs, sighs and other non-verbal sounds, speaking style, same speaker. <a href=\"#ab-nv\">Examples</a>",
@@ -409,6 +413,9 @@ const T = {
   s4:"种文字之外的信息：情绪、重音、停顿、笑声、呼吸、话轮状态……",
   l_models:"权重 🤗",
   news_h:"最新",
+  n0:"<time>2026-10-13</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.2</b></a>：新增口音判断（英文口音、中文方言区），用户刚停顿时的话轮判断更准。LiveKit eot-bench 上，最多等 300 ms 时的误打断：带助手上一句话 18.4%，只用音频 23.5%（Smart Turn v3.2 为 35.2%）。新版插件 <code>pipecat-duplexjev 0.3</code> / <code>livekit-plugins-duplexjev 0.2</code> 会自动带上这句话。",
+  n0m:"<time>2026-10-12</time>全部 10 个模型已上线<a href=\"https://www.modelscope.cn/organization/AdventistsAI\"><b>魔搭 ModelScope</b></a>（权重相同），国内下载更快。",
+  l_ms:"魔搭镜像",
   n1:"<time>2026-10-10</time><b>图像 + 语音一起判断</b>（研究预览）：DuplexJev-32B-Para 接回 Qwen3-VL 的视觉编码器，把听到的和看到的对起来——重读词 vs 标红词 94.1，语气 vs 表情 93.5，声音 vs 文字说明 97.5（只给图：50）。<a href=\"#ab-vision\">看案例</a>",
   n2:"<time>2026-10-10</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para\"><b>DuplexJev-4B-Para v1.1</b></a> 还能正常聊天（包括多轮），判断类成绩与 v1.0 相差 0.5–2.6 分。<a href=\"https://github.com/adventists-ai/duplexjev/blob/main/research/2026-10-chat-replay_zh.md\">研究笔记</a>",
   n3:"<time>2026-10-09</time><b>Para 版</b>：笑声、呼吸、咳嗽、叹气等非语言声音，说话风格，是否同一说话人。<a href=\"#ab-nv\">看案例</a>",
