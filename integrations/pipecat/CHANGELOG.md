@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.1 (unreleased)
+## 0.4.1 (2026-10-13)
 
 - Logs a one-time hint when the free trial API is used: it runs DuplexJev-4B-Para, so
   its turn-taking does not match the published eot-bench numbers (DuplexJev-32B-Para v1.2 behind your own

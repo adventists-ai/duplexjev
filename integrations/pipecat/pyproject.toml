@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pipecat-duplexjev"
-version = "0.4.0"
+version = "0.4.1"
 description = "Audio end-of-turn detection for Pipecat with DuplexJev: turn state, emotion and non-verbal sounds from one forward pass, no transcript needed."
 readme = "README.md"
 license = { text = "BSD-2-Clause" }
