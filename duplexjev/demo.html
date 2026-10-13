@@ -110,7 +110,7 @@ $("go").onclick = async () => {
   const b64 = await new Promise(r=>{const fr=new FileReader(); fr.onload=()=>r(fr.result.split(",")[1]); fr.readAsDataURL(wav);});
   const t0 = performance.now();
   try{
-    const headers = {"Content-Type":"application/json"}; if(apiKey) headers.Authorization = "Bearer "+apiKey;
+    const headers = {"Content-Type":"application/json","X-DuplexJev-Client":"demo-page"}; if(apiKey) headers.Authorization = "Bearer "+apiKey;
     let r = await fetch("v1/decide",{method:"POST",headers,body:JSON.stringify({audio_b64:b64,format:"wav",lang,questions:qs})});
     if(r.status===401){ apiKey = prompt(T[lang].key)||""; $("go").disabled=false; $("go").textContent=T[lang].go; return; }
     const j = await r.json(); if(!r.ok) throw new Error(j.detail||r.status);

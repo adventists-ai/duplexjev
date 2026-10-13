@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.2 (2026-10-13)
+
+- Sends an `X-DuplexJev-Client: pipecat-duplexjev/<version>` header (no personal data), so trial-API usage can be counted per integration.
+
 ## 0.4.1 (2026-10-13)
 
 - Logs a one-time hint when the free trial API is used: it runs DuplexJev-4B-Para, so

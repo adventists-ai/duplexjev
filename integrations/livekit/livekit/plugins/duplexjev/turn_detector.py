@@ -158,6 +158,8 @@ class TurnDetector:
         self._decide_url = self._base_url + "/v1/decide"
         api_key = api_key or os.environ.get("DUPLEXJEV_API_KEY")
         self._headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+        from .version import __version__ as _v
+        self._headers["X-DuplexJev-Client"] = f"livekit-plugins-duplexjev/{_v}"  # usage stats on the trial API
         self._lang = lang
         self._unlikely_threshold = unlikely_threshold
         self._backchannel_threshold = backchannel_threshold

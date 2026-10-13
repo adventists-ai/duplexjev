@@ -79,6 +79,7 @@ def main(argv=None):
     g.add_argument("--max-mb", type=float, default=4.0)
     g.add_argument("--max-questions", type=int, default=16)
     g.add_argument("--rate", type=int, default=30, help="requests per minute per client IP")
+    g.add_argument("--log", default=None, help="append one JSON line per request to this file (no audio stored)")
 
     args = ap.parse_args(argv)
     if args.cmd == "quick":
@@ -98,7 +99,8 @@ def main(argv=None):
 
         from .gateway import create_app
 
-        uvicorn.run(create_app(args.vllm, max_mb=args.max_mb, max_questions=args.max_questions, rate=args.rate),
+        uvicorn.run(create_app(args.vllm, max_mb=args.max_mb, max_questions=args.max_questions, rate=args.rate,
+                               log_path=args.log),
                     host=args.host, port=args.port, root_path=args.root_path, proxy_headers=True,
                     forwarded_allow_ips="*")
         return

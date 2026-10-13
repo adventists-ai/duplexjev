@@ -19,6 +19,15 @@ from typing import Any, Callable
 
 import numpy as np
 from loguru import logger
+
+
+def _version() -> str:
+    try:
+        from importlib.metadata import version
+
+        return version("pipecat-duplexjev")
+    except Exception:
+        return "?"
 from pipecat.audio.turn.base_turn_analyzer import EndOfTurnState
 from pipecat.audio.turn.smart_turn.base_smart_turn import BaseSmartTurn, SmartTurnParams, SmartTurnTimeoutException
 from pipecat.frames.frames import Frame, LLMFullResponseEndFrame, LLMFullResponseStartFrame, TextFrame
@@ -133,7 +142,7 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
             logger.info("Using the free DuplexJev trial API (DuplexJev-4B-Para, rate limited). "
                         "For the turn-taking quality reported on eot-bench, serve DuplexJev-32B-Para v1.2 behind "
                         "`duplexjev gateway` >= 0.6 and pass its URL; see the README.")
-        self._headers = {"Content-Type": "application/json"}
+        self._headers = {"Content-Type": "application/json", "X-DuplexJev-Client": f"pipecat-duplexjev/{_version()}"}
         if api_key:
             self._headers["Authorization"] = f"Bearer {api_key}"
         self._lang = lang

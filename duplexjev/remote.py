@@ -139,6 +139,8 @@ class ApiClient:
     def __init__(self, url: str, api_key: str | None = None, timeout: float = 60):
         self.url = url.rstrip("/")
         self.headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+        from . import __version__
+        self.headers["X-DuplexJev-Client"] = f"duplexjev/{__version__}"  # usage stats on the trial API
         self.timeout = timeout
 
     def decide(self, audio: Any, questions=None, *, lang: str = "en", assistant_said: str | None = None) -> dict:
