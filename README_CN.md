@@ -170,7 +170,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 ## 2. 最新动态
 
 - **2026-10-12** —— 全部 10 个 DuplexJev 模型已上线 **[魔搭 ModelScope](https://www.modelscope.cn/organization/AdventistsAI)**（权重与 Hugging Face 一致，已逐文件核对 sha256），国内下载更快。
-- **2026-10-13** —— 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：新增**口音判断**（英文口音、中文方言区：4 选 1 从 39.6 → 56.0、25.7 → 48.2；是否标准普通话 46.6 → 91.3），**用户刚停顿时的话轮判断**明显变准：LiveKit [eot-bench](https://github.com/livekit/eot-bench) 上，最多等 300 ms 时的误打断从 29.8%（32B-Turn）降到 23.5%，同时给模型助手上一句话时降到 **18.4%**（Smart Turn v3.2 为 35.2%）。新版插件会自动带上这句话：`pipecat-duplexjev 0.3`、`livekit-plugins-duplexjev 0.2`、网关 `duplexjev 0.6`。v1.1 仍可用 revision `v1.1` 下载。详见[第 5 节](#实时话轮livekit-eot-bench-与-pipecat-smart-turn)。
+- **2026-10-13** —— 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：新增**口音判断**（英文口音、中文方言区：4 选 1 从 39.6 → 56.0、25.7 → 48.2；是否标准普通话 46.6 → 91.3），**用户刚停顿时的话轮判断**明显变准：LiveKit [eot-bench](https://github.com/livekit/eot-bench) 上，最多等 300 ms 时的误打断从 29.8%（32B-Turn）降到 23.5%，像插件那样同时给模型助手上一句话时降到 **20.0%**（eot-bench 完整模式；Smart Turn v3.2 为 35.2%）。新版插件会自动带上这句话：`pipecat-duplexjev 0.3`、`livekit-plugins-duplexjev 0.2`、网关 `duplexjev 0.6`。v1.1 仍可用 revision `v1.1` 下载。详见[第 5 节](#实时话轮livekit-eot-bench-与-pipecat-smart-turn)。
 - **2026-10-12** —— 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：现在是总分最高的 DuplexJev 模型（92.6，32B-Turn 为 92.2），非语言声音（咳嗽 AUC 0.70 → 0.85、呼吸 0.73 → 0.81）、说话方式（69% → 82%）和重音（DEBATE 87 → 93、StressPresso 84 → 96）都明显提升。提示词和插件不变；v1.0 仍可用 revision `v1.0` 下载。
 - **2026-10-10** —— 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（研究预览）：同一道题可以同时用上**听到的和看到的**。没见过的说话人的真实照片配他们自己的声音：64.4（只给图 50），其中开心的声音 81.7。`pip install "duplexjev[vision]>=0.5"`，或用 `duplexjev-vllm>=0.3` 通过 `vllm serve` 部署（每道题约 0.05 秒）。见[语音 + 图像一起判断](#语音--图像一起判断研究预览)。
 - **2026-10-10** —— 🔬 研究预览：**图像 + 语音一起判断。** DuplexJev-32B-Para 的语言模型就是 Qwen3-VL 的，视觉编码器可以直接接回去；再加一层 LoRA，它能把听到的和看到的对起来（留出的合成测试集上：重读词 vs 标红词 94.1，语气 vs 表情 93.5，声音 vs 文字说明 97.5；只给图 = 50）。真实案例见[项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。
@@ -387,16 +387,18 @@ DuplexJev-32B-Turn 的话轮判断达到专用检测器的水平；同一次前�
 
 | 模型 | eot-bench 英文：最多等 300 / 600 ms 的误打断 | eot-bench 中文 | Smart Turn v3.2 测试集准确率 英 / 中 |
 |---|---:|---:|---:|
-| LiveKit Turn Detector v1（用到转写文本） | 9.9 / 4.5% | 20.6 / 8.7% | – |
-| **DuplexJev-32B-Para v1.2**，带助手上一句话 | **18.4 / 7.9%** | **37.3 / 12.3%** | – |
+| LiveKit Turn Detector v1 | 9.9 / 4.5% | 20.6 / 8.7% | – |
+| **DuplexJev-32B-Para v1.2**，带助手上一句话（插件设置） | **20.0 / 9.4%** | **37.7 / 12.2%** | – |
 | **DuplexJev-32B-Para v1.2**，只用音频 | 23.5 / 11.1% | 40.0 / 12.8% | **94.0 / 91.1**° |
 | DuplexJev-32B-Turn，只用音频 | 29.8 / 13.9% | 44.9 / 14.5% | 65.2 / 84.6 |
 | Smart Turn v3.2 | 35.2 / 14.8% | 42.9 / 13.2% | 94.7 / 90.5 |
 
 - eot-bench：验证集，在每个停顿的第 0.2 秒做判断，用官方 `compute-metrics` / `compare-models` 计分；它的音频不在我们的
-  训练数据里。其他行取自 eot-bench 仓库。“带上一句话”是在音频前加 `The assistant had just said: "..."`，新版插件会自动带上。
+  训练数据里。其他行取自 eot-bench 仓库。“带上一句话”那行是 eot-bench 完整模式、插件同设置：音频前加 `The assistant had just said: "..."`（新版插件会自动带上），
+  得分取 P(说完) + P(附和)。“只用音频”的 DuplexJev 各行用快速模式（每个停顿只在第 0.2 秒问一次）。
 - ° Smart Turn v3.2 的**训练集**在 v1.2 的训练数据里，所以这一列对 v1.2 是同分布成绩（对 Smart Turn 自己也是）。
-- 只用音频那几行的复现代码：[`benchmarks/turn_detection/`](benchmarks/turn_detection)。
+- 复现代码：[`benchmarks/turn_detection/`](benchmarks/turn_detection)；带上一句话那行用
+  [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py)。
 
 ### 速度与口语知识
 

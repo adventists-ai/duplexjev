@@ -184,7 +184,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 ## 2. News
 
 - **2026-10-12** — All ten DuplexJev models are now also on **[ModelScope](https://www.modelscope.cn/organization/AdventistsAI)** (same weights, sha256-checked), for faster downloads in mainland China.
-- **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **18.4%** when the model also gets the assistant's previous message (Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
+- **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **20.0%** when the model also gets the assistant's previous message, as the plugins send it (full eot-bench run; Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
 - **2026-10-12** — 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): now the best overall DuplexJev model (total 92.6 vs 92.2 for 32B-Turn) and much better at non-verbal sounds (cough AUC 0.70 → 0.85, breathing 0.73 → 0.81), speaking style (69% → 82%) and stress (DEBATE 87 → 93, StressPresso 84 → 96). Same prompts and plugin; v1.0 stays available as revision `v1.0`.
 - **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
 - **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Real examples on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
@@ -424,18 +424,21 @@ Both benchmarks ask the hard live question: the user has *just* gone quiet — f
 
 | model | eot-bench en: false cut-offs at 300 / 600 ms | eot-bench zh | Smart Turn v3.2 test, accuracy en / zh |
 |---|---:|---:|---:|
-| LiveKit Turn Detector v1 (uses the transcript) | 9.9 / 4.5% | 20.6 / 8.7% | – |
-| **DuplexJev-32B-Para v1.2**, with the assistant's previous message | **18.4 / 7.9%** | **37.3 / 12.3%** | – |
+| LiveKit Turn Detector v1 | 9.9 / 4.5% | 20.6 / 8.7% | – |
+| **DuplexJev-32B-Para v1.2**, with the assistant's previous message (plugin setting) | **20.0 / 9.4%** | **37.7 / 12.2%** | – |
 | **DuplexJev-32B-Para v1.2**, audio only | 23.5 / 11.1% | 40.0 / 12.8% | **94.0 / 91.1**° |
 | DuplexJev-32B-Turn, audio only | 29.8 / 13.9% | 44.9 / 14.5% | 65.2 / 84.6 |
 | Smart Turn v3.2 | 35.2 / 14.8% | 42.9 / 13.2% | 94.7 / 90.5 |
 
 - eot-bench: validation set, decision 0.2 s into each pause, official `compute-metrics` / `compare-models`; its audio is
-  not in our training data. Other rows are from the eot-bench repository. The context row puts
-  `The assistant had just said: "..."` before the audio, which the new plugins do automatically.
+  not in our training data. Other rows are from the eot-bench repository. The context row is a full eot-bench run with
+  the plugins' setting: `The assistant had just said: "..."` before the audio (the new plugins add it automatically),
+  score P(finished) + P(backchannel). The audio-only DuplexJev rows use fast mode (one call per pause, at the 0.2 s score
+  point).
 - ° The Smart Turn v3.2 *training* set is in the v1.2 training mix, so this column is in-distribution for v1.2 (as it
   is for Smart Turn itself).
-- Code for the audio-only rows: [`benchmarks/turn_detection/`](benchmarks/turn_detection).
+- Code: [`benchmarks/turn_detection/`](benchmarks/turn_detection); the context row uses
+  [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py).
 
 ### Speed and spoken knowledge
 
