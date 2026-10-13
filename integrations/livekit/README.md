@@ -91,6 +91,10 @@ Then pass `api_url="http://localhost:8420"` (or set `DUPLEXJEV_API_URL`).
 | `trim_silence` | `True` | drop the silence before the user started talking (keeps 0.3 s) |
 | `prediction_timeout` | `4.0` hosted, `1.0` own gateway | how long LiveKit waits for a prediction |
 | `fallback_probability` | `1.0` | P(finished) reported if the gateway fails, so the conversation never blocks |
+| `readout` | `"turn"` | `"act"` asks "What should the assistant do now?" (P(reply) + P(short acknowledgement)); slightly better on eot-bench with context |
+
+After each prediction `detector.last_turn_class` is `finished`, `not_finished`, `backchannel` or `hesitating`
+(`reply`, `keep_listening`, `acknowledge` with `readout="act"`), for your own routing.
 
 ## License
 

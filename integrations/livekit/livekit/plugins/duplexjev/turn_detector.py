@@ -56,6 +56,9 @@ REPLY_QUESTION = {
            "options": ["马上回复", "继续听", "简短回应一下"], "lang": "zh"},
 }
 
+TURN_CLASSES = ["finished", "not_finished", "backchannel", "hesitating"]
+ACT_CLASSES = ["reply", "keep_listening", "acknowledge"]
+
 PRESETS = {
     "emotion": {"en": ("What is the speaker's emotional state?", ["neutral", "happy", "angry", "sad"]),
                 "zh": ("说话人当时的情绪状态是？", ["中性", "高兴", "生气", "伤心"])},
@@ -117,6 +120,9 @@ class TurnDetector:
         extra_questions: names from ``PRESETS`` (``"emotion"``, ``"sound"``, ``"barge_in"``) or question dicts
             ``{"id", "text", "options"}``, answered in the same request; see ``last_answers``.
         on_answers: optional callback ``f(answers: dict)`` called after every successful prediction.
+        readout: ``"turn"`` (turn-state question, default) or ``"act"``: ask "What should the assistant do now?" and
+            report P(reply now) + P(short acknowledgement); slightly better on eot-bench with the agent's previous
+            message (18.4% vs 19.7% false cut-offs at 300 ms, English, 32B-Para v1.2).
         window_s: seconds of the current user turn sent with each request (the most recent ones).
         trim_silence: drop the quiet audio before the user started talking, keeping 0.3 s of pre-roll.
         prediction_timeout: how long LiveKit waits for a prediction before committing without one. Defaults to
@@ -142,6 +148,7 @@ class TurnDetector:
         prediction_timeout: float | None = None,
         fallback_probability: float = 1.0,
         http_session: aiohttp.ClientSession | None = None,
+        readout: str = "turn",
     ) -> None:
         if lang not in TURN_QUESTION:
             raise ValueError("lang must be 'en' or 'zh'")
@@ -164,8 +171,12 @@ class TurnDetector:
         self._fallback_probability = fallback_probability
         self._http_session = http_session
 
-        self._questions: list[dict[str, Any]] = [TURN_QUESTION[lang]]
-        if backchannel_threshold is not None:
+        if readout not in ("turn", "act"):
+            raise ValueError("readout must be 'turn' or 'act'")
+        self._readout = readout
+        main = dict(REPLY_QUESTION[lang], id="turn") if readout == "act" else TURN_QUESTION[lang]
+        self._questions: list[dict[str, Any]] = [main]
+        if backchannel_threshold is not None and readout == "turn":
             self._questions.append(REPLY_QUESTION[lang])
         self._questions += [self._as_question(q) for q in (extra_questions or [])]
         ids = [q["id"] for q in self._questions]
@@ -177,6 +188,9 @@ class TurnDetector:
         """Answers of the latest successful request: ``{id: {"answer", "confidence", "probs"}}``."""
         self.last_server_ms: float | None = None
         """Server-side model time of the latest request, in milliseconds."""
+        self.last_turn_class: str | None = None
+        """Most likely class of the latest request: finished / not_finished / backchannel / hesitating
+        (``readout="act"``: reply / keep_listening / acknowledge)."""
         self.assistant_said: str = ""
         """The agent's previous message, sent with every request (last 300 characters)."""
 
@@ -404,9 +418,12 @@ class TurnDetectorStream:
                 data = await resp.json()
             answers: dict[str, Any] = data["answers"]
             probs = answers["turn"]["probs"]
-            o = TURN_QUESTION[det._lang]["options"]
-            # finished + backchannel: a short "ok" / "yeah" with nobody else talking also ends the turn
+            o = (REPLY_QUESTION if det._readout == "act" else TURN_QUESTION)[det._lang]["options"]
+            # turn: finished + backchannel (a short "ok" with nobody else talking also ends the turn);
+            # act: reply now + short acknowledgement
             p_finished = float(probs.get(o[0], 0.0)) + float(probs.get(o[2], 0.0))
+            names = ACT_CLASSES if det._readout == "act" else TURN_CLASSES
+            det.last_turn_class = names[max(range(len(o)), key=lambda i: float(probs.get(o[i], 0.0)))]
         except asyncio.CancelledError:
             raise
         except Exception as e:  # network or server error: never block the conversation
@@ -425,8 +442,10 @@ class TurnDetectorStream:
         if data.get("model"):
             det._model_name = str(data["model"])
         backchannel = None
-        if "reply" in answers and det._backchannel_threshold is not None:
-            backchannel = float(answers["reply"]["probs"].get(REPLY_QUESTION[det._lang]["options"][2], 0.0))
+        if det._backchannel_threshold is not None:
+            src = answers["turn"] if det._readout == "act" else answers.get("reply")
+            if src is not None:
+                backchannel = float(src["probs"].get(REPLY_QUESTION[det._lang]["options"][2], 0.0))
         now = time.time()
         self.last_answers = det.last_answers = answers
         self.last_server_ms = det.last_server_ms = server_ms

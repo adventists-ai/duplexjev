@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 (2026-10-13)
+
+- `readout="act"`: ask "What should the assistant do now?" and use P(reply now) + P(short acknowledgement). On
+  LiveKit eot-bench (English, 32B-Para v1.2, with the assistant's previous message) false cut-offs at 300 ms are
+  18.4% vs 19.7% for the default turn-state question.
+- `last_turn_class` (finished / not_finished / backchannel / hesitating, or reply / keep_listening / acknowledge)
+  and `turn_class()` for routing in your own code.
+- `wait_stop_secs`: when the user sounds like they are hesitating or asking to wait, the silence limit for the
+  current turn is raised to this value, so a thinking pause is not cut off.
+
 ## 0.3.0 (2026-10-13)
 
 - Turn-taking context: `analyzer.set_assistant_said(text)` (or put `DuplexJevContextTracker(analyzer)` after your LLM)

@@ -19,6 +19,7 @@ from typing import Any, Callable
 
 import numpy as np
 from loguru import logger
+from pipecat.audio.turn.base_turn_analyzer import EndOfTurnState
 from pipecat.audio.turn.smart_turn.base_smart_turn import BaseSmartTurn, SmartTurnParams, SmartTurnTimeoutException
 from pipecat.frames.frames import Frame, LLMFullResponseEndFrame, LLMFullResponseStartFrame, TextFrame
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
@@ -35,6 +36,27 @@ TURN_QUESTION = {
 }
 
 
+# "What should the assistant do now?" -- on LiveKit eot-bench (with the assistant's previous message) this read-out,
+# P(reply now) + P(short acknowledgement), is a little better than the turn-state question (18.4% vs 19.7% false
+# cut-offs at 300 ms, English). Use it with ``readout="act"``.
+ACT_QUESTION = {
+    "en": {"id": "turn", "text": "What should the assistant do now?",
+           "options": ["reply now", "keep listening", "give a short acknowledgement"], "lang": "en"},
+    "zh": {"id": "turn", "text": "助手现在应该怎么做？", "options": ["马上回复", "继续听", "简短回应一下"], "lang": "zh"},
+}
+TURN_CLASSES = ["finished", "not_finished", "backchannel", "hesitating"]
+ACT_CLASSES = ["reply", "keep_listening", "acknowledge"]
+
+
+def turn_class(probs: dict, lang: str, readout: str = "turn") -> str:
+    """Most likely class: finished / not_finished / backchannel / hesitating (or reply / keep_listening / acknowledge)."""
+    q = (ACT_QUESTION if readout == "act" else TURN_QUESTION)["zh" if lang == "zh" else "en"]["options"]
+    names = ACT_CLASSES if readout == "act" else TURN_CLASSES
+    if not probs:
+        return names[0]
+    return names[max(range(len(q)), key=lambda i: float(probs.get(q[i], 0.0)))]
+
+
 def p_finished(probs: dict, lang: str) -> float:
     """P(the assistant may take the turn) = P(finished) + P(backchannel).
 
@@ -43,6 +65,12 @@ def p_finished(probs: dict, lang: str) -> float:
     30% (DuplexJev-32B-Turn, English) without changing accuracy on the Smart Turn test set.
     """
     o = TURN_QUESTION["zh" if lang == "zh" else "en"]["options"]
+    return float(probs.get(o[0], 0.0)) + float(probs.get(o[2], 0.0))
+
+
+def p_reply(probs: dict, lang: str) -> float:
+    """``readout="act"``: P(the assistant may take the turn) = P(reply now) + P(short acknowledgement)."""
+    o = ACT_QUESTION["zh" if lang == "zh" else "en"]["options"]
     return float(probs.get(o[0], 0.0)) + float(probs.get(o[2], 0.0))
 
 
@@ -85,12 +113,17 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
         extra_questions: names from ``PRESETS`` (``"emotion"``, ``"sound"``, ``"barge_in"``) or question dicts
             ``{"id", "text", "options"}``; answered in the same pass, see ``last_answers``.
         on_answers: optional callback ``f(answers: dict)`` called after every prediction.
+        readout: ``"turn"`` (turn-state question, default) or ``"act"`` ("What should the assistant do now?").
+        wait_stop_secs: if set, when the user sounds like they are hesitating or asking to wait (``"turn"`` read-out),
+            the silence after which the turn is forced to end is raised from ``params.stop_secs`` to this value
+            for the current turn, so a thinking pause is not cut off.
         timeout: HTTP timeout in seconds (defaults to ``params.stop_secs``).
     """
 
     def __init__(self, *, url: str = DEFAULT_URL, api_key: str | None = None, lang: str = "en",
                  threshold: float = 0.5, extra_questions: list | None = None,
                  on_answers: Callable[[dict], Any] | None = None, timeout: float | None = None,
+                 readout: str = "turn", wait_stop_secs: float | None = None,
                  sample_rate: int | None = None, params: SmartTurnParams | None = None):
         super().__init__(sample_rate=sample_rate, params=params)
         if lang not in TURN_QUESTION:
@@ -103,7 +136,13 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
         self._threshold = threshold
         self._timeout = timeout
         self._on_answers = on_answers
-        self._questions = [TURN_QUESTION[lang]] + [self._as_question(q) for q in (extra_questions or [])]
+        if readout not in ("turn", "act"):
+            raise ValueError("readout must be 'turn' or 'act'")
+        self._readout = readout
+        self._wait_stop_secs = wait_stop_secs
+        main = (ACT_QUESTION if readout == "act" else TURN_QUESTION)[lang]
+        self._questions = [main] + [self._as_question(q) for q in (extra_questions or [])]
+        self.last_turn_class: str | None = None
         self.last_answers: dict = {}
         self.last_server_ms: float | None = None
         self.assistant_said: str = ""
@@ -155,9 +194,18 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
                 self._on_answers(answers)
             except Exception as e:
                 logger.warning(f"on_answers callback raised: {e}")
-        turn = answers.get("turn", {})
-        p = p_finished(turn.get("probs", {}), self._lang)
-        return {"prediction": 1 if p >= self._threshold else 0, "probability": p}
+        probs = answers.get("turn", {}).get("probs", {})
+        p = (p_reply if self._readout == "act" else p_finished)(probs, self._lang)
+        self.last_turn_class = turn_class(probs, self._lang, self._readout)
+        complete = p >= self._threshold
+        if not complete and self._wait_stop_secs and self.last_turn_class == "hesitating":
+            self._stop_ms = max(self._stop_ms, self._wait_stop_secs * 1000)  # give a thinking pause more time
+        return {"prediction": 1 if complete else 0, "probability": p}
+
+    def _clear(self, turn_state):
+        super()._clear(turn_state)
+        if turn_state != EndOfTurnState.INCOMPLETE:
+            self._stop_ms = self.params.stop_secs * 1000  # back to the normal silence limit for the next turn
 
 
 class DuplexJevContextTracker(FrameProcessor):

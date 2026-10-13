@@ -97,6 +97,11 @@ Then pass `url="http://localhost:8420"`.
 | `on_answers` | `None` | callback with every answer dict |
 | `timeout` | `params.stop_secs` | HTTP timeout; on timeout Pipecat treats the turn as complete |
 | `params` | `SmartTurnParams()` | Pipecat's usual `stop_secs`, `pre_speech_ms`, `max_duration_secs` |
+| `readout` | `"turn"` | `"act"` asks "What should the assistant do now?" (P(reply) + P(short acknowledgement)); slightly better on eot-bench with context |
+| `wait_stop_secs` | `None` | if the user sounds like they are hesitating, wait up to this long in silence before forcing the turn to end |
+
+After each prediction `turn.last_turn_class` is `finished`, `not_finished`, `backchannel` or `hesitating`
+(`reply`, `keep_listening`, `acknowledge` with `readout="act"`), for your own routing.
 
 If the gateway can't be reached, the analyzer logs the error and reports "not finished", so Pipecat falls back to its
 silence timeout and the conversation never blocks.

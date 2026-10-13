@@ -205,3 +205,26 @@ async def test_assistant_said_is_sent_and_attach_follows_session(gateway):
     det.set_assistant_said("y" * 500)
     assert len(det.assistant_said) == 300
     await stream.aclose()
+
+
+async def test_act_readout_and_turn_class(gateway):
+    det = duplexjev.TurnDetector(api_url=gateway.url, readout="act", backchannel_threshold=0.5)
+    stream = det.stream()
+    push(stream, 1.0)
+    gateway.p_finished = 0.8
+    ev = await asyncio.wait_for(stream.predict(), 2)
+    qs = gateway.requests[-1]["questions"]
+    assert [q["id"] for q in qs] == ["turn"] and qs[0]["text"] == "What should the assistant do now?"
+    assert ev.end_of_turn_probability == pytest.approx(0.8) and det.last_turn_class == "reply"
+    assert ev.backchannel_probability == pytest.approx(0.0)
+    gateway.p_finished = 0.2
+    ev = await asyncio.wait_for(stream.predict(), 2)
+    assert det.last_turn_class == "keep_listening"
+    await stream.aclose()
+    t = duplexjev.TurnDetector(api_url=gateway.url)
+    s = t.stream(); push(s, 1.0); gateway.p_finished = 0.9
+    await asyncio.wait_for(s.predict(), 2)
+    assert t.last_turn_class == "finished"
+    await s.aclose()
+    with pytest.raises(ValueError):
+        duplexjev.TurnDetector(readout="x")

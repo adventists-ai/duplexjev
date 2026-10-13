@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 (2026-10-13)
+
+- `readout="act"`: ask "What should the assistant do now?" and report P(reply now) + P(short acknowledgement) as the
+  end-of-turn probability (also gives the backchannel probability from the same answer). On LiveKit eot-bench
+  (English, 32B-Para v1.2, with the agent's previous message) false cut-offs at 300 ms: 18.4% vs 19.7%.
+- `last_turn_class` (finished / not_finished / backchannel / hesitating, or reply / keep_listening / acknowledge).
+
 ## 0.2.0 (2026-10-13)
 
 - Turn-taking context: `detector.attach(session)` (or `detector.set_assistant_said(text)`) sends the agent's previous
