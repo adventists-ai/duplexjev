@@ -130,7 +130,7 @@ class DuplexJevTurnAnalyzer(BaseSmartTurn):
             raise ValueError("lang must be 'en' or 'zh'")
         self._url = url.rstrip("/") + "/v1/decide"
         if url.rstrip("/") == DEFAULT_URL:
-            logger.info("Using the free DuplexJev trial API (DuplexJev-4B-Para, rate limited, no assistant context). "
+            logger.info("Using the free DuplexJev trial API (DuplexJev-4B-Para, rate limited). "
                         "For the turn-taking quality reported on eot-bench, serve DuplexJev-32B-Para v1.2 behind "
                         "`duplexjev gateway` >= 0.6 and pass its URL; see the README.")
         self._headers = {"Content-Type": "application/json"}
