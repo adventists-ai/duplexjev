@@ -442,7 +442,6 @@ Same items, same prompt, options rotated and averaged, highest-probability lette
 | meaning from stress | DEBATE held-out (400)† | **88.5** | 43.8 |
 | meaning from stress | StressTest (218) | **72.0** | 69.7 |
 | speaking style (whisper, shout, fast, …) | EARS held-out speakers (220)† | **78.6** | 49.5 |
-| native English speaker? | held-out speakers (282)† | **91.1** | 70.2 |
 | laughter / breathing / cough / sigh, AUC | NonverbalTTS test (400) | 0.93 / **0.86** / 0.86 / 0.85 | **0.96** / 0.65 / **0.87** / **0.87** |
 
 - † Test sets from corpora that are also in our training data (held-out speakers or sentences); Qwen3-Omni is zero-shot.
