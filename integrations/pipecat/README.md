@@ -19,6 +19,12 @@ and tells your bot whether the user is **finished**, **still talking**, **just b
 
 Tested with `pipecat-ai` 1.12.0. Maintained by Adventists.ai (AI降临派).
 
+> **Getting the published turn-taking numbers.** LiveKit eot-bench (English, false cut-offs at 300 ms): **20.0%** for
+> DuplexJev-32B-Para v1.2 with the agent's previous message, 23.5% audio only, vs 35.2% for Smart Turn v3.2. That needs
+> DuplexJev-32B-Para **v1.2 on your own GPU** behind `duplexjev gateway` >= 0.6 (see *Run the model yourself*), the
+> default `readout="turn"`, and the agent's previous message (below). The free trial API runs the smaller DuplexJev-4B-Para
+> (no v1.2 turn-taking update): use it to try the plugin, not to judge turn-taking quality.
+
 ## Install
 
 ```bash
@@ -60,7 +66,7 @@ pipeline = Pipeline([transport.input(), stt, aggregators.user(), llm,
 ```
 
 or call `turn.set_assistant_said(text)` yourself. It needs a gateway from `duplexjev>=0.6`. On LiveKit eot-bench
-(English, DuplexJev-32B-Para v1.2) this cuts false cut-offs at a 300 ms budget from 23.5% to 19.7%.
+(English, DuplexJev-32B-Para v1.2, full run) this cuts false cut-offs at a 300 ms budget from 23.5% to 20.0%.
 
 A complete snippet is in [`examples/wiring.py`](examples/wiring.py). [`examples/live_check.py`](examples/live_check.py)
 feeds real clips through the analyzer, frame by frame, the way a transport does:
@@ -73,15 +79,20 @@ ex5.wav: INCOMPLETE p(finished)=0.28  turn='hesitating or asking to wait'       
 
 ## Run the model yourself (recommended for real-time)
 
-The default URL is our free trial API. It is rate limited (30 requests per minute) and served from mainland China,
-so the network round trip from elsewhere can be over a second. For a live bot, serve the model next to your agent.
-DuplexJev-4B-Para needs about 10 GB of GPU memory; for the best turn-taking use DuplexJev-32B-Para (v1.2, one 80 GB GPU):
+The default URL is our free trial API. It is rate limited (30 requests per minute), served from mainland China
+(the network round trip from elsewhere can be over a second), and runs the smaller DuplexJev-4B-Para
+without the v1.2 turn-taking update. For a live bot, serve the model next to your agent. For turn-taking, use
+DuplexJev-32B-Para v1.2 on one 80 GB GPU (the eot-bench numbers above):
 
 ```bash
 pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
-vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096 --port 8000 &
-duplexjev gateway --vllm http://localhost:8000/v1 --port 8420
+vllm serve adventists-ai/DuplexJev-32B-Para --revision v1.2 --max-model-len 4096 --port 8000 &
+duplexjev gateway --vllm http://localhost:8000/v1 --port 8420 --rate 1000000
 ```
+
+On a smaller GPU, `adventists-ai/DuplexJev-4B-Para` needs about 10 GB; it is fine for emotion and the other questions,
+but its turn-taking has not had the v1.2 update. `--rate 1000000` lifts the gateway's default limit of 30 requests per
+minute, which a live bot exceeds quickly.
 
 Then pass `url="http://localhost:8420"`.
 

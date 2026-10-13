@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1 (unreleased)
+
+- Logs a one-time hint when the free trial API is used: it runs DuplexJev-4B-Para, so
+  its turn-taking does not match the published eot-bench numbers (DuplexJev-32B-Para v1.2 behind your own
+  `duplexjev gateway` >= 0.6).
+- README: how to reproduce the eot-bench numbers; the self-hosting example now serves DuplexJev-32B-Para v1.2 with
+  `--rate 1000000`; eot-bench figure for the default setting updated to the full run (20.0%).
+
 ## 0.3.0 (2026-10-13)
 
 - `readout="act"`: ask "What should the assistant do now?" and report P(reply now) + P(short acknowledgement) as the
