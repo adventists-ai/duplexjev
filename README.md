@@ -440,6 +440,21 @@ Both benchmarks ask the hard live question: the user has *just* gone quiet — f
 - Code: [`benchmarks/turn_detection/`](benchmarks/turn_detection); the context row uses
   [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py).
 
+> **Reproducing these numbers.** They come from **DuplexJev-32B-Para v1.2 on your own GPU**, not from the free trial
+> API (the trial API runs the smaller DuplexJev-4B-Para behind an older gateway that ignores the assistant's
+> message, so its turn-taking is closer to Smart Turn). To get the published setup:
+>
+> ```bash
+> pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
+> vllm serve adventists-ai/DuplexJev-32B-Para --revision v1.2 --max-model-len 4096 --port 8000 &   # one 80 GB GPU
+> duplexjev gateway --vllm http://localhost:8000/v1 --port 8420 --rate 1000000
+> ```
+>
+> then point the plugin at it (`api_url=` / `url="http://localhost:8420"`), keep the default `readout="turn"`, and
+> give it the agent's previous message (`detector.attach(session)` in LiveKit, `DuplexJevContextTracker` in
+> Pipecat). Without the agent's message expect the audio-only row. Full eot-bench command:
+> [`benchmarks/turn_detection/README.md`](benchmarks/turn_detection/README.md).
+
 ### Speed and spoken knowledge
 
 | | DuplexJev-32B(-Turn) | DuplexJev-4B(-Turn) |
