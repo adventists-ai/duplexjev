@@ -400,6 +400,19 @@ DuplexJev-32B-Turn 的话轮判断达到专用检测器的水平；同一次前�
 - 复现代码：[`benchmarks/turn_detection/`](benchmarks/turn_detection)；带上一句话那行用
   [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py)。
 
+> **想测出上表的成绩，请这样跑。** 这些数来自**自己部署的 DuplexJev-32B-Para v1.2**，不是免费试用 API。试用 API 跑的是
+> 较小的 DuplexJev-4B-Para，网关也是旧版、会忽略助手上一句话，话轮效果接近 Smart Turn。复现步骤：
+>
+> ```bash
+> pip install "vllm[audio]>=0.29" duplexjev-vllm "duplexjev[server]>=0.6"
+> vllm serve adventists-ai/DuplexJev-32B-Para --revision v1.2 --max-model-len 4096 --port 8000 &   # 一张 80 GB 卡
+> duplexjev gateway --vllm http://localhost:8000/v1 --port 8420 --rate 1000000
+> ```
+>
+> 然后把插件指向它（`api_url=` / `url="http://localhost:8420"`），保持默认的 `readout="turn"`，并把助手上一句话交给插件
+> （LiveKit 用 `detector.attach(session)`，Pipecat 用 `DuplexJevContextTracker`）。不给助手上一句话，成绩对应“只用音频”那行。
+> eot-bench 完整命令见 [`benchmarks/turn_detection/README.md`](benchmarks/turn_detection/README.md)。
+
 ### 速度与口语知识
 
 | | DuplexJev-32B(-Turn) | DuplexJev-4B(-Turn) |
