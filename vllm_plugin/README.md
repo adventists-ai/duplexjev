@@ -1,14 +1,14 @@
 # duplexjev-vllm
 
 vLLM plugin for [DuplexJev](https://github.com/adventists-ai/duplexjev) speech-decision models, such as
-[`adventists-ai/DuplexJev-4B`](https://huggingface.co/adventists-ai/DuplexJev-4B).
+[`adventists-ai/DuplexJev-4B-Para`](https://huggingface.co/adventists-ai/DuplexJev-4B-Para).
 
 ```bash
 pip install "vllm[audio]>=0.29" duplexjev-vllm
-vllm serve adventists-ai/DuplexJev-4B --max-model-len 4096
+vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096
 ```
 
-The plugin registers the architectures `DuplexJevForConditionalGeneration` (Qwen-based DuplexJev-32B / 4B) and,
+The plugin registers the architectures `DuplexJevForConditionalGeneration` (all Qwen-based DuplexJev models: 32B-Para, 4B-Para, …) and,
 since 0.2.0, `DuplexJevGemmaForConditionalGeneration` (DuplexJev-Gemma-31B: audio embeddings scaled ×3 and wrapped in
 Gemma's `<|audio> … <audio|>` markers), and since 0.3.0 `DuplexJevVisionForConditionalGeneration` (DuplexJev-32B-Vision,
 speech and an image in one request; see below) through vLLM's `vllm.general_plugins` entry point, so nothing needs to be

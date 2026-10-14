@@ -1,7 +1,7 @@
 """Clients that need no GPU and no torch: a vLLM server running a DuplexJev model, or the DuplexJev HTTP API.
 
     from duplexjev.remote import VLLMClient, ApiClient
-    VLLMClient("http://localhost:8000/v1").decide("call.wav", questions)     # your own `vllm serve adventists-ai/DuplexJev-4B`
+    VLLMClient("http://localhost:8000/v1").decide("call.wav", questions)     # your own `vllm serve adventists-ai/DuplexJev-4B-Para`
     ApiClient("https://<host>/duplexjev").decide("call.wav", questions)      # a `duplexjev gateway` in front of it
 
 Both return ``{question_id: {"answer": option, "confidence": p, "probs": {option: p}}}``, like ``Decider.decide``.

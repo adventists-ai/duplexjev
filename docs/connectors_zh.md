@@ -3,8 +3,8 @@
 *[English](connectors.md) · [返回 README](../README_CN.md)*
 
 大多数用户请直接用**完整模型**（编码器 + 连接器 + 大模型在一个仓库里，用 vLLM 部署）：
-🤗 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) 或
-🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B)，见 [README](../README_CN.md#3-模型)。
+🤗 [DuplexJev-32B-Para](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 或
+🤗 [DuplexJev-4B-Para](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)，见 [README](../README_CN.md#3-模型)。
 
 本页面向研究用途：完整模型和论文背后的**连接器 checkpoint**（覆盖不同编码器、大模型和连接器类型），以及加载它们的
 `duplexjev` PyTorch 包。

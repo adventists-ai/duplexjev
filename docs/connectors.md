@@ -3,8 +3,8 @@
 *[中文](connectors_zh.md) · [back to README](../README.md)*
 
 Most users should start with a **complete model** (encoder + connector + LLM in one repository, served with vLLM):
-🤗 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) or
-🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B); see the [README](../README.md#3-models).
+🤗 [DuplexJev-32B-Para](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) or
+🤗 [DuplexJev-4B-Para](https://huggingface.co/adventists-ai/DuplexJev-4B-Para); see the [README](../README.md#3-models).
 
 This page is for research use: the **connector checkpoints** behind the complete models and the paper, across
 encoders, LLMs and connector types, and the `duplexjev` PyTorch package that loads them.

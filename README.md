@@ -193,6 +193,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 ## 2. News
 
 - **2026-10-12** — All ten DuplexJev models are now also on **[ModelScope](https://www.modelscope.cn/organization/AdventistsAI)** (same weights, sha256-checked), for faster downloads in mainland China.
+- **2026-10-14** — 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): the 32B-Para v1.2 turn-taking recipe on the 4B (~10 GB). LiveKit eot-bench false cut-offs at 300 ms: **25.5%** English, **38.8%** Chinese (4B-Para v1.1: 46.4% / 48.5%; Smart Turn v3.2: 35.2% / 42.9%). Stress, VoiceBench and VocalSound are a few points below 4B-Para, which stays the general 4B. Also on [ModelScope](https://www.modelscope.cn/models/AdventistsAI/DuplexJev-4B-Para-LiveTurn).
 - **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **20.0%** when the model also gets the assistant's previous message, as the plugins send it (full eot-bench run; Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. The [trial API](https://api.adventists.cn/duplexjev/) now serves 32B-Para v1.2 too. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
 - **2026-10-12** — 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): now the best overall DuplexJev model (total 92.6 vs 92.2 for 32B-Turn) and much better at non-verbal sounds (cough AUC 0.70 → 0.85, breathing 0.73 → 0.81), speaking style (69% → 82%) and stress (DEBATE 87 → 93, StressPresso 84 → 96). Same prompts and plugin; v1.0 stays available as revision `v1.0`.
 - **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
@@ -242,9 +243,8 @@ then use the local directory in place of the Hugging Face id, e.g. `vllm serve .
 |---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
 | ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 v1.2 | server, widest set of abilities (now with accents), best live turn-taking, best overall | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | 95 | 87 | **95.5**\* | **93.9** | 90.1 | **92.3** | CC BY-NC 4.0 |
 | ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | small GPU, widest set of abilities, **and normal conversation** (v1.1); `duplexjev` default | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 77 | **58** | 91.0\* | 89.2 | 90.0 | **82.5** | CC BY-NC 4.0 |
-| 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | server, best quality | Qwen3-VL-32B (language model, + rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 33.0 B | one 80 GB GPU | **96** | 87 | **95.3**\* | 91.5 | 91.1 | 92.2 | CC BY-NC 4.0 |
+| 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) 🆕 | small GPU, **live end-of-turn** for LiveKit / Pipecat agents (+ accents); 4B-Para stays the general 4B | as 4B-Para (+ accent and pause-level turn-taking data) | 4.2 B | ~10 GB | 76 | 62 | 92.0\* | 89.5 | 90.5 | — | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | 92.1 | 91.4 | — | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | small GPU, edge | Qwen3-4B (+ rank-16 LoRA) + Qwen3-ASR-0.6B encoder | 4.2 B | ~10 GB | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 | CC BY-NC 4.0 |
 | 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | small GPU, + stress and pauses | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
 
 **What the Para models add** (AUC, 0.5 = chance; unseen real speech from the NonverbalTTS test set and a third-party
@@ -268,28 +268,39 @@ identify people.
 
 **DuplexJev-4B-Para v1.1 (2026-10-10)** is trained with conversation replay, so the same weights also hold a normal conversation. Decision scores are within 0.5–2.6 points of v1.0 (still available as revision `v1.0`); see the [research note](research/2026-10-chat-replay.md). The 32B version is training.
 
-The Stress models add stress and pause understanding (which word is stressed: 92 / 95 on held-out Mandarin sentences for 32B / 4B; see the [research note](research/2026-10-stress-understanding.md)). 32B-Stress matches 32B-Turn on every other benchmark within noise. **4B-Stress trades about 4 points of VoiceBench** (42.0 / 38.2 vs 46.4 / 41.7) for it, so 4B-Turn stays the default small model.
+The Stress models add stress and pause understanding (which word is stressed: 92 / 95 on held-out Mandarin sentences for 32B / 4B; see the [research note](research/2026-10-stress-understanding.md)). 32B-Stress matches 32B-Turn on every other benchmark within noise. **4B-Stress trades about 4 points of VoiceBench** (42.0 / 38.2 vs 46.4 / 41.7) for it, so 4B-Para stays the default small model.
 
 
-Earlier versions without the turn-taking upgrade, [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) (total 87.7)
-and [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) (78.6), stay online but are superseded: the Turn models
-are equal or better on every benchmark we run.
+<details>
+<summary><b>Older models (archived)</b> — superseded by the Para models; still downloadable, not recommended for new projects</summary>
+
+| model | replaced by | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 🤗 [DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 32B-Para | 96 | 87 | 95.3\* | 91.5 | 91.1 | 92.2 |
+| 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 4B-Para / 4B-Para-LiveTurn | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 |
+| 🤗 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) | 32B-Para | | | | | | 87.7 |
+| 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | 4B-Para | | | | | | 78.6 |
+
+The Turn models keep a small edge on a few single scores (32B-Turn: qa100 +1, emotion +1; 4B-Turn: emotion +2), but have
+none of the Para abilities (non-verbal sounds, speaking style, speaker, stress, accents). DuplexJev-32B / 4B are the
+versions before the turn-taking upgrade (paper models).
+
+🤗 [DuplexJev-Gemma-31B](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B) (Gemma-4-31B-it + Qwen3-ASR-0.6B
+encoder, ~58 GB): no turn-taking training. In the prompt wording of [§4](#4-quick-start): qa100 97, ZJU-ML 87, gender 94.4,
+emotion 90.6, Easy-Turn 68.0 zero-shot; sensitive to question wording (paper-protocol wording: gender 78.5, emotion 60.9).
+
+</details>
 
 % under the paper protocol (single-token readout); total = mean of main language (qa100, ZJU-ML, Easy-Turn) and
 paralinguistics (gender, emotion), see [Benchmarks](#6-benchmarks). \* Both models were trained with the Easy-Turn
 training split (disjoint from the test set), so their Easy-Turn scores are in-domain. Both answer ten questions about one clip in about
 0.1–0.25 s on one GPU.
 
-**Also available: 🤗 [DuplexJev-Gemma-31B](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B)** (Gemma-4-31B-it +
-Qwen3-ASR-0.6B encoder, ~58 GB, one 80 GB GPU, CC BY-NC 4.0). No turn-taking training yet; like the Turn models, its LLM carries a merged LoRA. Served by vLLM in the prompt wording of [§4](#4-quick-start): qa100 97, ZJU-ML 87, gender 94.4, emotion
-90.6; Easy-Turn 68.0 zero-shot (no turn-taking training). It is sensitive to question wording (paper-protocol wording:
-gender 78.5, emotion 60.9), so it is not in the table above; details on its model card.
-
 **Which one to use.** The **Para** models if you want everything the voice carries (non-verbal sounds, speaking style,
 speaker, stress, emotion, gender, turn-taking) in one model — `DuplexJev-32B-Para` on an 80 GB GPU, `DuplexJev-4B-Para`
-on smaller GPUs. `DuplexJev-32B-Para` v1.2 is also the best for live turn-taking; `DuplexJev-4B-Turn` if the last point of turn-taking and emotion on a small GPU matters most;
-`DuplexJev-32B-Stress` / `4B-Stress` if stress and pauses are the main thing. The Turn
-models are drop-in replacements (same prompts, same plugin) and equal or better on every benchmark we run (within noise). The 32B models
+on smaller GPUs. `DuplexJev-32B-Para` v1.2 is also the best for live turn-taking; `DuplexJev-4B-Para-LiveTurn` for live end-of-turn on a small GPU;
+`DuplexJev-32B-Stress` / `4B-Stress` if stress and pauses are the main thing. All models
+use the same prompts and the same plugin. The 32B models
 use only the language model of Qwen3-VL-32B: their inputs are audio and text. For speech + image, use
 [DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview).
 
@@ -348,7 +359,7 @@ dj.decide(open("call_018.wav", "rb").read(), {"gender": ("说话人的性别是�
 
 The questions about one clip are sent concurrently and share the audio prefix in vLLM's prefix cache. Ask in the
 language of the clip. The prompt format and the plugin are described on the
-[model card](https://huggingface.co/adventists-ai/DuplexJev-32B) and in [`vllm_plugin/`](vllm_plugin).
+[model card](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) and in [`vllm_plugin/`](vllm_plugin).
 To use a connector checkpoint with the PyTorch package instead, see [docs/connectors.md](docs/connectors.md#pytorch-package).
 
 ### Try the new abilities
@@ -465,6 +476,8 @@ Both benchmarks ask the hard live question: the user has *just* gone quiet — f
 | **DuplexJev-32B-Para v1.2**, with the assistant's previous message (plugin setting) | **20.0 / 9.4%** | **37.7 / 12.2%** | – |
 | **DuplexJev-32B-Para v1.2**, audio only | 23.5 / 11.1% | 40.0 / 12.8% | **94.0 / 91.1**° |
 | DuplexJev-32B-Turn, audio only | 29.8 / 13.9% | 44.9 / 14.5% | 65.2 / 84.6 |
+| **DuplexJev-4B-Para-LiveTurn** (~10 GB), with the assistant's previous message (plugin setting) | **25.5 / 12.3%** | **38.8 / 12.0%** | **93.3 / 89.6**° |
+| DuplexJev-4B-Para v1.1, audio only | 46.4 / 17.7% | 48.5 / 15.6% | 67.9 / 78.9 |
 | Smart Turn v3.2 | 35.2 / 14.8% | 42.9 / 13.2% | 94.7 / 90.5 |
 
 - eot-bench: validation set, decision 0.2 s into each pause, official `compute-metrics` / `compare-models`; its audio is

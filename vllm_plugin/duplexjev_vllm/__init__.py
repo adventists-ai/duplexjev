@@ -1,7 +1,7 @@
 """vLLM plugin for DuplexJev speech-decision models (https://github.com/adventists-ai/duplexjev).
 
 Registered as a `vllm.general_plugins` entry point: `pip install duplexjev-vllm`, then
-`vllm serve adventists-ai/DuplexJev-4B`.
+`vllm serve adventists-ai/DuplexJev-4B-Para`.
 """
 __version__ = "0.3.0"
 

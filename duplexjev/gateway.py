@@ -1,6 +1,6 @@
 """A small public-facing HTTP API + web demo in front of a vLLM server running a DuplexJev complete model.
 
-    vllm serve adventists-ai/DuplexJev-4B --port 8010
+    vllm serve adventists-ai/DuplexJev-4B-Para --port 8010
     duplexjev gateway --vllm http://127.0.0.1:8010/v1 --port 8020
 
     GET  /                 web demo (record or upload a clip, see the decision table)

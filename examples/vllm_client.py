@@ -2,7 +2,7 @@
 
 Server (one GPU):
     pip install duplexjev-vllm
-    vllm serve adventists-ai/DuplexJev-4B
+    vllm serve adventists-ai/DuplexJev-4B-Para
 
 Client (this file, needs only `openai` and `numpy`):
     python vllm_client.py clip.wav

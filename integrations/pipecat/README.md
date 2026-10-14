@@ -91,8 +91,9 @@ vllm serve adventists-ai/DuplexJev-32B-Para --revision v1.2 --max-model-len 4096
 duplexjev gateway --vllm http://localhost:8000/v1 --port 8420 --rate 1000000
 ```
 
-On a smaller GPU, `adventists-ai/DuplexJev-4B-Para` needs about 10 GB; it is fine for emotion and the other questions,
-but its turn-taking has not had the v1.2 update. `--rate 1000000` lifts the gateway's default limit of 30 requests per
+On a smaller GPU (about 10 GB), serve `adventists-ai/DuplexJev-4B-Para-LiveTurn`, the 4B with the same turn-taking
+update: eot-bench false cut-offs at 300 ms 25.5% English / 38.8% Chinese with the agent's previous message (Smart Turn
+v3.2: 35.2% / 42.9%). `--rate 1000000` lifts the gateway's default limit of 30 requests per
 minute, which a live bot exceeds quickly.
 
 Then pass `url="http://localhost:8420"`.
