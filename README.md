@@ -43,7 +43,8 @@
 | 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
 | 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
 | 👂 emotion from the voice (4 classes) | **91** | 45 — Qwen3-Omni-30B, same questions · ~28 — speech LLMs trained on transcripts |
-| 🎭 emotion the words don't carry ([LISTEN](https://arxiv.org/abs/2510.10444), EACL 2026) | **51** · state of the art | 35 — best published (Gemini 2.5 Pro) · same items: 25 Gemini 3.1 Pro, 31 Gemini 3.8 Flash, 34 Qwen3-Omni (ours 45) |
+| 🏆 paralinguistic understanding, [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026), mean of 4 audio-only conditions | **38.4** · state of the art | 33.0 — best published (Qwen2.5-Omni) · same items: 33.9 Qwen3-Omni, 33.1 Gemini 3.8 Flash, 30.1 Gemini 3.1 Pro (ours 37.3) |
+| 🎭 emotion the words don't carry (LISTEN neutral text) | **51** | 35 — best published (Gemini 2.5 Pro) · same items: 25 Gemini 3.1 Pro, 31 Gemini 3.8 Flash, 34 Qwen3-Omni (ours 45) |
 | 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
 | 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
 | 👁️ voice + picture, one pass (new, preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
