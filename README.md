@@ -83,13 +83,14 @@ is speaking and how (paralinguistics):
   (95.4 / 79.3 from text).
 - **Paralinguistics, strong perception.** Gender 91.5, emotion 91.1, where speech LLMs trained on transcripts sit at
   chance (~55 / ~28).
-- **Far ahead of a general speech LLM on how things are said.** Same questions and scoring against Qwen3-Omni-30B-A3B:
+- **State of the art in paralinguistic understanding (LISTEN, EACL 2026).** Same questions and scoring against Qwen3-Omni-30B-A3B:
   emotion **90.5 vs 45.2**, which word is stressed **91 vs 63–73**, speaking style **79 vs 50** (these test sets come
   from corpora in our training data, held-out speakers or sentences; Qwen3-Omni is zero-shot). On the public LISTEN
   benchmark (EACL 2026), built to test whether audio LLMs *listen* or just read the words, DuplexJev-32B-Para leads where
   the words carry no emotion (**51 vs 33**) and on non-verbal sounds alone (**26 vs 18**; Gemini 2.5 Pro 16 in the paper).
   On the same items it is also ahead of **Gemini 3.1 Pro and Gemini 3.8 Flash** at hearing emotion the words do not carry
-  (45 vs 25 / 31): state of the art for that task ([§5](#paralinguistics-vs-a-general-speech-llm)).
+  (45 vs 25 / 31). Averaged over LISTEN's four audio-only conditions it scores **38.4**, against **33.0** for the best
+  published model: state of the art in paralinguistic understanding on LISTEN ([§5](#paralinguistics-vs-a-general-speech-llm)).
 - **Stress and pauses (new).** DuplexJev-32B-Stress finds the stressed word ("**I** didn't say…" vs "I didn't say she took the
   **money**") on unseen Mandarin and English sentences, 92 / 88, and answers "no word is stressed" on 99% of neutral speech;
   the other models are at chance ([research note](research/2026-10-stress-understanding.md)).
@@ -489,7 +490,9 @@ with the options in their original order and its first option letter taken as th
 | speaking style, EARS† | **80.0** | 51.0 | 68.5 | 45.0 |
 | MSPB (statement / question, …) | 67.7 | **71.7** | 54.3 | 66.9 |
 
-Hearing emotion the words do not carry is where DuplexJev is ahead of every model we tried, closed ones included; on
+Averaged over LISTEN's four audio-only conditions, DuplexJev scores 38.4 on the full set (37.3 on these items), ahead of
+every published and tested model: state of the art in paralinguistic understanding on LISTEN. Its largest lead is on
+emotion the words do not carry, where it is ahead of every model we tried, closed ones included; on
 the full LISTEN neutral-text set it scores 51.0, against 34.9 for the best published result (Gemini 2.5 Pro, LISTEN paper).
 Gemini 3.8 Flash is ahead on StressTest, and the general models are ahead when the words themselves carry the emotion.
 
