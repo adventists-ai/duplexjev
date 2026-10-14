@@ -43,12 +43,14 @@
 | 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
 | 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
 | 👂 emotion from the voice (4 classes) | **91** | 45 — Qwen3-Omni-30B, same questions · ~28 — speech LLMs trained on transcripts |
-| 🏆 paralinguistic understanding, [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026), mean of 4 audio-only conditions | **38.4** · state of the art | 33.0 — best published (Qwen2.5-Omni) · same items: 33.9 Qwen3-Omni, 33.1 Gemini 3.8 Flash, 30.1 Gemini 3.1 Pro (ours 37.3) |
-| 🎭 emotion the words don't carry (LISTEN neutral text) | **51** | 35 — best published (Gemini 2.5 Pro) · same items: 25 Gemini 3.1 Pro, 31 Gemini 3.8 Flash, 34 Qwen3-Omni (ours 45) |
+| 🏆 paralinguistic understanding, [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026), mean of 4 audio-only conditions | **38.4** · state of the art | 33.0 — best published (Qwen2.5-Omni) · same items: 33.9 Qwen3-Omni, 33.1 Gemini 3.8 Flash, 30.1 Gemini 3.1 Pro (ours 37.3)¹ |
+| 🎭 emotion the words don't carry (LISTEN neutral text) | **51** | 35 — best published (Gemini 2.5 Pro) · same items: 25 Gemini 3.1 Pro, 31 Gemini 3.8 Flash, 34 Qwen3-Omni (ours 45)¹ |
 | 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
 | 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
 | 👁️ voice + picture, one pass (new, preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
 | 🧩 a new decision | **one line of text at runtime** | new data, new model |
+
+¹ LISTEN's neutral-text set includes ESD and CREMA-D clips, which are in our training data; on the corpora we never trained on (TESS, SAVEE, RAVDESS) it is 34.6 vs 28.0 for the best other model (Qwen3-Omni) on the same items. DuplexJev reads options rotated and averaged; the paper and Gemini answer once (§5).
 
 **Get a result in 30 seconds:**
 
