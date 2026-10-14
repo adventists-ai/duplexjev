@@ -15,6 +15,7 @@
   <b>DuplexJev is the decision layer for voice agents.</b><br>
   Has the user finished? Should I stop talking? Are they angry? Which filler fits?<br>
   Every answer, straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.<br>
+  🏆 <b>It hears what the flagships miss.</b> State of the art in paralinguistic understanding on <a href="https://arxiv.org/abs/2510.10444">LISTEN</a> (EACL 2026), ahead of <b>Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni</b> on the same questions.<br>
   👁️ <b>New: it also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same single pass (preview) — <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">try it with a photo + your voice</a>.
 </p>
 
@@ -43,14 +44,15 @@
 | 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
 | 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
 | 👂 emotion from the voice (4 classes) | **91** | 45 — Qwen3-Omni-30B, same questions · ~28 — speech LLMs trained on transcripts |
-| 🏆 paralinguistic understanding, [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026), mean of 4 audio-only conditions | **38.4** · state of the art | 33.0 — best published (Qwen2.5-Omni) · same items: 33.9 Qwen3-Omni, 33.1 Gemini 3.8 Flash, 30.1 Gemini 3.1 Pro (ours 37.3)¹ |
-| 🎭 emotion the words don't carry (LISTEN neutral text) | **51** | 35 — best published (Gemini 2.5 Pro) · same items: 25 Gemini 3.1 Pro, 31 Gemini 3.8 Flash, 34 Qwen3-Omni (ours 45)¹ |
+| 🏆 paralinguistic understanding, [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026), mean of 4 audio-only conditions | **38.4** · state of the art | 33.0 — best published (Qwen2.5-Omni) · same items (ours 37.3): 33.9 Qwen3-Omni, 33.1 Gemini 3.8 Flash, 31.6 GPT-audio-1.5, 30.9 Gemini 3.8 Live, 30.1 Gemini 3.1 Pro, 25.6 GPT-realtime-2.1¹ |
+| 🎭 emotion the words don't carry (LISTEN neutral text) | **51** | 35 — best published (Gemini 2.5 Pro) · same items (ours 45): 34 Qwen3-Omni, 31 Gemini 3.8 Flash, 25 Gemini 3.8 Live, 25 Gemini 3.1 Pro, 25 GPT-audio-1.5, 16 GPT-realtime-2.1¹ |
 | 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
+| 🌍 live end of turn, LiveKit [eot-bench](https://github.com/livekit/eot-bench), **14 languages**, 300 ms budget | **fewer false cut-offs than Smart Turn v3.2 in all 14** | English 20.0% vs 35.2%, Japanese 14.1% vs 34.9%, German 21.3% vs 35.5% ([§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn)) |
 | 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
 | 👁️ voice + picture, one pass (new, preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
 | 🧩 a new decision | **one line of text at runtime** | new data, new model |
 
-¹ LISTEN's neutral-text set includes ESD and CREMA-D clips, which are in our training data; on the corpora we never trained on (TESS, SAVEE, RAVDESS) it is 34.6 vs 28.0 for the best other model (Qwen3-Omni) on the same items. DuplexJev reads options rotated and averaged; the paper and Gemini answer once (§5).
+¹ LISTEN's neutral-text set includes ESD and CREMA-D clips, which are in our training data; on the corpora we never trained on (TESS, SAVEE, RAVDESS) it is 34.6 vs 28.0 for the best other model (Qwen3-Omni) on the same items. DuplexJev reads options rotated and averaged; the paper and the closed models answer once. The realtime flagships were driven through their live APIs; both GPT models and Gemini 3.8 Live mostly answer "neutral" to emotion questions. Scripts and every prediction: [`benchmarks/paraling_compare`](benchmarks/paraling_compare) (§5).
 
 **Get a result in 30 seconds:**
 
@@ -88,8 +90,9 @@ is speaking and how (paralinguistics):
   from corpora in our training data, held-out speakers or sentences; Qwen3-Omni is zero-shot). On the public LISTEN
   benchmark (EACL 2026), built to test whether audio LLMs *listen* or just read the words, DuplexJev-32B-Para leads where
   the words carry no emotion (**51 vs 33**) and on non-verbal sounds alone (**26 vs 18**; Gemini 2.5 Pro 16 in the paper).
-  On the same items it is also ahead of **Gemini 3.1 Pro and Gemini 3.8 Flash** at hearing emotion the words do not carry
-  (45 vs 25 / 31). Averaged over LISTEN's four audio-only conditions it scores **38.4**, against **33.0** for the best
+  On the same items it is also ahead of every closed model we tried, the realtime flagships included (**Gemini 3.8 Flash,
+  Gemini 3.8 Live, Gemini 3.1 Pro, GPT-audio-1.5, GPT-realtime-2.1**), at hearing emotion the words do not carry
+  (45 vs 16–31). Averaged over LISTEN's four audio-only conditions it scores **38.4**, against **33.0** for the best
   published model: state of the art in paralinguistic understanding on LISTEN ([§5](#paralinguistics-vs-a-general-speech-llm)).
 - **Stress and pauses (new).** DuplexJev-32B-Stress finds the stressed word ("**I** didn't say…" vs "I didn't say she took the
   **money**") on unseen Mandarin and English sentences, 92 / 88, and answers "no word is stressed" on 99% of neutral speech;
@@ -197,6 +200,7 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 ## 2. News
 
+- **2026-10-15** — 🏆 **Closed flagships, realtime ones included.** Same LISTEN questions for Gemini 3.8 Live, GPT-realtime-2.1 and GPT-audio-1.5: DuplexJev-32B-Para leads all seven models we tested on LISTEN's four audio-only conditions (37.3; next best Qwen3-Omni 33.9, Gemini 3.8 Flash 33.1; the realtime models 30.9 and 25.6). Scripts and every prediction are in [`benchmarks/paraling_compare`](benchmarks/paraling_compare). And on LiveKit eot-bench, the remaining 12 languages (zero-shot: DuplexJev was trained on English and Chinese only): fewer false cut-offs than Smart Turn v3.2 in all 14 languages at 300 ms ([§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn)).
 - **2026-10-12** — All ten DuplexJev models are now also on **[ModelScope](https://www.modelscope.cn/organization/AdventistsAI)** (same weights, sha256-checked), for faster downloads in mainland China.
 - **2026-10-14** — 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): the 32B-Para v1.2 turn-taking recipe on the 4B (~10 GB). LiveKit eot-bench false cut-offs at 300 ms: **25.5%** English, **38.8%** Chinese (4B-Para v1.1: 46.4% / 48.5%; Smart Turn v3.2: 35.2% / 42.9%). Stress, VoiceBench and VocalSound are a few points below 4B-Para, which stays the general 4B. Also on [ModelScope](https://www.modelscope.cn/models/AdventistsAI/DuplexJev-4B-Para-LiveTurn).
 - **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **20.0%** when the model also gets the assistant's previous message, as the plugins send it (full eot-bench run; Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. The [trial API](https://api.adventists.cn/duplexjev/) now serves 32B-Para v1.2 too. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
@@ -472,29 +476,38 @@ Same items, same prompt, options rotated and averaged, highest-probability lette
 - On natural Mandarin conversation (MagicData samples: laughter, breathing, stress), the two are level. Where the words
   themselves carry the emotion (LISTEN matched), Qwen3-Omni is ahead: it reads the words, DuplexJev answers from the voice.
 
-**Against closed models (Gemini).** Same items again (200 per test; 127–174 where a set is smaller), Gemini asked once per item
-with the options in their original order and its first option letter taken as the answer (`gemini-3.1-pro-preview`,
-`gemini-3.8-flash`, default thinking).
+**Against closed models, realtime flagships included.** Same items again (200 per test; 107–174 where a set is smaller), each
+model asked once per item with the options in their original order and its first option letter taken as the answer:
+`gemini-3.1-pro-preview` and `gemini-3.8-flash` (default thinking), `gpt-audio-1.5` (chat completions with audio input),
+and the two realtime flagships through their live APIs: `gemini-3.8-live` (the question first, then the audio streamed as
+realtime input in one manual activity; it can only answer by voice, so we read its output transcription) and
+`gpt-realtime-2.1` (websocket session, text output, audio and question in one user message, no VAD).
 
-| test | DuplexJev-32B-Para | Qwen3-Omni-30B | Gemini 3.1 Pro | Gemini 3.8 Flash |
-|---|---:|---:|---:|---:|
-| LISTEN neutral words | **45.0** | 33.5 | 25.0 | 31.0 |
-| … unseen corpora only (TESS, SAVEE, RAVDESS) | **34.6** | 28.0 | 20.6 | 26.2 |
-| LISTEN no words | **25.0** | 18.0 | 15.5 | 19.5 |
-| LISTEN sarcastic words | 43.0 | 41.5 | 42.5 | 42.0 |
-| LISTEN words match | 36.0 | **42.5** | 37.5 | 40.0 |
-| emotion, ESD + CREMA-D† | **91.0** | 46.0 | 32.5 | 40.5 |
-| which word is stressed, zh / en† | **93.5 / 91.4** | 62.0 / 73.6 | 58.5 / 52.9 | 71.5 / 88.5 |
-| meaning from stress, DEBATE† | **90.5** | 36.5 | 51.5 | 79.5 |
-| StressTest | 71.5 | 70.0 | 70.5 | **89.0** |
-| speaking style, EARS† | **80.0** | 51.0 | 68.5 | 45.0 |
-| MSPB (statement / question, …) | 67.7 | **71.7** | 54.3 | 66.9 |
+| test | DuplexJev-32B-Para | Qwen3-Omni-30B | Gemini 3.1 Pro | Gemini 3.8 Flash | Gemini 3.8 Live | GPT-audio-1.5 | GPT-realtime-2.1 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **LISTEN, mean of 4 audio-only conditions** | **37.3** | 33.9 | 30.1 | 33.1 | 30.9 | 31.6 | 25.6 |
+| LISTEN neutral words | **45.0** | 33.5 | 25.0 | 31.0 | 25.0 | 24.5 | 15.5 |
+| … unseen corpora only (TESS, SAVEE, RAVDESS) | **34.6** | 28.0 | 20.6 | 26.2 | 23.4 | 18.7 | 12.1 |
+| LISTEN no words | **25.0** | 18.0 | 15.5 | 19.5 | 14.5 | **25.0** | 13.5 |
+| LISTEN sarcastic words | **43.0** | 41.5 | 42.5 | 42.0 | 42.5 | 41.5 | 38.5 |
+| LISTEN words match | 36.0 | **42.5** | 37.5 | 40.0 | 41.5 | 35.5 | 35.0 |
+| emotion, ESD + CREMA-D† | **91.0** | 46.0 | 32.5 | 40.5 | 27.5 | 35.0 | 31.5 |
+| which word is stressed, zh / en† | **93.5 / 91.4** | 62.0 / 73.6 | 58.5 / 52.9 | 71.5 / 88.5 | 43.0 / 56.9 | 28.0 / 42.0 | 14.0 / 30.5 |
+| meaning from stress, DEBATE† | **90.5** | 36.5 | 51.5 | 79.5 | 55.0 | 27.5 | 26.0 |
+| StressTest | 71.5 | 70.0 | 70.5 | **89.0** | 66.0 | 62.5 | 60.0 |
+| speaking style, EARS† | **80.0** | 51.0 | 68.5 | 45.0 | 56.5 | 54.0 | 48.0 |
+| MSPB (statement / question, …) | 68.0 | **71.9** | 54.7 | 67.2 | 46.9 | 57.8 | 47.7 |
 
 Averaged over LISTEN's four audio-only conditions, DuplexJev scores 38.4 on the full set (37.3 on these items), ahead of
-every published and tested model: state of the art in paralinguistic understanding on LISTEN. Its largest lead is on
-emotion the words do not carry, where it is ahead of every model we tried, closed ones included; on
-the full LISTEN neutral-text set it scores 51.0, against 34.9 for the best published result (Gemini 2.5 Pro, LISTEN paper).
-Gemini 3.8 Flash is ahead on StressTest, and the general models are ahead when the words themselves carry the emotion.
+every published and tested model, closed realtime flagships included: state of the art in paralinguistic understanding on
+LISTEN. Its largest lead is on emotion the words do not carry; on the full LISTEN neutral-text set it scores 51.0, against
+34.9 for the best published result (Gemini 2.5 Pro, LISTEN paper). The realtime models trail their offline siblings
+(Gemini 3.8 Live below 3.8 Flash, GPT-realtime-2.1 below GPT-audio-1.5), and the GPT models and Gemini 3.8 Live mostly
+answer "neutral" to emotion questions (GPT-realtime-2.1: 150 of the 200 neutral-words items), which looks like a
+deliberate choice not to infer emotion from the voice rather than an inability to hear it. Gemini 3.8 Flash is ahead
+on StressTest, and the general models are ahead when the words themselves carry the emotion. Unparsable answers count
+as wrong (GPT-audio-1.5 2%, Gemini 3.8 Live 0.5%, the others ~0). Scripts, the item list and every model's raw answer:
+[`benchmarks/paraling_compare`](benchmarks/paraling_compare).
 
 ### Live end of turn: LiveKit eot-bench and Pipecat Smart Turn
 
@@ -517,6 +530,16 @@ Both benchmarks ask the hard live question: the user has *just* gone quiet — f
   point).
 - ° The Smart Turn v3.2 *training* set is in the v1.2 training mix, so this column is in-distribution for v1.2 (as it
   is for Smart Turn itself).
+- **All 14 eot-bench languages** (DuplexJev-32B-Para v1.2 with the assistant's previous message, full run; trained on
+  English and Chinese only, the question is asked in English for the other 12). False cut-offs at 300 / 600 ms:
+
+  | | ar | de | es | fr | hi | id | it | ja | ko | nl | pt | tr |
+  |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+  | DuplexJev-32B-Para v1.2 | **34.7** / **11.5** | **21.3** / **8.3** | **33.4** / **13.6** | **23.1** / **9.1** | **29.7** / **5.3** | **31.9** / **14.0** | **28.6** / **10.9** | **14.1** / **3.7** | **23.8** / 9.7 | **25.3** / **10.5** | **32.5** / **10.8** | **29.8** / **13.2** |
+  | Smart Turn v3.2 | 39.2 / 13.2 | 35.5 / 14.2 | 38.7 / 17.3 | 38.9 / 10.6 | 42.6 / 6.5 | 46.2 / 15.9 | 44.1 / 15.2 | 34.9 / 11.2 | 30.1 / 9.7 | 42.3 / 13.4 | 42.7 / 13.1 | 43.3 / 17.9 |
+  | LiveKit Turn Detector v1 | 16.2 / 6.9 | 11.8 / 5.7 | 15.5 / 6.0 | 12.7 / 5.4 | 10.5 / 2.0 | 22.3 / 8.8 | 16.9 / 7.9 | 5.6 / 1.3 | 5.5 / 2.1 | 12.5 / 5.1 | 20.1 / 7.3 | 15.7 / 6.9 |
+
+  Bold: fewer false cut-offs than Smart Turn v3.2. LiveKit's own detector is ahead in every language.
 - Code: [`benchmarks/turn_detection/`](benchmarks/turn_detection); the context row uses
   [`eot_bench/duplexjev_ctx_adapter.py`](benchmarks/turn_detection/eot_bench/duplexjev_ctx_adapter.py).
 
