@@ -10,13 +10,13 @@ All use the frozen **Qwen3-ASR-0.6B** encoder and the frozen **[Qwen3-32B](https
 
 | repository | connector | trained for | trainable params | license |
 |---|---|---|---:|---|
-| 🤗 [DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B) | A · cross-attention fusion | content (R2) | 21.1 M | Apache-2.0 |
-| 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B) | B · last layer | content (R2), best spoken QA | 17.8 M | Apache-2.0 |
-| 🤗 [DuplexJev-A-Gender-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Gender-Qwen3-ASR-0.6B-Qwen3-32B) | A | + speaker gender | 21.1 M | Apache-2.0 |
-| 🤗 [DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B) | B | + speaker gender | 17.8 M | Apache-2.0 |
-| 🤗 [DuplexJev-A-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | A | + emotion (4-way) | 21.1 M | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | B | + emotion (4-way) | 17.8 M | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B) | A | gender + emotion + content, mixed objective | 21.1 M | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B) | A · cross-attention fusion | content (R2) | 21.1 M | Apache-2.0 |
+| 🤗 [DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B) | B · last layer | content (R2), best spoken QA | 17.8 M | Apache-2.0 |
+| 🤗 [DuplexJev-A-Gender-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-A-Gender-Qwen3-ASR-0.6B-Qwen3-32B) | A | + speaker gender | 21.1 M | Apache-2.0 |
+| 🤗 [DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Gender-Qwen3-ASR-0.6B-Qwen3-32B) | B | + speaker gender | 17.8 M | Apache-2.0 |
+| 🤗 [DuplexJev-A-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-A-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | A | + emotion (4-way) | 21.1 M | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | B | + emotion (4-way) | 17.8 M | CC BY-NC 4.0 |
+| 🤗 [DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B) | A | gender + emotion + content, mixed objective | 21.1 M | CC BY-NC 4.0 |
 
 ## Accuracy (paper Tables 2–3)
 

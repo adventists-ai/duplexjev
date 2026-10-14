@@ -7,8 +7,8 @@ Ultravox format**. A checkpoint is an ASR encoder plus the connector trained for
 trained against. So you pick one name; the encoder comes with it, and the LLM is fetched from the id in its config.
 
 ```python
-d = Decider.from_pretrained("adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B")      # download everything
-d = Decider.from_pretrained("adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B",
+d = Decider.from_pretrained("adventists-ai-research/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B")      # download everything
+d = Decider.from_pretrained("adventists-ai-research/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B",
                             text_model="/data/models/Qwen3-32B")                        # reuse a local LLM copy
 d = Decider.from_pretrained("/data/models/my-checkpoint", device="auto")                # local path, shard over GPUs
 ```

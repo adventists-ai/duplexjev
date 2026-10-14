@@ -1,6 +1,6 @@
 # SenseVoice-Small encoder as a standalone transformers model
 
-Builds [`adventists-ai/SenseVoice-Small-Encoder`](https://huggingface.co/adventists-ai/SenseVoice-Small-Encoder) from
+Builds [`adventists-ai-research/SenseVoice-Small-Encoder`](https://huggingface.co/adventists-ai-research/SenseVoice-Small-Encoder) from
 FunAudioLLM/SenseVoiceSmall (`model.pt`, `am.mvn`) and FunASR's `models/sense_voice/model.py` (for the SANM blocks):
 
 ```bash

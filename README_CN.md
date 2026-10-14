@@ -277,6 +277,7 @@ Turn 版在个别单项上还略高一点（32B-Turn：qa100 +1、情绪 +1；4B
 
 > **研究用 checkpoint。** 这些模型背后还有几十个连接器 checkpoint，覆盖其他编码器（MOSS、Whisper、SenseVoice）、
 > 大模型（Qwen3 0.6B–32B、Falcon-H1、SmolLM3）和两种连接器类型，配合 `duplexjev` PyTorch 包使用。
+> 它们放在单独的组织 🤗 [adventists-ai-research](https://huggingface.co/adventists-ai-research)（2026-10-14 迁移，旧链接自动跳转）。
 > 排行榜、分项成绩和包的用法见 **[docs/connectors_zh.md](docs/connectors_zh.md)**。
 
 ## 4. 快速上手

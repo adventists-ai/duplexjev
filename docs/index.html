@@ -211,7 +211,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
       <a href="https://www.modelscope.cn/organization/AdventistsAI" data-i18n="l_ms"></a>
     </nav>
     <aside class="news" aria-labelledby="news-h"><h2 id="news-h" data-i18n="news_h"></h2>
-      <ul><li data-i18n="n0"></li><li data-i18n="n0m"></li><li data-i18n="n1"></li><li data-i18n="n2"></li></ul>
+      <ul><li data-i18n="n0l"></li><li data-i18n="n0"></li><li data-i18n="n0m"></li><li data-i18n="n1"></li></ul>
     </aside>
     <p class="lede" data-i18n="lede"></p>
   </header>
@@ -347,6 +347,7 @@ const T = {
   s4:"things it hears beyond the words: emotion, stress, pauses, laughter, breathing, turn state …",
   l_models:"Weights 🤗",
   news_h:"New",
+  n0l:"<time>2026-10-14</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn\"><b>DuplexJev-4B-Para-LiveTurn</b></a>: the 32B-Para v1.2 turn-taking recipe on the 4B model, for live end-of-turn in LiveKit / Pipecat agents on a ~10 GB GPU. eot-bench false cut-offs at a 300 ms budget: 25.5% English, 38.8% Chinese (4B-Para v1.1 audio-only: 46.4% / 48.5%). 4B-Para stays the general 4B model.",
   n0:"<time>2026-10-13</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.2</b></a>: accent judgments (English accents, Mandarin dialect regions) and sharper end-of-turn right after a pause. On LiveKit eot-bench, false cut-offs at a 300 ms budget: 20.0% with the assistant’s previous message (full run, plugin setting), 23.5% audio only (Smart Turn v3.2: 35.2%). Plugins send that message from <code>pipecat-duplexjev 0.3</code> / <code>livekit-plugins-duplexjev 0.2</code>.",
   n0m:"<time>2026-10-12</time>All ten models are also on <a href=\"https://www.modelscope.cn/organization/AdventistsAI\"><b>ModelScope</b></a> (same weights) for faster downloads in mainland China.",
   l_ms:"ModelScope mirror",
@@ -411,6 +412,7 @@ const T = {
   s4:"种文字之外的信息：情绪、重音、停顿、笑声、呼吸、话轮状态……",
   l_models:"权重 🤗",
   news_h:"最新",
+  n0l:"<time>2026-10-14</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn\"><b>DuplexJev-4B-Para-LiveTurn</b></a>：把 32B-Para v1.2 的话轮训练用到 4B 上，给 LiveKit / Pipecat 语音 agent 在约 10 GB 显卡上做实时话轮判断。eot-bench 300 ms 预算下误打断率：英文 25.5%、中文 38.8%（4B-Para v1.1 仅音频：46.4% / 48.5%）。通用 4B 仍是 4B-Para。",
   n0:"<time>2026-10-13</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.2</b></a>：新增口音判断（英文口音、中文方言区），用户刚停顿时的话轮判断更准。LiveKit eot-bench 上，最多等 300 ms 时的误打断：带助手上一句话 20.0%（完整模式、插件设置），只用音频 23.5%（Smart Turn v3.2 为 35.2%）。新版插件 <code>pipecat-duplexjev 0.3</code> / <code>livekit-plugins-duplexjev 0.2</code> 会自动带上这句话。",
   n0m:"<time>2026-10-12</time>全部 10 个模型已上线<a href=\"https://www.modelscope.cn/organization/AdventistsAI\"><b>魔搭 ModelScope</b></a>（权重相同），国内下载更快。",
   l_ms:"魔搭镜像",

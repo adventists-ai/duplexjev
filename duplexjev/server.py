@@ -1,6 +1,6 @@
 """HTTP server that answers every request arriving within one tick in a single decision pass.
 
-    duplexjev serve --model adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B --tick-ms 160
+    duplexjev serve --model adventists-ai-research/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B --tick-ms 160
 
 * ``POST /v1/decide``        one clip + option groups           -> ``{"answers": {question_id: ...}}``
 * ``POST /v1/decide_batch``  many clips + option groups bound to clip ids -> ``{"answers": {clip_id: {...}}}``

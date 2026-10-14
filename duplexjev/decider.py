@@ -230,7 +230,7 @@ class Decider:
         if getattr(cfg, "model_type", "") != "ultravox":
             raise ValueError(
                 f"{name_or_path!r} is not a speech checkpoint. duplexjev answers questions about audio and needs an "
-                "encoder + connector checkpoint in Ultravox format, e.g. adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B "
+                "encoder + connector checkpoint in Ultravox format, e.g. adventists-ai-research/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B "
                 "or fixie-ai/ultravox-v0_6-qwen-3-32b."
             )
         if True:

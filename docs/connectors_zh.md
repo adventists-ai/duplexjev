@@ -19,23 +19,23 @@
 
 | 排名 | 编码器 | LLM | 连接器 | 模型 | 总分 | 主语言 | 副语言 |
 |---:|---|---|---|---|---:|---:|---:|
-| 1 | Qwen3-ASR-0.6B | Qwen3-32B | A · 交叉注意力 | 🤗 [DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B) | **80.6** | 71.2 | 90.0 |
-| 2 | Qwen3-ASR-0.6B | Qwen3-4B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | **75.9** | 61.1 | 90.7 |
-| 3 | Qwen3-ASR-0.6B | Qwen3-32B | B · 原生 | 🤗 [DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai/DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | **72.7** | 76.7 | 68.7 |
-| 4 | MOSS-Transcribe-Diarize | Qwen3-4B-2507 | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507) | **70.0** | 49.6 | 90.5 |
-| 5 | MOSS-Transcribe-Diarize | Falcon-H1-3B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B) | **67.7** | 43.8 | 91.6 |
-| 6 | SenseVoice-Small | Qwen3-4B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B) | **66.5** | 50.0 | 82.9 |
-| 7 | Qwen3-ASR-0.6B | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | **66.3** | 45.8 | 86.9 |
-| 8 | MOSS-Transcribe-Diarize | SmolLM3-3B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B) | **65.6** | 40.0 | 91.2 |
-| 9 | Whisper-small | Falcon-H1-3B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Falcon-H1-3B) | **65.3** | 45.7 | 85.0 |
-| 10 | MOSS-Transcribe-Diarize | Falcon-H1-1.5B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B) | **63.2** | 37.1 | 89.3 |
-| 11 | Whisper-small | Qwen3-4B-2507 | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507) | **63.1** | 45.7 | 80.6 |
-| 12 | Qwen3-ASR-0.6B | Qwen3-0.6B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B) | **62.8** | 36.2 | 89.3 |
-| 13 | Whisper-small | SmolLM3-3B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-SmolLM3-3B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-SmolLM3-3B) | **62.6** | 39.5 | 85.7 |
-| 14 | Whisper-small | Falcon-H1-1.5B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B) | **56.8** | 36.8 | 76.7 |
-| 15 | SenseVoice-Small | Qwen3-0.6B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B) | **55.2** | 33.8 | 76.7 |
-| 16 | SenseVoice-Small | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B) | **54.9** | 37.0 | 72.7 |
-| 17 | Whisper-small | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | **54.2** | 37.9 | 70.6 |
+| 1 | Qwen3-ASR-0.6B | Qwen3-32B | A · 交叉注意力 | 🤗 [DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B) | **80.6** | 71.2 | 90.0 |
+| 2 | Qwen3-ASR-0.6B | Qwen3-4B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-4B) | **75.9** | 61.1 | 90.7 |
+| 3 | Qwen3-ASR-0.6B | Qwen3-32B | B · 原生 | 🤗 [DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Emotion-Qwen3-ASR-0.6B-Qwen3-32B) | **72.7** | 76.7 | 68.7 |
+| 4 | MOSS-Transcribe-Diarize | Qwen3-4B-2507 | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-MOSS-Transcribe-Qwen3-4B-2507) | **70.0** | 49.6 | 90.5 |
+| 5 | MOSS-Transcribe-Diarize | Falcon-H1-3B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-3B) | **67.7** | 43.8 | 91.6 |
+| 6 | SenseVoice-Small | Qwen3-4B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-SenseVoice-Small-Qwen3-4B) | **66.5** | 50.0 | 82.9 |
+| 7 | Qwen3-ASR-0.6B | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-1.7B) | **66.3** | 45.8 | 86.9 |
+| 8 | MOSS-Transcribe-Diarize | SmolLM3-3B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-MOSS-Transcribe-SmolLM3-3B) | **65.6** | 40.0 | 91.2 |
+| 9 | Whisper-small | Falcon-H1-3B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-3B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Whisper-small-Falcon-H1-3B) | **65.3** | 45.7 | 85.0 |
+| 10 | MOSS-Transcribe-Diarize | Falcon-H1-1.5B | B · 原生 | 🤗 [DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-MOSS-Transcribe-Falcon-H1-1.5B) | **63.2** | 37.1 | 89.3 |
+| 11 | Whisper-small | Qwen3-4B-2507 | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Whisper-small-Qwen3-4B-2507) | **63.1** | 45.7 | 80.6 |
+| 12 | Qwen3-ASR-0.6B | Qwen3-0.6B | B · 原生 | 🤗 [DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Qwen3-ASR-0.6B-Qwen3-0.6B) | **62.8** | 36.2 | 89.3 |
+| 13 | Whisper-small | SmolLM3-3B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-SmolLM3-3B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Whisper-small-SmolLM3-3B) | **62.6** | 39.5 | 85.7 |
+| 14 | Whisper-small | Falcon-H1-1.5B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Whisper-small-Falcon-H1-1.5B) | **56.8** | 36.8 | 76.7 |
+| 15 | SenseVoice-Small | Qwen3-0.6B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-SenseVoice-Small-Qwen3-0.6B) | **55.2** | 33.8 | 76.7 |
+| 16 | SenseVoice-Small | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B) | **54.9** | 37.0 | 72.7 |
+| 17 | Whisper-small | Qwen3-1.7B | B · 原生 | 🤗 [DuplexJev-B-Para-Whisper-small-Qwen3-1.7B](https://huggingface.co/adventists-ai-research/DuplexJev-B-Para-Whisper-small-Qwen3-1.7B) | **54.2** | 37.9 | 70.6 |
 
 #### 分项成绩
 
@@ -85,7 +85,7 @@ pip install "duplexjev[speech]>=0.2.2"      # 需要 HTTP 服务再加 [all]
 ```python
 from duplexjev import Decider, Question
 
-d = Decider.from_pretrained("adventists-ai/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B", device="auto")
+d = Decider.from_pretrained("adventists-ai-research/DuplexJev-A-Para-Qwen3-ASR-0.6B-Qwen3-32B", device="auto")
 groups = [Question("turn", "用户说完了吗？", ["说完了", "还没说完"], lang="zh"),
           Question("filler", "先说哪句垫话？", ["好的——", "请稍等——", "（不说话）"], lang="zh"),
           Question("gender", "说话人的性别是？", ["男性", "女性"], lang="zh"),
@@ -111,7 +111,7 @@ d.decide_batch(
 **批量服务** —— 同一个时间片内到达的请求在一次计算里一起回答：
 
 ```bash
-duplexjev serve --model adventists-ai/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tick-ms 160
+duplexjev serve --model adventists-ai-research/DuplexJev-B-Qwen3-ASR-0.6B-Qwen3-32B --tick-ms 160
 # POST /v1/decide        {"audio_b64": ..., "questions": [...]}
 # POST /v1/decide_batch  {"audios": {"car1": ..., "car2": ...}, "questions": [{..., "audio": "car1"}]}
 ```

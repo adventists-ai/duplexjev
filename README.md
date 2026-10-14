@@ -306,7 +306,8 @@ use only the language model of Qwen3-VL-32B: their inputs are audio and text. Fo
 
 > **Research checkpoints.** Behind these models are several dozen connector checkpoints for other encoders (MOSS, Whisper,
 > SenseVoice), LLMs (Qwen3 0.6B–32B, Falcon-H1, SmolLM3) and both connector types, used with the `duplexjev` PyTorch
-> package. Leaderboard, details and package usage: **[docs/connectors.md](docs/connectors.md)**.
+> package. They live in a separate organization, 🤗 [adventists-ai-research](https://huggingface.co/adventists-ai-research)
+> (moved 2026-10-14; old links redirect). Leaderboard, details and package usage: **[docs/connectors.md](docs/connectors.md)**.
 
 ## 4. Quick start
 

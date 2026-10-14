@@ -4,7 +4,7 @@
     quick("call.wav", api="https://<host>/duplexjev")   # default table of 8 decisions, printed as a table
 
     from duplexjev import Decider, Question
-    d = Decider.from_pretrained("adventists-ai/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B")
+    d = Decider.from_pretrained("adventists-ai-research/DuplexJev-A-Qwen3-ASR-0.6B-Qwen3-32B")
     d.decide("call.wav", [Question("turn", "Has the user finished?", ["finished", "not finished"])])
     d.decide_batch({"car1": "a.wav", "car2": "b.wav"},
                    [Question("turn", "Has the user finished?", ["finished", "not finished"], audio="*"),
