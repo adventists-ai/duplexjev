@@ -43,7 +43,8 @@
 | 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
 | 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
 | 👂 emotion from the voice (4 classes) | **91** | 45 — Qwen3-Omni-30B, same questions · ~28 — speech LLMs trained on transcripts |
-| 🎭 emotion when the words are neutral ([LISTEN](https://arxiv.org/abs/2510.10444), EACL 2026) | **51** | 33 — Qwen3-Omni-30B · 35 — Gemini 2.5 Pro (paper) |
+| 🏆 paralinguistic understanding, [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026), mean of 4 audio-only conditions | **38.4** · state of the art | 33.0 — best published (Qwen2.5-Omni) · same items: 33.9 Qwen3-Omni, 33.1 Gemini 3.8 Flash, 30.1 Gemini 3.1 Pro (ours 37.3) |
+| 🎭 emotion the words don't carry (LISTEN neutral text) | **51** | 35 — best published (Gemini 2.5 Pro) · same items: 25 Gemini 3.1 Pro, 31 Gemini 3.8 Flash, 34 Qwen3-Omni (ours 45) |
 | 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
 | 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
 | 👁️ voice + picture, one pass (new, preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
@@ -84,8 +85,9 @@ is speaking and how (paralinguistics):
   emotion **90.5 vs 45.2**, which word is stressed **91 vs 63–73**, speaking style **79 vs 50** (these test sets come
   from corpora in our training data, held-out speakers or sentences; Qwen3-Omni is zero-shot). On the public LISTEN
   benchmark (EACL 2026), built to test whether audio LLMs *listen* or just read the words, DuplexJev-32B-Para leads where
-  the words carry no emotion (**51 vs 33**) and on non-verbal sounds alone (**26 vs 18**; Gemini 2.5 Pro 16 in the paper)
-  ([§5](#paralinguistics-vs-a-general-speech-llm)).
+  the words carry no emotion (**51 vs 33**) and on non-verbal sounds alone (**26 vs 18**; Gemini 2.5 Pro 16 in the paper).
+  On the same items it is also ahead of **Gemini 3.1 Pro and Gemini 3.8 Flash** at hearing emotion the words do not carry
+  (45 vs 25 / 31): state of the art for that task ([§5](#paralinguistics-vs-a-general-speech-llm)).
 - **Stress and pauses (new).** DuplexJev-32B-Stress finds the stressed word ("**I** didn't say…" vs "I didn't say she took the
   **money**") on unseen Mandarin and English sentences, 92 / 88, and answers "no word is stressed" on 99% of neutral speech;
   the other models are at chance ([research note](research/2026-10-stress-understanding.md)).
@@ -466,6 +468,28 @@ Same items, same prompt, options rotated and averaged, highest-probability lette
   are not an artefact of the single-token readout.
 - On natural Mandarin conversation (MagicData samples: laughter, breathing, stress), the two are level. Where the words
   themselves carry the emotion (LISTEN matched), Qwen3-Omni is ahead: it reads the words, DuplexJev answers from the voice.
+
+**Against closed models (Gemini).** Same items again (200 per test; 127–174 where a set is smaller), Gemini asked once per item
+with the options in their original order and its first option letter taken as the answer (`gemini-3.1-pro-preview`,
+`gemini-3.8-flash`, default thinking).
+
+| test | DuplexJev-32B-Para | Qwen3-Omni-30B | Gemini 3.1 Pro | Gemini 3.8 Flash |
+|---|---:|---:|---:|---:|
+| LISTEN neutral words | **45.0** | 33.5 | 25.0 | 31.0 |
+| … unseen corpora only (TESS, SAVEE, RAVDESS) | **34.6** | 28.0 | 20.6 | 26.2 |
+| LISTEN no words | **25.0** | 18.0 | 15.5 | 19.5 |
+| LISTEN sarcastic words | 43.0 | 41.5 | 42.5 | 42.0 |
+| LISTEN words match | 36.0 | **42.5** | 37.5 | 40.0 |
+| emotion, ESD + CREMA-D† | **91.0** | 46.0 | 32.5 | 40.5 |
+| which word is stressed, zh / en† | **93.5 / 91.4** | 62.0 / 73.6 | 58.5 / 52.9 | 71.5 / 88.5 |
+| meaning from stress, DEBATE† | **90.5** | 36.5 | 51.5 | 79.5 |
+| StressTest | 71.5 | 70.0 | 70.5 | **89.0** |
+| speaking style, EARS† | **80.0** | 51.0 | 68.5 | 45.0 |
+| MSPB (statement / question, …) | 67.7 | **71.7** | 54.3 | 66.9 |
+
+Hearing emotion the words do not carry is where DuplexJev is ahead of every model we tried, closed ones included; on
+the full LISTEN neutral-text set it scores 51.0, against 34.9 for the best published result (Gemini 2.5 Pro, LISTEN paper).
+Gemini 3.8 Flash is ahead on StressTest, and the general models are ahead when the words themselves carry the emotion.
 
 ### Live end of turn: LiveKit eot-bench and Pipecat Smart Turn
 
