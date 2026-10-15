@@ -6,6 +6,7 @@ The numbers in the README's "Against closed models, realtime flagships included"
 |---|---|
 | `items/items.jsonl` | the 2,102 questions: set, item id, language, audio file name, question, options (in the order every closed model saw them), gold option |
 | `items/listen_sources.json` | LISTEN item id → source corpus (used for the "unseen corpora only" row) |
+| `answers/duplexjev_v1.3.json` | set → item id → DuplexJev-32B-Para v1.3 prediction (option index), same readout as v1.2 |
 | `answers/duplexjev_qwen3omni.json` | set → item id → `[Qwen3-Omni-30B-A3B prediction, DuplexJev-32B-Para v1.2 prediction]` (option index). Both are single-token readouts with options rotated and averaged |
 | `answers/<model>.jsonl` | one line per item for each closed model: parsed prediction, gold, the model's raw answer (first 200 characters) |
 | `score.py` | prints the comparison table on the items every listed model answered |

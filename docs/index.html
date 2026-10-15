@@ -211,7 +211,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
       <a href="https://www.modelscope.cn/organization/AdventistsAI" data-i18n="l_ms"></a>
     </nav>
     <aside class="news" aria-labelledby="news-h"><h2 id="news-h" data-i18n="news_h"></h2>
-      <ul><li data-i18n="n0s"></li><li data-i18n="n0l"></li><li data-i18n="n0"></li><li data-i18n="n0m"></li><li data-i18n="n1"></li></ul>
+      <ul><li data-i18n="n0v"></li><li data-i18n="n0s"></li><li data-i18n="n0l"></li><li data-i18n="n0"></li></ul>
     </aside>
     <p class="lede" data-i18n="lede"></p>
   </header>
@@ -340,13 +340,14 @@ const T = {
   title:"Batched Speech Decisions Without Decoding",
   subtitle:"DuplexJev — single-token supervision lets a frozen LLM hear beyond the transcript",
   affil:"<sup>1</sup>Adventists.ai, Melbourne · <sup>2</sup>College of CS&amp;T, Zhejiang University · <sup>3</sup>Future Design Lab, Innovation Center of Yangtze River Delta, Zhejiang University · <sup>4</sup>University of Virginia · <sup>★</sup>jiejin@adventists.ai",
-  claim:"<b>Ten decisions in 92 ms — 21× faster than ASR → LLM.</b> One forward pass, zero decoding, and it hears what a transcript drops.<br>🏆 <b>State of the art in paralinguistic understanding on <a href=\"https://arxiv.org/abs/2510.10444\">LISTEN</a></b> (EACL 2026): ahead of Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni on the same questions.",
+  claim:"<b>Ten decisions in 92 ms — 21× faster than ASR → LLM.</b> One forward pass, zero decoding, and it hears what a transcript drops.<br>🏆 <b>State of the art in paralinguistic understanding on public benchmarks</b> (<a href=\"https://arxiv.org/abs/2510.10444\">LISTEN</a>, StressTest and MSPB combined): ahead of Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni on the same questions.",
   s1:"ten decisions on one utterance, against 1,978 ms for an ASR → LLM cascade on the same H200",
   s2:"decode steps: each answer is one constrained token from a frozen speech LLM",
   s3:"faster for 50 questions over a 5k-token context (111.5 s → 5.5 s), thanks to a shared prefix",
   s4:"things it hears beyond the words: emotion, stress, pauses, laughter, breathing, turn state …",
   l_models:"Weights 🤗",
   news_h:"New",
+  n0v:"<time>2026-10-15</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.3</b></a>: much better at hearing stress. Same items as the closed models: StressTest 71.5 → 86.5 (Gemini 3.8 Flash 89.0), MSPB 68.0 → 77.3 (ahead of every model tested). The six public paralinguistic benchmarks combined: 50.9, against 46.9 for Gemini 3.8 Flash and 44.6 for Qwen3-Omni.",
   n0s:"<time>2026-10-15</time><b>Closed flagships, realtime ones included.</b> On the same LISTEN questions DuplexJev-32B-Para leads all seven models we tested (mean of 4 audio-only conditions 37.3; Qwen3-Omni 33.9, Gemini 3.8 Flash 33.1, GPT-audio-1.5 31.6, Gemini 3.8 Live 30.9, Gemini 3.1 Pro 30.1, GPT-realtime-2.1 25.6). Gemini 3.8 Flash stays ahead on StressTest. LiveKit eot-bench, all 14 languages: fewer false cut-offs than Smart Turn v3.2 in every one at 300 ms (12 of them zero-shot). <a href=\"https://github.com/adventists-ai/duplexjev/tree/main/benchmarks/paraling_compare\">Scripts and every prediction</a>",
   n0l:"<time>2026-10-14</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn\"><b>DuplexJev-4B-Para-LiveTurn</b></a>: the 32B-Para v1.2 turn-taking recipe on the 4B model, for live end-of-turn in LiveKit / Pipecat agents on a ~10 GB GPU. eot-bench false cut-offs at a 300 ms budget: 25.5% English, 38.8% Chinese (4B-Para v1.1 audio-only: 46.4% / 48.5%). 4B-Para stays the general 4B model.",
   n0:"<time>2026-10-13</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.2</b></a>: accent judgments (English accents, Mandarin dialect regions) and sharper end-of-turn right after a pause. On LiveKit eot-bench, false cut-offs at a 300 ms budget: 20.0% with the assistant’s previous message (full run, plugin setting), 23.5% audio only (Smart Turn v3.2: 35.2%). Plugins send that message from <code>pipecat-duplexjev 0.3</code> / <code>livekit-plugins-duplexjev 0.2</code>.",
@@ -406,13 +407,14 @@ const T = {
   title:"不解码的批量语音判断",
   subtitle:"DuplexJev —— 单 token 监督让冻结的大模型听到转写之外的信息",
   affil:"<sup>1</sup>Adventists.ai（墨尔本）· <sup>2</sup>浙江大学计算机科学与技术学院 · <sup>3</sup>浙江大学长三角智慧绿洲创新中心 Future Design Lab · <sup>4</sup>弗吉尼亚大学 · <sup>★</sup>jiejin@adventists.ai",
-  claim:"<b>92 毫秒做完十个判断，比 ASR → LLM 快 21 倍。</b>一次前向、零解码，还能听到转写里丢掉的信息。<br>🏆 <b>在 <a href=\"https://arxiv.org/abs/2510.10444\">LISTEN</a>（EACL 2026）上副语言理解 SOTA</b>：同一批题超过 Gemini 3.8 Flash、Gemini 3.8 Live、GPT-realtime-2.1、GPT-audio-1.5 和 Qwen3-Omni。",
+  claim:"<b>92 毫秒做完十个判断，比 ASR → LLM 快 21 倍。</b>一次前向、零解码，还能听到转写里丢掉的信息。<br>🏆 <b>公开基准（<a href=\"https://arxiv.org/abs/2510.10444\">LISTEN</a>、StressTest、MSPB 合计）副语言理解 SOTA</b>：同一批题超过 Gemini 3.8 Flash、Gemini 3.8 Live、GPT-realtime-2.1、GPT-audio-1.5 和 Qwen3-Omni。",
   s1:"对一句话做十个判断；同一张 H200 上，ASR → LLM 级联要 1,978 毫秒",
   s2:"解码步数：每个答案都是冻结语音大模型输出的一个受约束 token",
   s3:"倍加速：5k token 上下文上的 50 个问题，共享前缀后从 111.5 秒降到 5.5 秒",
   s4:"种文字之外的信息：情绪、重音、停顿、笑声、呼吸、话轮状态……",
   l_models:"权重 🤗",
   news_h:"最新",
+  n0v:"<time>2026-10-15</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.3</b></a>：听重音大幅提升。与闭源模型同一批题：StressTest 71.5 → 86.5（Gemini 3.8 Flash 89.0），MSPB 68.0 → 77.3（测过的模型里最高）。六个公开副语言基准合计 50.9，Gemini 3.8 Flash 46.9、Qwen3-Omni 44.6。",
   n0s:"<time>2026-10-15</time><b>对比闭源旗舰，包括实时模型。</b>同一批 LISTEN 题上，DuplexJev-32B-Para 在测过的 7 个模型里排第一（纯音频四项平均 37.3；Qwen3-Omni 33.9、Gemini 3.8 Flash 33.1、GPT-audio-1.5 31.6、Gemini 3.8 Live 30.9、Gemini 3.1 Pro 30.1、GPT-realtime-2.1 25.6）。StressTest 上 Gemini 3.8 Flash 仍领先。LiveKit eot-bench 全部 14 种语言：300 ms 预算下误打断都少于 Smart Turn v3.2（其中 12 种为零样本）。<a href=\"https://github.com/adventists-ai/duplexjev/tree/main/benchmarks/paraling_compare\">脚本和每道题的预测</a>",
   n0l:"<time>2026-10-14</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn\"><b>DuplexJev-4B-Para-LiveTurn</b></a>：把 32B-Para v1.2 的话轮训练用到 4B 上，给 LiveKit / Pipecat 语音 agent 在约 10 GB 显卡上做实时话轮判断。eot-bench 300 ms 预算下误打断率：英文 25.5%、中文 38.8%（4B-Para v1.1 仅音频：46.4% / 48.5%）。通用 4B 仍是 4B-Para。",
   n0:"<time>2026-10-13</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.2</b></a>：新增口音判断（英文口音、中文方言区），用户刚停顿时的话轮判断更准。LiveKit eot-bench 上，最多等 300 ms 时的误打断：带助手上一句话 20.0%（完整模式、插件设置），只用音频 23.5%（Smart Turn v3.2 为 35.2%）。新版插件 <code>pipecat-duplexjev 0.3</code> / <code>livekit-plugins-duplexjev 0.2</code> 会自动带上这句话。",
