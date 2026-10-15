@@ -503,8 +503,8 @@ every published and tested model, closed realtime flagships included: state of t
 LISTEN. Its largest lead is on emotion the words do not carry; on the full LISTEN neutral-text set it scores 51.0, against
 34.9 for the best published result (Gemini 2.5 Pro, LISTEN paper). The realtime models trail their offline siblings
 (Gemini 3.8 Live below 3.8 Flash, GPT-realtime-2.1 below GPT-audio-1.5), and the GPT models and Gemini 3.8 Live mostly
-answer "neutral" to emotion questions (GPT-realtime-2.1: 150 of the 200 neutral-words items), which looks like a
-deliberate choice not to infer emotion from the voice rather than an inability to hear it. Gemini 3.8 Flash is ahead
+answer "neutral" to emotion questions (GPT-realtime-2.1: 150 of the 200 neutral-words items); we score them as asked
+and do not know whether this is a design choice or a limit of what they hear. Gemini 3.8 Flash is ahead
 on StressTest, and the general models are ahead when the words themselves carry the emotion. Unparsable answers count
 as wrong (GPT-audio-1.5 2%, Gemini 3.8 Live 0.5%, the others ~0). Scripts, the item list and every model's raw answer:
 [`benchmarks/paraling_compare`](benchmarks/paraling_compare).

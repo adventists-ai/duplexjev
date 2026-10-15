@@ -451,8 +451,8 @@ DuplexJev-32B-Turn 的话轮判断达到专用检测器的水平；同一次前�
 LISTEN 纯音频四项平均，DuplexJev 全集 38.4（这批题 37.3），超过所有已公开和我们测过的模型，包括闭源的实时旗舰：在 LISTEN 上副语言理解 SOTA。
 领先最多的是听出字面里没有的情绪；LISTEN 中性文本全集上 51.0，此前公开最好成绩是 Gemini 2.5 Pro 的 34.9（LISTEN 论文）。
 实时模型都不如同家的离线模型（Gemini 3.8 Live 低于 3.8 Flash，GPT-realtime-2.1 低于 GPT-audio-1.5）。两个 GPT 模型和
-Gemini 3.8 Live 对情绪题大多回答“中性”（GPT-realtime-2.1 在 200 道字面中性题里答了 150 次 neutral），看起来是有意不从声音推断情绪，
-而不是听不出来。Gemini 3.8 Flash 在 StressTest 上领先；字面本身带情绪时，通用模型领先。答不出选项字母记为错（GPT-audio-1.5 约 2%，
+Gemini 3.8 Live 对情绪题大多回答“中性”（GPT-realtime-2.1 在 200 道字面中性题里答了 150 次 neutral）；我们按原样计分，
+不清楚这是产品上的有意设计，还是确实听不出来。Gemini 3.8 Flash 在 StressTest 上领先；字面本身带情绪时，通用模型领先。答不出选项字母记为错（GPT-audio-1.5 约 2%，
 Gemini 3.8 Live 0.5%，其他约 0）。脚本、题目列表和每个模型的原始回答：[`benchmarks/paraling_compare`](benchmarks/paraling_compare)。
 
 ### 实时话轮：LiveKit eot-bench 与 Pipecat Smart Turn
