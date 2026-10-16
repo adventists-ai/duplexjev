@@ -9,14 +9,16 @@ The numbers in the README's "Against closed models, realtime flagships included"
 | `answers/duplexjev_v1.3.json` | set → item id → DuplexJev-32B-Para v1.3 prediction (option index), same readout as v1.2 |
 | `answers/duplexjev_qwen3omni.json` | set → item id → `[Qwen3-Omni-30B-A3B prediction, DuplexJev-32B-Para v1.2 prediction]` (option index). Both are single-token readouts with options rotated and averaged |
 | `answers/<model>.jsonl` | one line per item for each closed model: parsed prediction, gold, the model's raw answer (first 200 characters) |
-| `score.py` | prints the comparison table on the items every listed model answered |
+| `score.py` | prints the comparison table on the items every listed model answered. Default: the headline 1,035 items (the 93 LISTEN neutral-text items from ESD / CREMA-D, which are in our training data, left out); `--include-train-corpora` gives the 1,128-item version; `--by-corpus` adds LISTEN accuracy per source corpus |
 | `run_gemini.py` | Gemini via `generate_content` (audio + question in one request) |
 | `run_openai.py` | OpenAI chat completions with audio input (`gpt-audio-1.5`) |
 | `run_realtime.py` | OpenAI Realtime over websocket (`gpt-realtime-2.1`): one session per item, text output, VAD off, audio and question in one user message |
 | `run_glive.py` | Gemini Live (`gemini-3.8-live`): the question first, then the audio streamed as realtime input inside one manual activity (VAD off). The model can only answer by voice, so its output transcription is parsed |
 
 ```bash
-python score.py                                   # all models
+python score.py                                   # all models, headline 1,035 items
+python score.py --include-train-corpora           # 1,128 items, ESD / CREMA-D included
+python score.py --by-corpus                       # + LISTEN per source corpus (e.g. MELD)
 python score.py gemini-3.8-live gpt-realtime-2.1  # only items these two answered
 ```
 
