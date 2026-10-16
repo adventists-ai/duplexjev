@@ -12,7 +12,7 @@
 <h1 align="center">别再先转写、再判断了。</h1>
 
 <p align="center">
-  <b>DuplexJev 是一个“语音到决策”（Speech-to-Decision）模型：语音智能体的耳朵。</b><br>
+  <b>DuplexJev 是语音的 System One 模型（JEV 式决策模型）：原始音频进，带概率的判断出。语音智能体的耳朵。</b><br>
   用户说完了吗？我该不该停？他生气了吗？该接哪句垫词？<br>
   全部直接从原始语音读出，<b>一次前向</b>：<b>10 个判断 92 毫秒</b>，比 ASR → LLM 级联<b>快 21 倍</b>，
   <b>每百万次判断不到 0.5 美元</b>，新增一种判断只要<b>写一行文字</b>。<br>
@@ -41,6 +41,8 @@
 <p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch_zh.mp4">看 2 分半中文介绍视频（有声音）</a> · 画面里的答案都是模型真实输出</sub></p>
 
 ## ⚡ 语音到决策：快、便宜、什么判断都能做
+
+DuplexJev 把 Jev 带火的 System One（决策模型）思路用到了原始语音上：文本决策模型只能看转写，而语气、重音、迟疑恰恰在转写这一步丢了。
 
 语音智能体在每次停顿时都要做判断。常规做法是先把语音转成文字，再让大模型写一段答案，每个问题生成一次。DuplexJev 直接听原始音频，
 把你的**所有**问题当作选择题，在**一次前向**里一起回答，每题只读一个 token：不转写，也不解码文字。每个答案都带概率，可以直接当置信度用。
@@ -521,4 +523,4 @@ DuplexJev-32B 和 DuplexJev-4B 基于 [Qwen3-VL](https://github.com/QwenLM/Qwen3
 研究用 checkpoint 还用到 [MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize)、Whisper、
 SenseVoice、SmolLM3 和 Falcon-H1。感谢浙大团队提供[音频基准](https://github.com/Vsky-morigen/audio-gender-benchmark)。
 Claude（Anthropic）协助编写代码。
-问题和建议：[GitHub Issues](https://github.com/adventists-ai/duplexjev/issues)。
+问题和建议：[GitHub Issues](https://github.com/adventists-ai/duplexjev/issues)。DuplexJev 是独立项目，与 TypeSafe（Jev）无关。

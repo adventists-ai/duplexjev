@@ -12,7 +12,7 @@
 <h1 align="center">Stop transcribing to decide.</h1>
 
 <p align="center">
-  <b>DuplexJev is a Speech-to-Decision model: the ears of a voice agent.</b><br>
+  <b>DuplexJev is a System One model for speech: raw audio in, typed decisions out. The ears of a voice agent.</b><br>
   Has the user finished? Should I stop talking? Are they angry? Which filler fits?<br>
   Every answer straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM,
   under <b>$0.50 per million decisions</b>, and a new kind of decision is <b>one line of text</b>.<br>
@@ -41,6 +41,8 @@
 <p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 2-minute video (with sound)</a> · answers shown are real model outputs</sub></p>
 
 ## ⚡ Speech-to-Decision: fast, cheap, any decision
+
+DuplexJev brings the System One idea (decision models, popularized by Jev) to raw speech: a text decision model only sees the transcript, and the transcript is where tone, stress and hesitation disappear.
 
 A voice agent has to decide something at every pause. The usual way transcribes the speech and asks an LLM to write an
 answer, one generation per question. DuplexJev listens to the raw audio and answers **all** of your questions as
@@ -565,5 +567,5 @@ DuplexJev-32B and DuplexJev-4B are built on [Qwen3-VL](https://github.com/QwenLM
 and served with [vLLM](https://github.com/vllm-project/vllm). The research checkpoints also use
 [MOSS-Transcribe-Diarize](https://huggingface.co/OpenMOSS-Team/MOSS-Transcribe-Diarize), Whisper, SenseVoice, SmolLM3
 and Falcon-H1. We thank the ZJU team for the [audio benchmark](https://github.com/Vsky-morigen/audio-gender-benchmark).
-Claude (Anthropic) assisted with code.
+Claude (Anthropic) assisted with code. DuplexJev is an independent project and is not affiliated with TypeSafe (Jev).
 Questions and issues: [GitHub Issues](https://github.com/adventists-ai/duplexjev/issues).
