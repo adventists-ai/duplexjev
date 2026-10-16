@@ -25,7 +25,7 @@ README 主推四个模型：**DuplexJev-32B-Para**、**DuplexJev-4B-Para**、**D
 32B 模型只用了 Qwen3-VL-32B 的语言模型部分，
 输入是音频和文字。要同时输入语音和图像，用 [DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（研究预览）。
 
-## Para 版新增的能力（按版本）
+## Para 版新增能力（各版本）
 
 **Para 版新增的能力**（AUC，0.5 为瞎猜；训练未见的真人语音：NonverbalTTS 测试集、第三方中文自然对话样本；说话人 EER 用 AISHELL-1 同性别配对）：
 
@@ -48,9 +48,9 @@ README 主推四个模型：**DuplexJev-32B-Para**、**DuplexJev-4B-Para**、**D
 
 Stress 版增加了重音和停顿理解（哪个词被重读：中文留出句 32B 92 / 4B 95，见[研究笔记](../research/2026-10-stress-understanding_zh.md)）。32B-Stress 其余各项都与 32B-Turn 在误差内持平；**4B-Stress 用约 4 分 VoiceBench 换来这项能力**（42.0 / 38.2 对 46.4 / 41.7），所以小显卡默认仍推荐 4B-Para。
 
-## DuplexJev-32B-Para：v1.3 对 v1.2
+## DuplexJev-32B-Para：v1.3 与 v1.2 对比
 
-题目和测试方法与[闭源模型对比](../README_CN.md#与闭源模型对比包括实时旗舰)相同。v1.3 听重音大幅提升；字面中性时的情绪 v1.2 略好。
+题目和测试方法与[闭源模型对比](../README_CN.md#与闭源模型对比含实时旗舰)相同。v1.3 听重音大幅提升；字面中性时的情绪 v1.2 略好。
 v1.2 仍可用 revision `v1.2` 下载（`vllm serve adventists-ai/DuplexJev-32B-Para --revision v1.2`）。
 
 | 测试 | DuplexJev-32B-Para v1.3 | v1.2 |
@@ -71,9 +71,9 @@ v1.2 仍可用 revision `v1.2` 下载（`vllm serve adventists-ai/DuplexJev-32B-
 
 † 测试集与训练语料同源（说话人或句子不重叠）。v1.3 其他变化：由重音判断意思 90.5 → 93.0；情绪略升；性别和 Easy-Turn 约低 1 分。LISTEN 四项平均全集 38.9（v1.2：38.4）。
 
-## 实时话轮，各版本
+## 实时话轮检测：各版本成绩
 
-LiveKit eot-bench（验证集）与 Smart Turn v3.2 测试集；测试方法见 [README](../README_CN.md#实时话轮livekit-eot-bench-与-pipecat-smart-turn)。
+LiveKit eot-bench（验证集）与 Smart Turn v3.2 测试集；测试方法见 [README](../README_CN.md#实时话轮检测livekit-eot-bench-与-pipecat-smart-turn)。
 
 | 模型 | eot-bench 英文：最多等 300 / 600 ms 的误打断 | eot-bench 中文 | Smart Turn v3.2 测试集准确率 英 / 中 |
 |---|---:|---:|---:|
@@ -85,7 +85,7 @@ LiveKit eot-bench（验证集）与 Smart Turn v3.2 测试集；测试方法见 
 | DuplexJev-4B-Para v1.1，只用音频 | 46.4 / 17.7% | 48.5 / 15.6% | 67.9 / 78.9 |
 | Smart Turn v3.2 | 35.2 / 14.8% | 42.9 / 13.2% | 94.7 / 90.5 |
 
-## 与 Qwen3-Omni 一对一（v1.2，更多题目）
+## 与 Qwen3-Omni 逐项对比（v1.2，题量更大）
 
 两个模型（DuplexJev-32B-Para v1.2、Qwen3-Omni-30B-A3B-Instruct，bf16，单张 H200）用同一批题、同样的提示词，选项轮换取平均，
 取概率最高的选项字母。
@@ -128,7 +128,7 @@ Turn 版在个别单项上还略高一点（32B-Turn：qa100 +1、情绪 +1；4B
 约 58 GB）：没有做话轮训练。按[第 4 节](../README_CN.md#快速上手)的提问格式：qa100 97、ZJU-ML 87、性别 94.4、情绪 90.6，Easy-Turn 68.0（零样本）；
 对提问措辞敏感（论文口径措辞下性别 78.5、情绪 60.9）。
 
-## 研究用 checkpoint
+## 研究用检查点（checkpoint）
 
 > **研究用 checkpoint。** 这些模型背后还有几十个连接器 checkpoint，覆盖其他编码器（MOSS、Whisper、SenseVoice）、
 > 大模型（Qwen3 0.6B–32B、Falcon-H1、SmolLM3）和两种连接器类型，配合 `duplexjev` PyTorch 包使用。
