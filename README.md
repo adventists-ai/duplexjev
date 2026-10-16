@@ -12,11 +12,11 @@
 <h1 align="center">Stop transcribing to decide.</h1>
 
 <p align="center">
-  <b>DuplexJev is the decision layer for voice agents.</b><br>
+  <b>DuplexJev is a Speech-to-Decision model: the ears of a voice agent.</b><br>
   Has the user finished? Should I stop talking? Are they angry? Which filler fits?<br>
-  Every answer, straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.<br>
-  🏆 <b>It hears what the flagships miss.</b> State of the art in paralinguistic understanding on public benchmarks (<a href="https://arxiv.org/abs/2510.10444">LISTEN</a>, StressTest and MSPB combined), ahead of <b>Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni</b> on the same questions. <b>New in v1.3:</b> StressTest 72 → 86.5.<br>
-  👁️ <b>New: it also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same single pass (preview) — <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">try it with a photo + your voice</a>.
+  Every answer straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.<br>
+  🏆 <b>State of the art in paralinguistic understanding</b> on public benchmarks (<a href="https://arxiv.org/abs/2510.10444">LISTEN</a>, StressTest and MSPB combined):
+  ahead of <b>Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni</b> on the same 1,128 questions. Open weights, code and every prediction.
 </p>
 
 <p align="center">
@@ -38,22 +38,47 @@
 <p align="center"><img src="docs/assets/race.gif" alt="Ten decisions: DuplexJev 92 ms vs ASR → LLM 1,978 ms on the same H200" width="820"></p>
 <p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 2-minute video (with sound)</a> · answers shown are real model outputs</sub></p>
 
-| why voice teams switch | **DuplexJev** | the usual way |
+## 🏆 Results
+
+### It hears what the flagships miss
+
+Paralinguistic understanding means hearing *how* something is said, not only *what*: tone, emotion, stress, pauses,
+laughter, sighs. Three public benchmarks combined: the four audio-only conditions of
+[LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026, built to test whether audio models *listen* or just read the words),
+StressTest (word stress) and MSPB (prosody). 1,128 questions; every model answered the same items.
+
+| model | **combined** | LISTEN, 4-condition mean | StressTest | MSPB |
+|---|---:|---:|---:|---:|
+| 🤗 **DuplexJev-32B-Para v1.3** (open) | **50.9** | **37.8** | 86.5 | **77.3** |
+| Gemini 3.8 Flash | 46.9 | 33.1 | **89.0** | 67.2 |
+| Qwen3-Omni-30B | 44.6 | 33.9 | 70.0 | 71.9 |
+| Gemini 3.1 Pro | 40.1 | 30.1 | 70.5 | 54.7 |
+| GPT-audio-1.5 | 40.1 | 31.6 | 62.5 | 57.8 |
+| Gemini 3.8 Live (realtime) | 38.9 | 30.9 | 66.0 | 46.9 |
+| GPT-realtime-2.1 (realtime) | 34.2 | 25.6 | 60.0 | 47.7 |
+
+- **LISTEN, full set: 38.9**, against **33.0** for the best published model: state of the art on LISTEN. Its largest lead is on
+  emotion the words do not carry (full neutral-text set **51.0** vs 34.9, best published, Gemini 2.5 Pro).
+- **Both vendors' realtime models trail their own offline models** at hearing tone, the ability a voice agent needs most.
+- **Where we are not ahead.** Gemini 3.8 Flash on StressTest (89.0 vs 86.5). Where the words themselves carry the emotion,
+  general models do better (Qwen3-Omni 42.5 vs 38.0). Two corpora of LISTEN's neutral-text set are in our training data;
+  on the unseen ones we score 29.9 vs 28.0 (Qwen3-Omni). Both GPT models and Gemini 3.8 Live mostly answer "neutral" to
+  emotion questions; we score them as asked.
+- Scripts, the item list and every model's raw answer: [`benchmarks/paraling_compare`](benchmarks/paraling_compare);
+  per-test table and protocol in [Detailed results](#against-closed-models-realtime-flagships-included).
+
+### Built to decide, not to chat
+
+| for a voice agent | **DuplexJev** | the usual way |
 |---|:---:|---|
-| ⚡ ten decisions about one utterance (one H200) | **92 ms** | 1,978 ms — ASR → LLM → JSON, same GPU and LLM |
+| ⚡ ten decisions about one utterance (one H200) | **92 ms** | 1,978 ms: ASR → LLM → JSON, same GPU and LLM |
 | 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
 | 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
-| 👂 emotion from the voice (4 classes) | **91** | 45 — Qwen3-Omni-30B, same questions · ~28 — speech LLMs trained on transcripts |
-| 🏆 **public paralinguistic benchmarks combined** (LISTEN ×4, StressTest, MSPB; 1,128 same items) | **50.9** · state of the art (v1.3) | 46.9 Gemini 3.8 Flash · 44.6 Qwen3-Omni · 40.1 GPT-audio-1.5 · 40.1 Gemini 3.1 Pro · 38.9 Gemini 3.8 Live · 34.2 GPT-realtime-2.1 (v1.2: 46.8)¹ |
-| 🏆 paralinguistic understanding, [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026), mean of 4 audio-only conditions | **38.9** (v1.3) · state of the art | 33.0 — best published (Qwen2.5-Omni) · same items (ours 37.8; v1.2 37.3): 33.9 Qwen3-Omni, 33.1 Gemini 3.8 Flash, 31.6 GPT-audio-1.5, 30.9 Gemini 3.8 Live, 30.1 Gemini 3.1 Pro, 25.6 GPT-realtime-2.1¹ |
-| 🎭 emotion the words don't carry (LISTEN neutral text) | **51** | 35 — best published (Gemini 2.5 Pro) · same items (ours 45): 34 Qwen3-Omni, 31 Gemini 3.8 Flash, 25 Gemini 3.8 Live, 25 Gemini 3.1 Pro, 25 GPT-audio-1.5, 16 GPT-realtime-2.1¹ |
-| 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 — Smart Turn v3 |
-| 🌍 live end of turn, LiveKit [eot-bench](https://github.com/livekit/eot-bench), **14 languages**, 300 ms budget | **fewer false cut-offs than Smart Turn v3.2 in all 14** | English 20.0% vs 35.2%, Japanese 14.1% vs 34.9%, German 21.3% vs 35.5% ([§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn)) |
-| 🔊 stress, pauses, laughter, breathing, sighs | **heard** | gone from the transcript |
-| 👁️ voice + picture, one pass (new, preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
+| 👂 emotion from the voice (4 classes) | **91** | 45 Qwen3-Omni-30B, same questions · ~28 speech LLMs trained on transcripts |
+| 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 Smart Turn v3 |
+| 🌍 live end of turn, LiveKit [eot-bench](https://github.com/livekit/eot-bench), 14 languages, 300 ms | **fewer false cut-offs than Smart Turn v3.2 in all 14** | English 20.0% vs 35.2%, Japanese 14.1% vs 34.9%; LiveKit's own detector is still ahead ([details](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn)) |
+| 👁️ voice + picture in one pass (preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
 | 🧩 a new decision | **one line of text at runtime** | new data, new model |
-
-¹ LISTEN's neutral-text set includes ESD and CREMA-D clips, which are in our training data; on the corpora we never trained on (TESS, SAVEE, RAVDESS) it is 34.6 (v1.2) / 29.9 (v1.3) vs 28.0 for the best other model (Qwen3-Omni) on the same items. Gemini 3.8 Flash is ahead on StressTest (89.0 vs 86.5). DuplexJev reads options rotated and averaged; the paper and the closed models answer once. The realtime flagships were driven through their live APIs; both GPT models and Gemini 3.8 Live mostly answer "neutral" to emotion questions. Scripts and every prediction: [`benchmarks/paraling_compare`](benchmarks/paraling_compare) (§5).
 
 **Get a result in 30 seconds:**
 
@@ -62,7 +87,7 @@ pip install duplexjev
 python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.adventists.cn/duplexjev').decide('your.wav'))"
 ```
 
-**Self-host:** `vllm serve adventists-ai/DuplexJev-4B-Para` (~10 GB GPU) with the `duplexjev-vllm` plugin ([§4](#4-quick-start)) ·
+**Self-host:** `vllm serve adventists-ai/DuplexJev-4B-Para` (~10 GB GPU) with the `duplexjev-vllm` plugin ([Quick start](#quick-start)) ·
 **Pipecat:** `pip install pipecat-duplexjev` · **LiveKit Agents:** `pip install livekit-plugins-duplexjev` ([integrations/livekit](integrations/livekit)) — audio end-of-turn detection, plus emotion and non-verbal sounds from the same pass.
 
 > 🏢 **Building a product?** Our full-duplex voice API already runs on **300+ AI hardware products and 100,000+ devices**.
@@ -71,43 +96,16 @@ python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.
 
 ⭐ **Star the repo** to follow new abilities — image + voice and an open full-duplex pipeline are next.
 
-### DuplexJev is a speech-to-decision model.
+## What it does
 
 **Input:** an audio clip and the questions you need decided, each with its options. **Output:** for every question,
 the chosen option and its probability. All questions are answered together in one forward pass, with no transcription
 and no text decoding: ten decisions take **about 0.1–0.24 s**, and one H200 serves about **170 decisions per second**
-while keeping every request under 0.25 s ([§5](#5-performance)).
+while keeping every request under 0.25 s.
 
-It decides from the raw audio, so it uses both **what is said** (main language) and **what a transcript drops** — who
-is speaking and how (paralinguistics):
-
-- **Main language, close to the text LLM.** Spoken multiple-choice questions: 90 against 91 when the same LLM reads the
-  oracle transcript (qa100, paper). DuplexJev-32B-Turn: qa100 96, ZJU-ML 87; VoiceBench OBQA / MMSU 85.5 / 72.1
-  (95.4 / 79.3 from text).
-- **Paralinguistics, strong perception.** Gender 91.5, emotion 91.1, where speech LLMs trained on transcripts sit at
-  chance (~55 / ~28).
-- **State of the art in paralinguistic understanding (LISTEN, EACL 2026).** Same questions and scoring against Qwen3-Omni-30B-A3B:
-  emotion **90.5 vs 45.2**, which word is stressed **91 vs 63–73**, speaking style **79 vs 50** (these test sets come
-  from corpora in our training data, held-out speakers or sentences; Qwen3-Omni is zero-shot). On the public LISTEN
-  benchmark (EACL 2026), built to test whether audio LLMs *listen* or just read the words, DuplexJev-32B-Para leads where
-  the words carry no emotion (**51 vs 33**) and on non-verbal sounds alone (**26 vs 18**; Gemini 2.5 Pro 16 in the paper).
-  On the same items it is also ahead of every closed model we tried, the realtime flagships included (**Gemini 3.8 Flash,
-  Gemini 3.8 Live, Gemini 3.1 Pro, GPT-audio-1.5, GPT-realtime-2.1**), at hearing emotion the words do not carry
-  (45 vs 16–31). Averaged over LISTEN's four audio-only conditions it scores **38.9** (v1.3), against **33.0** for the best
-  published model: state of the art in paralinguistic understanding on LISTEN ([§5](#paralinguistics-vs-a-general-speech-llm)).
-- **Stress and pauses (new).** DuplexJev-32B-Stress finds the stressed word ("**I** didn't say…" vs "I didn't say she took the
-  **money**") on unseen Mandarin and English sentences, 92 / 88, and answers "no word is stressed" on 99% of neutral speech;
-  the other models are at chance ([research note](research/2026-10-stress-understanding.md)).
-- **Common decision tasks, on par with or above dedicated models.** Turn state on the Easy-Turn test set 95.3 (the
-  dedicated Easy-Turn detector 96.4; TEN and Smart Turn cover only some states). Turn action on CoDeTT 69.2 / 70.0
-  zero-shot, above every dedicated turn model (37.9–65.4) and level with Qwen3-Omni (70.4 / 70.9).
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/bench_turn_dark.svg">
-    <img src="docs/assets/bench_turn_light.svg" alt="Turn-taking accuracy of DuplexJev against dedicated detectors and speech LLMs on CoDeTT and Easy-Turn" width="880">
-  </picture>
-</p>
+It decides from the raw audio, so it uses both **what is said** and **what a transcript drops**: who is speaking and how.
+Spoken multiple-choice questions score 90, against 91 when the same LLM reads the transcript (qa100, paper); gender and
+emotion reach about 90, where speech LLMs trained on transcripts sit at chance (~55 / ~28).
 
 **One clip, eight decisions.** 🔊 *"Wait, wait — stop. That's not the address I asked for."* — said while the assistant is talking
 ([listen](docs/audio/ex1.wav), synthetic clip) — one call to DuplexJev-32B-Turn, 0.2 s on one H200:
@@ -145,39 +143,13 @@ Real outputs of DuplexJev-32B-Stress (vLLM, both option orders averaged) on shor
 </details>
 
 <details>
-<summary><b>Full comparison on common decision tasks</b></summary>
-
-| task | benchmark | DuplexJev | dedicated and other models |
-|---|---|---:|---|
-| turn state: finished / unfinished / backchannel / wait | Easy-Turn test (800) | **95.3** | Easy-Turn detector 96.4 · TEN Turn Detection and Smart Turn v2 cover only 3 / 2 of the 4 states |
-| what to do, system state given | CoDeTT zh / en (18 k, zero-shot) | **69.2 / 70.0** | Easy-Turn 37.9 (zh) · Smart-Turn-v3 51.4 (en) · NAMO-Turn 59.5 (zh) · FireRedChat 65.4 (en) · GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
-| gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
-| emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) · Qwen3-Omni-30B 45.2 (same questions, 400 of the items)† |
-| emotion, neutral words | LISTEN neutral-text, audio only (TESS, SAVEE, RAVDESS, ESD, CREMA-D) | **51.0** (all 4,286; 50.7 on the 400 compared) | Qwen3-Omni-30B 32.8 (same 400 items) · paper: Gemini 2.5 Pro 34.9, Qwen3-Omni 29.3 |
-| emotion, no words at all | LISTEN paralinguistic (IEMOCAP laughs, sighs, breaths) | **26.9** (all 975; 26.0 on the 400 compared) | Qwen3-Omni-30B 18.2 (same 400 items) · paper: Qwen3-Omni 21.0, Gemini 2.5 Pro 15.7 |
-| same speaker? | official VoxCeleb1-H list: different speakers share gender and nationality (2,000 trials) | **EER 36.9%** (4B-Para) / 40.3% (32B-Para); research checkpoints‡ 29.6% / 31.2% | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
-| laughter / breathing / cough / sigh | NonverbalTTS test (real speech, unseen), AUC | **0.88 / 0.81 / 0.85 / 0.80** (32B-Para) | AudioSet AST tagger 0.71 / 0.75 / 0.85 / 0.76 |
-| spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
-
-Other systems' numbers are from their papers (Easy-Turn Table 2, CoDeTT, Dynamic-SUPERB Phase-2). Easy-Turn is in-domain
-for both the Easy-Turn detector and our model. ‡ Research checkpoints trained only for speaker verification
-(no VoxCeleb1 speakers), not released; the Para models trade some of that for keeping every other ability; see the [research note](research/2026-10-speaker-identity.md). On random pairs about half of the different-speaker pairs also differ in
-gender, so a gender-only guess already reaches 74%; we therefore report hard pairs only. Details: [§5](#5-performance).
-
-</details>
-
-**Models:** 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) (one 80 GB GPU) ·
-🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) (~10 GB), served with vLLM ([§4](#4-quick-start)).
-New: they also hear **laughter, breathing, coughs and sighs**, **how** someone is talking (whispering, shouting) and
-whether two clips are **the same speaker** — [try it](#try-the-new-abilities).
-
-## 1. Introduction
+<summary><b>How it works</b></summary>
 
 **DuplexJev** turns a frozen speech LLM into a *typed decision engine* for full-duplex spoken agents
 (product name: **Speech-to-Decision**). Hidden states of an off-the-shelf ASR encoder are projected into a frozen
 LLM, and every runtime-declared question — *is the turn complete? which filler to play? who is speaking?* — is read
 as a **single-token, closed-set distribution**: no ASR decoding, no text decoding. Many questions, about one call or
-across many calls, share one forward pass. All released models are ready to serve with vLLM ([§3](#3-models)); we
+across many calls, share one forward pass. All released models are ready to serve with vLLM ([Models](#models)); we
 recommend **[DuplexJev-32B-Para](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)**, or
 **[DuplexJev-4B-Para](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)** on smaller GPUs.
 
@@ -199,128 +171,37 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 - **Prefix sharing.** Context and audio are encoded once and all question suffixes are packed into one row under a
   block-diagonal mask; answers match one-by-one runs up to bf16 noise.
 
-## 2. News
-
-- **2026-10-15** — 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **much better at hearing stress**. On the same items as the closed models: StressTest **71.5 → 86.5** (Gemini 3.8 Flash 89.0, Qwen3-Omni 70.0, GPT-audio-1.5 62.5), MSPB **68.0 → 77.3** (now ahead of every model we tested; Qwen3-Omni 71.9), which meaning a stressed word implies 90.5 → 93.0. With LISTEN, the six public paralinguistic benchmarks combined: **50.9**, against 46.9 for Gemini 3.8 Flash and 44.6 for Qwen3-Omni. Emotion is a little better; gender and Easy-Turn about one point lower. v1.2 stays available as revision `v1.2`. Also on [ModelScope](https://www.modelscope.cn/models/AdventistsAI/DuplexJev-32B-Para).
-- **2026-10-15** — 🏆 **Closed flagships, realtime ones included.** Same LISTEN questions for Gemini 3.8 Live, GPT-realtime-2.1 and GPT-audio-1.5: DuplexJev-32B-Para leads all seven models we tested on LISTEN's four audio-only conditions (37.3; next best Qwen3-Omni 33.9, Gemini 3.8 Flash 33.1; the realtime models 30.9 and 25.6). Scripts and every prediction are in [`benchmarks/paraling_compare`](benchmarks/paraling_compare). And on LiveKit eot-bench, the remaining 12 languages (zero-shot: DuplexJev was trained on English and Chinese only): fewer false cut-offs than Smart Turn v3.2 in all 14 languages at 300 ms ([§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn)).
-- **2026-10-12** — All ten DuplexJev models are now also on **[ModelScope](https://www.modelscope.cn/organization/AdventistsAI)** (same weights, sha256-checked), for faster downloads in mainland China.
-- **2026-10-14** — 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): the 32B-Para v1.2 turn-taking recipe on the 4B (~10 GB). LiveKit eot-bench false cut-offs at 300 ms: **25.5%** English, **38.8%** Chinese (4B-Para v1.1: 46.4% / 48.5%; Smart Turn v3.2: 35.2% / 42.9%). Stress, VoiceBench and VocalSound are a few points below 4B-Para, which stays the general 4B. Also on [ModelScope](https://www.modelscope.cn/models/AdventistsAI/DuplexJev-4B-Para-LiveTurn).
-- **2026-10-13** — 🤗 [**DuplexJev-32B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **accent judgments** (English accents, Mandarin dialect regions: 4-way 39.6 → 56.0 and 25.7 → 48.2; standard Mandarin or not 46.6 → 91.3) and much sharper **end of turn right after a pause**: on LiveKit's [eot-bench](https://github.com/livekit/eot-bench) false cut-offs at a 300 ms budget drop from 29.8% (32B-Turn) to 23.5%, and to **20.0%** when the model also gets the assistant's previous message, as the plugins send it (full eot-bench run; Smart Turn v3.2: 35.2%). New plugin releases send that message: `pipecat-duplexjev 0.3`, `livekit-plugins-duplexjev 0.2`, gateway `duplexjev 0.6`. The [trial API](https://api.adventists.cn/duplexjev/) now serves 32B-Para v1.2 too. v1.1 stays available as revision `v1.1`. Details in [§5](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn).
-- **2026-10-12** — 🤗 [**DuplexJev-32B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): now the best overall DuplexJev model (total 92.6 vs 92.2 for 32B-Turn) and much better at non-verbal sounds (cough AUC 0.70 → 0.85, breathing 0.73 → 0.81), speaking style (69% → 82%) and stress (DEBATE 87 → 93, StressPresso 84 → 96). Same prompts and plugin; v1.0 stays available as revision `v1.0`.
-- **2026-10-10** — 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview): one question can use **what it hears and what it sees**. Real photos of unseen speakers with their own voice: 64.4 (picture alone 50), happy voices 81.7. `pip install "duplexjev[vision]>=0.5"`, or `vllm serve` with `duplexjev-vllm>=0.3` (about 0.05 s per question). See [Speech + image together](#speech--image-together-research-preview).
-- **2026-10-10** — 🔬 Research preview: **image + voice together.** DuplexJev-32B-Para's language model is Qwen3-VL's, so the vision encoder plugs back in; with one more LoRA it checks what it hears against what it sees (stressed word vs. the red word 94.1, voice vs. face 93.5, sound vs. caption 97.5 on held-out synthetic sets; image alone = 50). Real examples on the [project page](https://adventists-ai.github.io/duplexjev/#abilities).
-- **2026-10-10** — 🤗 [**DuplexJev-4B-Para v1.1**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the same small model now also **holds a normal conversation**, multi-turn included, while keeping the decision scores of v1.0 (conversation replay in the LoRA stage, per-row loss). v1.0 stays available as revision `v1.0`. [Research note](research/2026-10-chat-replay.md).
-- **2026-10-09** — 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) and
-  [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): the widest set of paralinguistic
-  abilities in one model. On top of turn-taking, gender, emotion, stress and pauses they hear **laughter, breathing,
-  coughs and sighs** (AUC 0.70–0.85 on unseen real speech, from 0.40–0.73), recognise **speaking style** (whisper,
-  shouting, fast, slow …) and judge **same speaker or not** roughly as a person would. 4B-Para is also the strongest
-  4B on spoken QA (qa100 79, VoiceBench 57.8 / 41.8) and is now the default model of the `duplexjev` package (0.4).
-- **2026-10-08** — 🤗 [**DuplexJev-32B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress): DuplexJev-32B-Turn
-  that also hears **stress and pauses**. Which word is stressed: 92 (Mandarin, held-out sentences) / 88 (English); neutral speech
-  answered "no word is stressed" 99%; spoken QA, gender, emotion and turn-taking unchanged within noise. Trained with balanced
-  negatives in every speech source; meaning-choice items were left out because they cost VoiceBench points. Also
-  🤗 [**DuplexJev-4B-Stress**](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) (which word is stressed 95 / 95; about 4 points below 4B-Turn on VoiceBench).
-  [Research note](research/2026-10-stress-understanding.md).
-- **2026-10-05** — 📄 Paper on arXiv: [arXiv:2610.02638](https://arxiv.org/abs/2610.02638). 🤗 [**DuplexJev-32B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn)
-  and [**DuplexJev-4B-Turn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn): a turn-taking upgrade (connector + rank-16
-  LoRA on public turn-taking data). 32B-Turn: Easy-Turn 95.3, CoDeTT 69.2 / 70.0 zero-shot, with qa100, gender and emotion
-  all slightly up. [Research note](research/2026-10-turn-taking-lora.md).
-- **2026-10-03** — 🤗 [**DuplexJev-Gemma-31B**](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B), the first
-  non-Qwen model: Qwen3-ASR-0.6B encoder + connector + Gemma-4-31B-it with a merged LoRA. In vLLM: qa100 97, gender
-  94.4, emotion 90.6 (no turn-taking training yet). Needs [`duplexjev-vllm`](https://pypi.org/project/duplexjev-vllm/) ≥ 0.2.0.
-- **2026-10-01** — 🎧 [**Online demo and trial API**](https://api.adventists.cn/duplexjev/) (DuplexJev-4B) and
-  [`duplexjev` 0.3](https://pypi.org/project/duplexjev/): `duplexjev quick call.wav` prints a table of eight default
-  decisions (turn state, what to do, barge-in, intent, emotion, gender, language, wants a human) for any clip.
-- **2026-09-30** — 🤗 [**DuplexJev-32B**](https://huggingface.co/adventists-ai/DuplexJev-32B), our new recommended model:
-  Qwen3-ASR-0.6B encoder + connector + the language model of Qwen3-VL-32B, one repository, served with vLLM.
-  Best total score so far (87.7): qa100 90, Easy-Turn 79.1, gender 89.4, emotion 90.6; spoken VoiceBench MMSU 70.8
-  (earlier 32B connectors: 56–60). DuplexJev-4B updated with the same recipe (total 75.9 → 78.6). Connector checkpoints moved to [their own page](docs/connectors.md).
-- **2026-09-28** — New [research notes](research) section. First note: [does cross-layer fusion help a speech connector?](research/2026-09-connector-a-vs-b.md)
-- **2026-09-28** — First complete model, 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B), and the
-  vLLM plugin [`duplexjev-vllm`](https://pypi.org/project/duplexjev-vllm/).
-
-Coming next: open-source full-duplex Jev dialogue pipeline (around 2026-10-20). Commercial licences and the hosted Speech-to-Decision API: jiejin@adventists.ai.
-
-## 3. Models
-
-Each model is **one repository with everything needed** (audio encoder + trained connector + LLM) and runs on
-[vLLM](https://github.com/vllm-project/vllm) with a small plugin ([§4](#4-quick-start)).
-Every model is mirrored on [ModelScope](https://www.modelscope.cn/organization/AdventistsAI) under the same name (same weights; latest version only):
-`pip install modelscope && modelscope download --model AdventistsAI/DuplexJev-32B-Para --local_dir ./DuplexJev-32B-Para`,
-then use the local directory in place of the Hugging Face id, e.g. `vllm serve ./DuplexJev-32B-Para`.
-
-| model | for | built on | params | GPU memory | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total | licence |
-|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|
-| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 🆕 v1.3 | server, widest set of abilities (now with much better stress and accents), best live turn-taking, best overall | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | 96 | 87 | 94.4\* | **93.8** | **92.1** | **92.7** | CC BY-NC 4.0 |
-| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) 🆕 | small GPU, widest set of abilities, **and normal conversation** (v1.1); `duplexjev` default | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 77 | **58** | 91.0\* | 89.2 | 90.0 | **82.5** | CC BY-NC 4.0 |
-| 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) 🆕 | small GPU, **live end-of-turn** for LiveKit / Pipecat agents (+ accents); 4B-Para stays the general 4B | as 4B-Para (+ accent and pause-level turn-taking data) | 4.2 B | ~10 GB | 76 | 62 | 92.0\* | 89.5 | 90.5 | — | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-32B-Stress](https://huggingface.co/adventists-ai/DuplexJev-32B-Stress) 🆕 | server, + stress and pauses | as 32B-Turn (+ a second rank-16 LoRA) | 33.0 B | one 80 GB GPU | **96** | 87 | 94.4\* | 92.1 | 91.4 | — | CC BY-NC 4.0 |
-| 🤗 [DuplexJev-4B-Stress](https://huggingface.co/adventists-ai/DuplexJev-4B-Stress) 🆕 | small GPU, + stress and pauses | as 4B-Turn (+ a second rank-16 LoRA) | 4.2 B | ~10 GB | 73 | 51 | 91.8\* | 89.1 | 91.4 | — | CC BY-NC 4.0 |
-
-**What the Para models add** (AUC, 0.5 = chance; unseen real speech from the NonverbalTTS test set and a third-party
-sample of natural Mandarin conversation; speaker EER on same-gender AISHELL-1 pairs):
-
-| | laughter | breathing | cough | sigh | laughter / breathing in conversation | speaking style (7 classes) | same speaker? EER |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| 32B-Stress | 0.73 | 0.56 | 0.40 | 0.70 | 0.61 / 0.44 | 45% | — |
-| **32B-Para** v1.2 | 0.87 | **0.81** | 0.84 | 0.75 | 0.80 / 0.56 | 79% | — |
-| 32B-Para v1.1 | **0.88** | **0.81** | **0.85** | 0.80 | 0.83 / 0.65 | **82%** | ≈ v1.0 (18%)² |
-| 32B-Para v1.0 | 0.85 | 0.73 | 0.70 | 0.74 | 0.80 / 0.78 | 69% | 18% |
-| **4B-Para** v1.1 | 0.81 | 0.77 | 0.77 | 0.71 | 0.85 / 0.74 | 67% | ≈ v1.0 (9%)¹ |
-| 4B-Para v1.0 | 0.80 | 0.76 | 0.75 | 0.81 | 0.84 / 0.84 | 67% | 9% |
-
-¹ v1.1 was not re-run on the AISHELL-1 pairs; on VoxCeleb1 hard pairs its EER is 42.0% vs 41.8% for v1.0.
-² 32B-Para v1.1 was not re-run on the AISHELL-1 pairs; on VoxCeleb1 random / hard pairs its EER is 28.2% / 39.6% (v1.0: 37.4% / 45.7%).
-
-The costs are small and listed on the model cards (32B-Para v1.2: emotion −1 vs 32B-Turn and slightly lower English stress, sighs and speaker pairs than v1.1;
-4B-Para: ZJU-ML −2, Easy-Turn −1 vs 4B-Turn). Speaker judgments are coarse, human-like, and must not be used to
-identify people.
-
-**DuplexJev-4B-Para v1.1 (2026-10-10)** is trained with conversation replay, so the same weights also hold a normal conversation. Decision scores are within 0.5–2.6 points of v1.0 (still available as revision `v1.0`); see the [research note](research/2026-10-chat-replay.md). The 32B version is training.
-
-The Stress models add stress and pause understanding (which word is stressed: 92 / 95 on held-out Mandarin sentences for 32B / 4B; see the [research note](research/2026-10-stress-understanding.md)). 32B-Stress matches 32B-Turn on every other benchmark within noise. **4B-Stress trades about 4 points of VoiceBench** (42.0 / 38.2 vs 46.4 / 41.7) for it, so 4B-Para stays the default small model.
-
-
-<details>
-<summary><b>Older models (archived)</b> — superseded by the Para models; still downloadable, not recommended for new projects</summary>
-
-| model | replaced by | qa100 | ZJU-ML | Easy-Turn | gender | emotion | total |
-|---|---|---:|---:|---:|---:|---:|---:|
-| 🤗 [DuplexJev-32B-Turn](https://huggingface.co/adventists-ai/DuplexJev-32B-Turn) | 32B-Para | 96 | 87 | 95.3\* | 91.5 | 91.1 | 92.2 |
-| 🤗 [DuplexJev-4B-Turn](https://huggingface.co/adventists-ai/DuplexJev-4B-Turn) | 4B-Para / 4B-Para-LiveTurn | 74 | 52 | 92.5\* | 89.4 | 92.0 | 80.0 |
-| 🤗 [DuplexJev-32B](https://huggingface.co/adventists-ai/DuplexJev-32B) | 32B-Para | | | | | | 87.7 |
-| 🤗 [DuplexJev-4B](https://huggingface.co/adventists-ai/DuplexJev-4B) | 4B-Para | | | | | | 78.6 |
-
-The Turn models keep a small edge on a few single scores (32B-Turn: qa100 +1, emotion +1; 4B-Turn: emotion +2), but have
-none of the Para abilities (non-verbal sounds, speaking style, speaker, stress, accents). DuplexJev-32B / 4B are the
-versions before the turn-taking upgrade (paper models).
-
-🤗 [DuplexJev-Gemma-31B](https://huggingface.co/adventists-ai/DuplexJev-Gemma-31B) (Gemma-4-31B-it + Qwen3-ASR-0.6B
-encoder, ~58 GB): no turn-taking training. In the prompt wording of [§4](#4-quick-start): qa100 97, ZJU-ML 87, gender 94.4,
-emotion 90.6, Easy-Turn 68.0 zero-shot; sensitive to question wording (paper-protocol wording: gender 78.5, emotion 60.9).
-
 </details>
 
-% under the paper protocol (single-token readout); total = mean of main language (qa100, ZJU-ML, Easy-Turn) and
-paralinguistics (gender, emotion), see [Benchmarks](#6-benchmarks). \* Both models were trained with the Easy-Turn
-training split (disjoint from the test set), so their Easy-Turn scores are in-domain. Both answer ten questions about one clip in about
-0.1–0.25 s on one GPU.
+## Models
 
-**Which one to use.** The **Para** models if you want everything the voice carries (non-verbal sounds, speaking style,
-speaker, stress, emotion, gender, turn-taking) in one model — `DuplexJev-32B-Para` on an 80 GB GPU, `DuplexJev-4B-Para`
-on smaller GPUs. `DuplexJev-32B-Para` v1.2 is also the best for live turn-taking; `DuplexJev-4B-Para-LiveTurn` for live end-of-turn on a small GPU;
-`DuplexJev-32B-Stress` / `4B-Stress` if stress and pauses are the main thing. All models
-use the same prompts and the same plugin. The 32B models
-use only the language model of Qwen3-VL-32B: their inputs are audio and text. For speech + image, use
-[DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (research preview).
+Four models, each **one repository with everything needed** (audio encoder + connector + LLM), served with
+[vLLM](https://github.com/vllm-project/vllm) and a small plugin ([Quick start](#quick-start)). Same prompts and plugin for all.
 
-> **Research checkpoints.** Behind these models are several dozen connector checkpoints for other encoders (MOSS, Whisper,
-> SenseVoice), LLMs (Qwen3 0.6B–32B, Falcon-H1, SmolLM3) and both connector types, used with the `duplexjev` PyTorch
-> package. They live in a separate organization, 🤗 [adventists-ai-research](https://huggingface.co/adventists-ai-research)
-> (moved 2026-10-14; old links redirect). Leaderboard, details and package usage: **[docs/connectors.md](docs/connectors.md)**.
+| model | use it for | GPU | highlights |
+|---|---|---|---|
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **best overall**: every ability, best paralinguistics, best live turn-taking | one 80 GB GPU | public paralinguistic benchmarks **50.9** · gender 93.8 · emotion 92.1 · qa100 96 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.1 | **small GPU**, every ability, also holds a normal conversation; `duplexjev` default | ~10 GB | gender 89.2 · emotion 90.0 · laughter / cough / sigh AUC 0.80 / 0.75 / 0.81 |
+| 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) | small GPU, **live end-of-turn** in LiveKit / Pipecat agents | ~10 GB | eot-bench false cut-offs at 300 ms: en **25.5%** / zh **38.8%** (Smart Turn v3.2: 35.2 / 42.9) |
+| 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (preview) | **voice + picture** in one question | one 80 GB GPU | stressed word vs red word 94.1 · face vs voice 93.5 (picture alone 50) · [try it](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision) |
 
-## 4. Quick start
+All on [ModelScope](https://www.modelscope.cn/organization/AdventistsAI) too (same weights):
+`modelscope download --model AdventistsAI/DuplexJev-32B-Para --local_dir ./DuplexJev-32B-Para`, then `vllm serve ./DuplexJev-32B-Para`.
+Weights: CC BY-NC 4.0; commercial licences: jiejin@adventists.ai.
+
+**Version history, per-version scores, specialised and archived models** (Stress, Turn, Gemma-31B) and the research
+connector checkpoints: **[docs/models.md](docs/models.md)**.
+
+## News
+
+- **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.9**, against 46.9 for Gemini 3.8 Flash.
+- **2026-10-15** · 🏆 Same questions for the realtime flagships (Gemini 3.8 Live, GPT-realtime-2.1) and GPT-audio-1.5, plus LiveKit eot-bench in all 14 languages.
+- **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): live end-of-turn on a ~10 GB GPU.
+- **Coming next:** an open-source full-duplex Jev dialogue pipeline.
+
+All releases: [docs/news.md](docs/news.md).
+
+## Quick start
 
 **Without a GPU** — ask our trial API (rate-limited, audio is not stored):
 
@@ -421,89 +302,38 @@ Held-out results: stressed word vs. the red word 94.1, face vs. voice 93.5, soun
 real photos of unseen speakers with their own voice 64.4, happy voices 81.7. Examples with real photos are on the
 [project page](https://adventists-ai.github.io/duplexjev/#ab-vision).
 
-## 5. Performance
+## Detailed results
 
-### Turn-taking vs. dedicated detectors
+### Against closed models, realtime flagships included
 
-DuplexJev-32B-Turn decides turn-taking as well as dedicated detectors do, and in the same forward pass it also answers
-every other question you declare (intent, emotion, gender, barge-in, …). It does not decode any tokens, so ten
-decisions about one clip cost about as much as one.
-
-| model | Easy-Turn test (complete / incomplete / backchannel / wait) | Easy-Turn overall | CoDeTT zh / en | other decisions in the same call | latency |
-|---|---|---:|---:|---|---|
-| Smart Turn v2 (95 MB) | 78.7 / 62.0 / – / – | – | – / 51.4 (v3) | no | 27 ms |
-| TEN Turn Detection (7 B) | 86.7 / 89.3 / – / 91.0 | – | – | no | 204 ms |
-| Easy-Turn (0.85 B) | 96.3 / 97.7 / 91.0 / 98.0 | 96.4 | 37.9 / – | no | 263 ms |
-| NAMO-Turn · FireRedChat | – | – | 59.5 / – · – / 65.4 | no | – |
-| GPT-4o-audio · Qwen3-Omni | – | – | 66.6 / 71.9 · 70.4 / 70.9 | yes, by generating text | seconds |
-| **DuplexJev-32B-Turn** (ours) | **98.7** / 94.3 / 88.0 / 95.0 | **95.3** | **69.2 / 70.0** | **yes, any number, one pass** | **~0.24 s for 10 decisions** (one H200) |
-| DuplexJev-4B-Turn (ours) | 92.3 / 93.0 / 90.0 / 94.0 | 92.5 | 67.0 / 68.6 | yes | ~0.08 s for 8 decisions (one H100) |
-
-- **Easy-Turn**: accuracy (%) on the 800-item test set. Easy-Turn itself and our Turn models were both trained on its
-  training split. Other rows are from the Easy-Turn paper (Table 2, their hardware); their latency is per single decision.
-- **CoDeTT** ([arXiv:2603.25434](https://arxiv.org/abs/2603.25434)): 18 k items, system state given, mean of four
-  action accuracies. Zero-shot for us: no CoDeTT data in training. Other rows are from the CoDeTT paper. Our protocol gives
-  the current utterance as audio without history; the official one also plays earlier user turns.
-- On our TurnBench-dev clip protocol (not the official leaderboard), the Turn models reach 88.7 (32B) and 87.3 (4B),
-  against 60.7 and 49.4 before the upgrade.
-- **Nothing else got worse.** For 32B: qa100 90 → 96, gender 89.4 → 91.5, emotion 90.6 → 91.1, VoiceBench MMSU
-  70.8 → 72.1. How it was done (public data only, a rank-16 LoRA, one recipe for 4B and 32B):
-  [research note](research/2026-10-turn-taking-lora.md).
-
-### Paralinguistics vs. a general speech LLM
-
-Same items, same prompt, options rotated and averaged, highest-probability letter, for both models
-(DuplexJev-32B-Para v1.2 and Qwen3-Omni-30B-A3B-Instruct, bf16, one H200).
-
-| ability | test | DuplexJev-32B-Para | Qwen3-Omni-30B |
-|---|---|---:|---:|
-| emotion, 4-way | ESD + CREMA-D (400)† | **90.5** | 45.2 |
-| emotion, neutral words | LISTEN neutral-text (400) · unseen corpora only: TESS, SAVEE, RAVDESS (213) | **50.7** · **39.9** | 32.8 · 27.2 |
-| emotion, no words | LISTEN paralinguistic (400) | **26.0** | 18.2 |
-| emotion, words match | LISTEN matched (IEMOCAP, MELD, MSP-Podcast, MOSEI, OMG; 400) | 34.8 | **43.0** |
-| emotion vs. sarcastic words | LISTEN mismatched (MUStARD, 400) | 39.2 | 40.5 |
-| which word is stressed, zh / en | held-out sentences (400 / 187)† | **91.5 / 91.4** | 62.5 / 73.3 |
-| meaning from stress | DEBATE held-out (400)† | **88.5** | 43.8 |
-| meaning from stress | StressTest (218) | **72.0** | 69.7 |
-| speaking style (whisper, shout, fast, …) | EARS held-out speakers (220)† | **78.6** | 49.5 |
-| laughter / breathing / cough / sigh, AUC | NonverbalTTS test (400) | 0.93 / **0.86** / 0.86 / 0.85 | **0.96** / 0.65 / **0.87** / **0.87** |
-
-- † Test sets from corpora that are also in our training data (held-out speakers or sentences); Qwen3-Omni is zero-shot.
-  LISTEN, StressTest and NonverbalTTS are public benchmarks; LISTEN corpora are not in our emotion training data except
-  ESD and CREMA-D.
-- NonverbalTTS AUCs here are on the 400 items both models answered, so they differ from the full-test-set row above.
-- LISTEN asks up to 16 emotion labels; DuplexJev was trained on four (neutral, happy, angry, sad).
-- Readout check: asking Qwen3-Omni to answer in free text instead (600 items) moves its scores by −9 to +4, so the gaps
-  are not an artefact of the single-token readout.
-- On natural Mandarin conversation (MagicData samples: laughter, breathing, stress), the two are level. Where the words
-  themselves carry the emotion (LISTEN matched), Qwen3-Omni is ahead: it reads the words, DuplexJev answers from the voice.
-
-**Against closed models, realtime flagships included.** Same items again (200 per test; 107–174 where a set is smaller), each
+Same items again (200 per test; 107–174 where a set is smaller), each
 model asked once per item with the options in their original order and its first option letter taken as the answer:
 `gemini-3.1-pro-preview` and `gemini-3.8-flash` (default thinking), `gpt-audio-1.5` (chat completions with audio input),
 and the two realtime flagships through their live APIs: `gemini-3.8-live` (the question first, then the audio streamed as
 realtime input in one manual activity; it can only answer by voice, so we read its output transcription) and
 `gpt-realtime-2.1` (websocket session, text output, audio and question in one user message, no VAD).
 
-| test | DuplexJev-32B-Para v1.3 | v1.2 | Qwen3-Omni-30B | Gemini 3.1 Pro | Gemini 3.8 Flash | Gemini 3.8 Live | GPT-audio-1.5 | GPT-realtime-2.1 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **public benchmarks combined** (LISTEN ×4, StressTest, MSPB; 1,128 items) | **50.9** | 46.8 | 44.6 | 40.1 | 46.9 | 38.9 | 40.1 | 34.2 |
-| **LISTEN, mean of 4 audio-only conditions** | **37.8** | 37.3 | 33.9 | 30.1 | 33.1 | 30.9 | 31.6 | 25.6 |
-| LISTEN neutral words | 43.0 | **45.0** | 33.5 | 25.0 | 31.0 | 25.0 | 24.5 | 15.5 |
-| … unseen corpora only (TESS, SAVEE, RAVDESS) | 29.9 | **34.6** | 28.0 | 20.6 | 26.2 | 23.4 | 18.7 | 12.1 |
-| LISTEN no words | **26.0** | 25.0 | 18.0 | 15.5 | 19.5 | 14.5 | **25.0** | 13.5 |
-| LISTEN sarcastic words | **44.0** | 43.0 | 41.5 | 42.5 | 42.0 | 42.5 | 41.5 | 38.5 |
-| LISTEN words match | 38.0 | 36.0 | **42.5** | 37.5 | 40.0 | 41.5 | 35.5 | 35.0 |
-| emotion, ESD + CREMA-D† | **92.0** | 91.0 | 46.0 | 32.5 | 40.5 | 27.5 | 35.0 | 31.5 |
-| which word is stressed, zh / en† | **95.5 / 96.0** | 93.5 / 91.4 | 62.0 / 73.6 | 58.5 / 52.9 | 71.5 / 88.5 | 43.0 / 56.9 | 28.0 / 42.0 | 14.0 / 30.5 |
-| meaning from stress, DEBATE† | **93.0** | 90.5 | 36.5 | 51.5 | 79.5 | 55.0 | 27.5 | 26.0 |
-| StressTest | 86.5 | 71.5 | 70.0 | 70.5 | **89.0** | 66.0 | 62.5 | 60.0 |
-| speaking style, EARS† | 79.5 | **80.0** | 51.0 | 68.5 | 45.0 | 56.5 | 54.0 | 48.0 |
-| MSPB (statement / question, …) | **77.3** | 68.0 | 71.9 | 54.7 | 67.2 | 46.9 | 57.8 | 47.7 |
+| test | DuplexJev-32B-Para v1.3 | Qwen3-Omni-30B | Gemini 3.1 Pro | Gemini 3.8 Flash | Gemini 3.8 Live | GPT-audio-1.5 | GPT-realtime-2.1 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| **public benchmarks combined** (LISTEN ×4, StressTest, MSPB; 1,128 items) | **50.9** | 44.6 | 40.1 | 46.9 | 38.9 | 40.1 | 34.2 |
+| **LISTEN, mean of 4 audio-only conditions** | **37.8** | 33.9 | 30.1 | 33.1 | 30.9 | 31.6 | 25.6 |
+| LISTEN neutral words | **43.0** | 33.5 | 25.0 | 31.0 | 25.0 | 24.5 | 15.5 |
+| … unseen corpora only (TESS, SAVEE, RAVDESS) | **29.9** | 28.0 | 20.6 | 26.2 | 23.4 | 18.7 | 12.1 |
+| LISTEN no words | **26.0** | 18.0 | 15.5 | 19.5 | 14.5 | **25.0** | 13.5 |
+| LISTEN sarcastic words | **44.0** | 41.5 | 42.5 | 42.0 | 42.5 | 41.5 | 38.5 |
+| LISTEN words match | 38.0 | **42.5** | 37.5 | 40.0 | 41.5 | 35.5 | 35.0 |
+| emotion, ESD + CREMA-D† | **92.0** | 46.0 | 32.5 | 40.5 | 27.5 | 35.0 | 31.5 |
+| which word is stressed, zh / en† | **95.5 / 96.0** | 62.0 / 73.6 | 58.5 / 52.9 | 71.5 / 88.5 | 43.0 / 56.9 | 28.0 / 42.0 | 14.0 / 30.5 |
+| meaning from stress, DEBATE† | **93.0** | 36.5 | 51.5 | 79.5 | 55.0 | 27.5 | 26.0 |
+| StressTest | 86.5 | 70.0 | 70.5 | **89.0** | 66.0 | 62.5 | 60.0 |
+| speaking style, EARS† | **79.5** | 51.0 | 68.5 | 45.0 | 56.5 | 54.0 | 48.0 |
+| MSPB (statement / question, …) | **77.3** | 71.9 | 54.7 | 67.2 | 46.9 | 57.8 | 47.7 |
+
+† Test sets from corpora that are also in our training data (held-out speakers or sentences); every other model is zero-shot. The other rows are public benchmarks; of the LISTEN corpora only ESD and CREMA-D are in our emotion training data.
 
 Over the six public benchmarks together, v1.3 scores 50.9 against 46.9 for Gemini 3.8 Flash, the best other model; v1.3 is
 ahead on MSPB and on LISTEN, Gemini 3.8 Flash on StressTest (89.0 vs 86.5). Averaged over LISTEN's four audio-only
-conditions, DuplexJev scores 38.9 (v1.3; v1.2 38.4) on the full set (37.8 / 37.3 on these items), ahead of
+conditions, DuplexJev scores 38.9 on the full set (37.8 on these items), ahead of
 every published and tested model, closed realtime flagships included: state of the art in paralinguistic understanding on
 LISTEN. Its largest lead is on emotion the words do not carry; on the full LISTEN neutral-text set it scores 51.0, against
 34.9 for the best published result (Gemini 2.5 Pro, LISTEN paper). The realtime models trail their offline siblings
@@ -523,9 +353,7 @@ Both benchmarks ask the hard live question: the user has *just* gone quiet — f
 | LiveKit Turn Detector v1 | 9.9 / 4.5% | 20.6 / 8.7% | – |
 | **DuplexJev-32B-Para v1.2**, with the assistant's previous message (plugin setting) | **20.0 / 9.4%** | **37.7 / 12.2%** | – |
 | **DuplexJev-32B-Para v1.2**, audio only | 23.5 / 11.1% | 40.0 / 12.8% | **94.0 / 91.1**° |
-| DuplexJev-32B-Turn, audio only | 29.8 / 13.9% | 44.9 / 14.5% | 65.2 / 84.6 |
 | **DuplexJev-4B-Para-LiveTurn** (~10 GB), with the assistant's previous message (plugin setting) | **25.5 / 12.3%** | **38.8 / 12.0%** | **93.3 / 89.6**° |
-| DuplexJev-4B-Para v1.1, audio only | 46.4 / 17.7% | 48.5 / 15.6% | 67.9 / 78.9 |
 | Smart Turn v3.2 | 35.2 / 14.8% | 42.9 / 13.2% | 94.7 / 90.5 |
 
 - eot-bench: validation set, decision 0.2 s into each pause, official `compute-metrics` / `compare-models`; its audio is
@@ -576,7 +404,68 @@ For reference, the same LLM answering from text reaches 95.4 / 79.3 (Qwen3-VL-32
 1,567 ms + 411 ms ASR (paper measurement: Qwen3-32B on one H200, vLLM, all ten questions in one packed request). Full tables:
 [docs/paper_results.md](docs/paper_results.md).
 
-## 6. Benchmarks
+<details>
+<summary><b>Turn-taking vs. dedicated detectors</b> (Easy-Turn, CoDeTT)</summary>
+
+Measured with DuplexJev-32B-Turn, the turn-taking base of the Para models (32B-Para v1.3: Easy-Turn 94.4). It decides turn-taking as well as dedicated detectors do, and in the same forward pass it also answers
+every other question you declare (intent, emotion, gender, barge-in, …). It does not decode any tokens, so ten
+decisions about one clip cost about as much as one.
+
+| model | Easy-Turn test (complete / incomplete / backchannel / wait) | Easy-Turn overall | CoDeTT zh / en | other decisions in the same call | latency |
+|---|---|---:|---:|---|---|
+| Smart Turn v2 (95 MB) | 78.7 / 62.0 / – / – | – | – / 51.4 (v3) | no | 27 ms |
+| TEN Turn Detection (7 B) | 86.7 / 89.3 / – / 91.0 | – | – | no | 204 ms |
+| Easy-Turn (0.85 B) | 96.3 / 97.7 / 91.0 / 98.0 | 96.4 | 37.9 / – | no | 263 ms |
+| NAMO-Turn · FireRedChat | – | – | 59.5 / – · – / 65.4 | no | – |
+| GPT-4o-audio · Qwen3-Omni | – | – | 66.6 / 71.9 · 70.4 / 70.9 | yes, by generating text | seconds |
+| **DuplexJev-32B-Turn** (ours) | **98.7** / 94.3 / 88.0 / 95.0 | **95.3** | **69.2 / 70.0** | **yes, any number, one pass** | **~0.24 s for 10 decisions** (one H200) |
+| DuplexJev-4B-Turn (ours) | 92.3 / 93.0 / 90.0 / 94.0 | 92.5 | 67.0 / 68.6 | yes | ~0.08 s for 8 decisions (one H100) |
+
+- **Easy-Turn**: accuracy (%) on the 800-item test set. Easy-Turn itself and our Turn models were both trained on its
+  training split. Other rows are from the Easy-Turn paper (Table 2, their hardware); their latency is per single decision.
+- **CoDeTT** ([arXiv:2603.25434](https://arxiv.org/abs/2603.25434)): 18 k items, system state given, mean of four
+  action accuracies. Zero-shot for us: no CoDeTT data in training. Other rows are from the CoDeTT paper. Our protocol gives
+  the current utterance as audio without history; the official one also plays earlier user turns.
+- On our TurnBench-dev clip protocol (not the official leaderboard), the Turn models reach 88.7 (32B) and 87.3 (4B),
+  against 60.7 and 49.4 before the upgrade.
+- **Nothing else got worse.** For 32B: qa100 90 → 96, gender 89.4 → 91.5, emotion 90.6 → 91.1, VoiceBench MMSU
+  70.8 → 72.1. How it was done (public data only, a rank-16 LoRA, one recipe for 4B and 32B):
+  [research note](research/2026-10-turn-taking-lora.md).
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/bench_turn_dark.svg">
+    <img src="docs/assets/bench_turn_light.svg" alt="Turn-taking accuracy of DuplexJev against dedicated detectors and speech LLMs on CoDeTT and Easy-Turn" width="880">
+  </picture>
+</p>
+
+</details>
+
+<details>
+<summary><b>Common decision tasks vs. dedicated models</b> (gender, emotion, speaker, non-verbal sounds, spoken QA)</summary>
+
+| task | benchmark | DuplexJev | dedicated and other models |
+|---|---|---:|---|
+| turn state: finished / unfinished / backchannel / wait | Easy-Turn test (800) | **95.3** | Easy-Turn detector 96.4 · TEN Turn Detection and Smart Turn v2 cover only 3 / 2 of the 4 states |
+| what to do, system state given | CoDeTT zh / en (18 k, zero-shot) | **69.2 / 70.0** | Easy-Turn 37.9 (zh) · Smart-Turn-v3 51.4 (en) · NAMO-Turn 59.5 (zh) · FireRedChat 65.4 (en) · GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
+| gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
+| emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) · Qwen3-Omni-30B 45.2 (same questions, 400 of the items)† |
+| emotion, neutral words | LISTEN neutral-text, audio only (TESS, SAVEE, RAVDESS, ESD, CREMA-D) | **51.0** (all 4,286; 50.7 on the 400 compared) | Qwen3-Omni-30B 32.8 (same 400 items) · paper: Gemini 2.5 Pro 34.9, Qwen3-Omni 29.3 |
+| emotion, no words at all | LISTEN paralinguistic (IEMOCAP laughs, sighs, breaths) | **26.9** (all 975; 26.0 on the 400 compared) | Qwen3-Omni-30B 18.2 (same 400 items) · paper: Qwen3-Omni 21.0, Gemini 2.5 Pro 15.7 |
+| same speaker? | official VoxCeleb1-H list: different speakers share gender and nationality (2,000 trials) | **EER 36.9%** (4B-Para) / 40.3% (32B-Para); research checkpoints‡ 29.6% / 31.2% | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
+| laughter / breathing / cough / sigh | NonverbalTTS test (real speech, unseen), AUC | **0.88 / 0.81 / 0.85 / 0.80** (32B-Para) | AudioSet AST tagger 0.71 / 0.75 / 0.85 / 0.76 |
+| spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
+
+Other systems' numbers are from their papers (Easy-Turn Table 2, CoDeTT, Dynamic-SUPERB Phase-2). Easy-Turn is in-domain
+for both the Easy-Turn detector and our model. ‡ Research checkpoints trained only for speaker verification
+(no VoxCeleb1 speakers), not released; the Para models trade some of that for keeping every other ability; see the [research note](research/2026-10-speaker-identity.md). On random pairs about half of the different-speaker pairs also differ in
+gender, so a gender-only guess already reaches 74%; we therefore report hard pairs only.
+
+</details>
+
+Version-by-version scores and the earlier head-to-head with Qwen3-Omni on more items: [docs/models.md](docs/models.md).
+
+## Benchmarks
 
 | benchmark | task | size | link |
 |---|---|---:|---|
@@ -590,7 +479,7 @@ For reference, the same LLM answering from text reaches 95.4 / 79.3 (Qwen3-VL-32
 **total** = mean of the two. Chance: 25% on the four-way tasks, 50% on gender. The [connector leaderboard](docs/connectors.md#leaderboard) is generated by
 [`evaluation/build_leaderboard.py`](evaluation/build_leaderboard.py) from the result files next to it.
 
-## 7. Training
+## Training
 
 Frozen encoder and frozen LLM; only the connector is trained, with a patched
 [Ultravox](https://github.com/fixie-ai/ultravox). Both complete models follow the same three stages:
@@ -606,7 +495,7 @@ Frozen encoder and frozen LLM; only the connector is trained, with a patched
 Recipe, data links and scripts: [`training/`](training). The emotion corpora are not redistributed. The research
 checkpoints in [docs/connectors.md](docs/connectors.md) use earlier versions of this recipe.
 
-## 8. Repository layout
+## Repository layout
 
 | path | contents |
 |---|---|
@@ -621,7 +510,7 @@ checkpoints in [docs/connectors.md](docs/connectors.md) use earlier versions of 
 
 The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/PATHS.md).
 
-## 9. License
+## License
 
 Code: Apache-2.0 ([LICENSE](LICENSE)). Complete models (DuplexJev-32B, DuplexJev-4B, DuplexJev-Gemma-31B): CC BY-NC 4.0, because their
 connectors were trained on emotion data. Connector weights: Apache-2.0, except those trained on emotion data
@@ -629,7 +518,7 @@ connectors were trained on emotion data. Connector weights: Apache-2.0, except t
 The frozen encoders and LLMs keep their own licences (Falcon-H1: TII Falcon License; SenseVoice: FunASR Model License).
 Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms. See [NOTICE](NOTICE).
 
-## 10. Citation
+## Citation
 
 ```bibtex
 @misc{jin2026duplexjev,
@@ -642,7 +531,7 @@ Some training corpora (e.g. WenetSpeech, CoVoST 2) have non-commercial terms. Se
 }
 ```
 
-## 11. Acknowledgements
+## Acknowledgements
 
 DuplexJev-32B and DuplexJev-4B are built on [Qwen3-VL](https://github.com/QwenLM/Qwen3-VL),
 [Qwen3](https://github.com/QwenLM/Qwen3) and Qwen3-ASR (DuplexJev-Gemma-31B on [Gemma 4](https://huggingface.co/google/gemma-4-31B-it)), trained with [Ultravox](https://github.com/fixie-ai/ultravox)

@@ -15,7 +15,7 @@ d = Decider.from_pretrained("/data/models/my-checkpoint", device="auto")        
 
 | checkpoint | encoder (inside) | frozen LLM | status |
 |---|---|---|---|
-| `adventists-ai/DuplexJev-*` (see the [README leaderboard](../README.md#3-models)) | as named | as named | released, tested with 0.2.2 |
+| `adventists-ai/DuplexJev-*` (see the [README leaderboard](../README.md#models)) | as named | as named | released, tested with 0.2.2 |
 | `fixie-ai/ultravox-v0_6-qwen-3-32b` | Whisper-large-v3-turbo | Qwen3-32B | tested (qa100 0.89) |
 | `fixie-ai/ultravox-v0_6-gemma-3-27b` | Whisper-large-v3-turbo | Gemma-3-27B (licence acceptance needed) | same format |
 

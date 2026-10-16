@@ -4,7 +4,7 @@
 
 大多数用户请直接用**完整模型**（编码器 + 连接器 + 大模型在一个仓库里，用 vLLM 部署）：
 🤗 [DuplexJev-32B-Para](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 或
-🤗 [DuplexJev-4B-Para](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)，见 [README](../README_CN.md#3-模型)。
+🤗 [DuplexJev-4B-Para](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)，见 [README](../README_CN.md#模型)。
 
 本页面向研究用途：完整模型和论文背后的**连接器 checkpoint**（覆盖不同编码器、大模型和连接器类型），以及加载它们的
 `duplexjev` PyTorch 包。
@@ -59,7 +59,7 @@
 | DuplexJev-B-Para-SenseVoice-Small-Qwen3-1.7B | 47 | 30 | 34.1 | 66.9 | 78.4 | 2.0 B | 2.4 s | CC BY-NC 4.0 |
 | DuplexJev-B-Para-Whisper-small-Qwen3-1.7B | 48 | 28 | 37.8 | 78.8 | 62.4 | 1.8 B | 2.4 s | CC BY-NC 4.0 |
 
-分数为论文口径的百分比（单 token 读出，单张 H200），见[评测基准](../README_CN.md#6-评测基准)。CPU 列为一次判断（10 个问题、4.5 秒音频）
+分数为论文口径的百分比（单 token 读出，单张 H200），见[评测基准](../README_CN.md#评测基准)。CPU 列为一次判断（10 个问题、4.5 秒音频）
 在 8 个 CPU 线程上的耗时，fp32、未量化；在单张 H200 上所有模型都在约 0.05–0.2 秒内完成。
 
 **选哪个连接器。** 部署服务请优先用上面的完整模型。
