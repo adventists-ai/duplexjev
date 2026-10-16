@@ -138,31 +138,33 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 Paralinguistic understanding means hearing *how* something is said, not only *what*. Three public benchmarks combined:
 the four audio-only conditions of [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026, built to test whether audio models
-*listen* or just read the words), StressTest (word stress) and MSPB (prosody); 1,128 questions, every model answered the
-same items.
+*listen* or just read the words), StressTest (word stress) and MSPB (prosody); 1,035 questions, none from a corpus in our
+training data, and every model answered the same items.
 
 | model | **combined** | LISTEN, 4-condition mean | MSPB |
 |---|---:|---:|---:|
-| 🤗 **DuplexJev-32B-Para v1.3** (open) | **50.9** | **37.8** | **77.3** |
-| Gemini 3.8 Flash | 46.9 | 33.1 | 67.2 |
-| Qwen3-Omni-30B | 44.6 | 33.9 | 71.9 |
-| Gemini 3.1 Pro | 40.1 | 30.1 | 54.7 |
-| GPT-audio-1.5 | 40.1 | 31.6 | 57.8 |
-| Gemini 3.8 Live (realtime) | 38.9 | 30.9 | 46.9 |
-| GPT-realtime-2.1 (realtime) | 34.2 | 25.6 | 47.7 |
+| 🤗 **DuplexJev-32B-Para v1.3** (open) | **50.2** | **34.5** | **77.3** |
+| Gemini 3.8 Flash | 47.8 | 31.9 | 67.2 |
+| Qwen3-Omni-30B | 45.0 | 32.5 | 71.9 |
+| Gemini 3.1 Pro | 41.0 | 29.0 | 54.7 |
+| GPT-audio-1.5 | 40.9 | 30.2 | 57.8 |
+| Gemini 3.8 Live (realtime) | 40.0 | 30.5 | 46.9 |
+| GPT-realtime-2.1 (realtime) | 35.6 | 24.8 | 47.7 |
 
 **How far ahead:**
 
-- **Combined:** +4.0 over Gemini 3.8 Flash, +6.3 over Qwen3-Omni, +12.0 over Gemini 3.8 Live and +16.7 over GPT-realtime-2.1.
-- **LISTEN, full set: 38.9** against **33.0** for the best published model, and ahead of every model we tested.
-- **Emotion the words do not carry** (LISTEN neutral text, full set): **50.6** against 34.9 for the best published result (Gemini 2.5 Pro)¹.
+- **Combined:** +2.4 over Gemini 3.8 Flash, +5.2 over Qwen3-Omni, +10.2 over Gemini 3.8 Live and +14.6 over GPT-realtime-2.1.
+- **First or tied first on 8 of 11 corpora** against Gemini 3.8 Flash and Qwen3-Omni.
+- **Emotion the words do not carry, on voices it has never heard** (LISTEN neutral text, TESS): **38.3**, against 25.5 for Qwen3-Omni and 17.0 for Gemini 3.8 Flash.
 - **Emotion with no words at all** (LISTEN laughs, sighs, breaths, full set): **28.1** against 21.0 for the best published result (Qwen3-Omni).
 - **Prosody (MSPB): 77.3**, the highest of the seven models.
 - **The realtime flagships trail their own offline models** (Gemini 3.8 Live below 3.8 Flash, GPT-realtime-2.1 below GPT-audio-1.5),
   yet hearing tone in real time is exactly what a voice agent needs.
 
-<sub>¹ Two of LISTEN's neutral-text corpora are in our training data; on the three it does not contain, 29.9 vs 28.0 for Qwen3-Omni-30B. Gemini 3.8 Flash leads StressTest (89.0 vs 86.5).
-Per-test table, protocol and every model's raw answer: [Detailed results](#against-closed-models-realtime-flagships-included),
+<sub>Gemini 3.8 Flash leads StressTest (89.0 vs 86.5), and general models lead when the words themselves carry the emotion
+(MELD dialogue: 59.6 for Qwen3-Omni vs 38.5); dialogue emotion data is in our next training round. Thanks to Dipankar Sarkar for
+suggesting the split: LISTEN's ESD and CREMA-D items (in our training data) are left out of the headline; with them, 1,128 items,
+DuplexJev scores 50.9. Per-test table, protocol and every model's raw answer: [Detailed results](#against-closed-models-realtime-flagships-included),
 [`benchmarks/paraling_compare`](benchmarks/paraling_compare).</sub>
 
 ## 🥇 Task by task
@@ -310,7 +312,7 @@ Four models, each **one repository with everything needed** (audio encoder + con
 
 | model | use it for | GPU | highlights |
 |---|---|---|---|
-| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **best overall**: every ability, best paralinguistics, best live turn-taking | one 80 GB GPU | public paralinguistic benchmarks **50.9** · gender 93.8 · emotion 92.1 · qa100 96 |
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **best overall**: every ability, best paralinguistics, best live turn-taking | one 80 GB GPU | public paralinguistic benchmarks **50.2** · gender 93.8 · emotion 92.1 · qa100 96 |
 | ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.1 | **small GPU**, every ability, also holds a normal conversation; `duplexjev` default | ~10 GB | gender 89.2 · emotion 90.0 · laughter / cough / sigh AUC 0.80 / 0.75 / 0.81 |
 | 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) | small GPU, **live end-of-turn** in LiveKit / Pipecat agents | ~10 GB | eot-bench false cut-offs at 300 ms: en **25.5%** / zh **38.8%** (Smart Turn v3.2: 35.2 / 42.9) |
 | 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (preview) | **voice + picture** in one question | one 80 GB GPU | stressed word vs red word 94.1 · face vs voice 93.5 (picture alone 50) · [try it](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision) |
@@ -324,7 +326,7 @@ connector checkpoints: **[docs/models.md](docs/models.md)**.
 
 ## News
 
-- **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.9**, against 46.9 for Gemini 3.8 Flash.
+- **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.2**, against 47.8 for Gemini 3.8 Flash.
 - **2026-10-15** · 🏆 Same questions for the realtime flagships (Gemini 3.8 Live, GPT-realtime-2.1) and GPT-audio-1.5, plus LiveKit eot-bench in all 14 languages.
 - **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): live end-of-turn on a ~10 GB GPU.
 - **Coming next:** an open-source full-duplex Jev dialogue pipeline.
@@ -344,8 +346,9 @@ realtime input in one manual activity; it can only answer by voice, so we read i
 
 | test | DuplexJev-32B-Para v1.3 | Qwen3-Omni-30B | Gemini 3.1 Pro | Gemini 3.8 Flash | Gemini 3.8 Live | GPT-audio-1.5 | GPT-realtime-2.1 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| **public benchmarks combined** (LISTEN ×4, StressTest, MSPB; 1,128 items) | **50.9** | 44.6 | 40.1 | 46.9 | 38.9 | 40.1 | 34.2 |
-| **LISTEN, mean of 4 audio-only conditions** | **37.8** | 33.9 | 30.1 | 33.1 | 30.9 | 31.6 | 25.6 |
+| **public benchmarks combined** (LISTEN ×4, StressTest, MSPB; 1,035 items, no training corpora) | **50.2** | 45.0 | 41.0 | 47.8 | 40.0 | 40.9 | 35.6 |
+| … with LISTEN's ESD + CREMA-D items (1,128 items) | **50.9** | 44.6 | 40.1 | 46.9 | 38.9 | 40.1 | 34.2 |
+| **LISTEN, mean of 4 audio-only conditions** (no training corpora) | **34.5** | 32.5 | 29.0 | 31.9 | 30.5 | 30.2 | 24.8 |
 | LISTEN neutral words | **43.0** | 33.5 | 25.0 | 31.0 | 25.0 | 24.5 | 15.5 |
 | … unseen corpora only (TESS, SAVEE, RAVDESS) | **29.9** | 28.0 | 20.6 | 26.2 | 23.4 | 18.7 | 12.1 |
 | LISTEN no words | **26.0** | 18.0 | 15.5 | 19.5 | 14.5 | **25.0** | 13.5 |
@@ -360,7 +363,7 @@ realtime input in one manual activity; it can only answer by voice, so we read i
 
 † Test sets from corpora that are also in our training data (held-out speakers or sentences); every other model is zero-shot. The other rows are public benchmarks; of the LISTEN corpora only ESD and CREMA-D are in our emotion training data.
 
-Over the six public benchmarks together, v1.3 scores 50.9 against 46.9 for Gemini 3.8 Flash, the best other model; v1.3 is
+Over the six public benchmarks together, leaving out every item from a corpus in our training data, v1.3 scores 50.2 against 47.8 for Gemini 3.8 Flash, the best other model, and 45.0 for Qwen3-Omni; v1.3 is
 ahead on MSPB and on LISTEN, Gemini 3.8 Flash on StressTest (89.0 vs 86.5). Averaged over LISTEN's four audio-only
 conditions, DuplexJev scores 38.9 on the full set (37.8 on these items), ahead of
 every published and tested model, closed realtime flagships included: state of the art in paralinguistic understanding on
