@@ -373,6 +373,10 @@ on StressTest, and the general models are ahead when the words themselves carry 
 as wrong (GPT-audio-1.5 2%, Gemini 3.8 Live 0.5%, the others ~0). Scripts, the item list and every model's raw answer:
 [`benchmarks/paraling_compare`](benchmarks/paraling_compare).
 
+**Shuffling the options** (all 24 orders of every 4-option item, 33,508 requests): the answer changes in 3.3% of orders,
+only on uncertain items (0.01% when the answer's probability is ≥ 0.8), with no letter-position bias and the same
+accuracy as the average over orders. Details: [`benchmarks/option_order`](benchmarks/option_order).
+
 ### Live end of turn: LiveKit eot-bench and Pipecat Smart Turn
 
 Both benchmarks ask the hard live question: the user has *just* gone quiet — finished, or only pausing?

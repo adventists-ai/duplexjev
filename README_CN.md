@@ -344,6 +344,8 @@ Gemini 3.8 Live 对情绪题大多回答“中性”（GPT-realtime-2.1 在 200 
 不清楚这是产品上的有意设计，还是确实听不出来。Gemini 3.8 Flash 在 StressTest 上领先；字面本身带情绪时，通用模型领先。答不出选项字母记为错（GPT-audio-1.5 约 2%，
 Gemini 3.8 Live 0.5%，其他约 0）。脚本、题目列表和每个模型的原始回答：[`benchmarks/paraling_compare`](benchmarks/paraling_compare)。
 
+**打乱选项顺序**（每道 4 选 1 题的 24 种顺序全部测，共 33,508 次请求）：答案改变的比例是 3.3%，全部出现在模型本来就不确定的题上（答案概率 ≥ 0.8 的题只有 0.01%）；没有偏向某个字母位置，单一顺序的准确率和多种顺序平均后一样。详见 [`benchmarks/option_order`](benchmarks/option_order)。
+
 ### 实时话轮：LiveKit eot-bench 与 Pipecat Smart Turn
 
 这两个榜考的是实时对话里最难的一刻：用户**刚**停下来，是说完了，还是只是停顿？
