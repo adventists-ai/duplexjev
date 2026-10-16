@@ -14,9 +14,11 @@
 <p align="center">
   <b>DuplexJev is a Speech-to-Decision model: the ears of a voice agent.</b><br>
   Has the user finished? Should I stop talking? Are they angry? Which filler fits?<br>
-  Every answer straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM.<br>
+  Every answer straight from raw speech, in <b>one forward pass</b>: <b>10 decisions in 92 ms</b>, <b>21× faster</b> than ASR → LLM,
+  under <b>$0.50 per million decisions</b>, and a new kind of decision is <b>one line of text</b>.<br>
   🏆 <b>State of the art in paralinguistic understanding</b> on public benchmarks (<a href="https://arxiv.org/abs/2510.10444">LISTEN</a>, StressTest and MSPB combined):
-  ahead of <b>Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni</b> on the same 1,128 questions. Open weights, code and every prediction.
+  ahead of <b>Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni</b> on the same questions.<br>
+  👁️ <b>It also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same pass (preview) — <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">try it with a photo + your voice</a>.
 </p>
 
 <p align="center">
@@ -38,74 +40,31 @@
 <p align="center"><img src="docs/assets/race.gif" alt="Ten decisions: DuplexJev 92 ms vs ASR → LLM 1,978 ms on the same H200" width="820"></p>
 <p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch.mp4">Watch the 2-minute video (with sound)</a> · answers shown are real model outputs</sub></p>
 
-## 🏆 Results
+## ⚡ Speech-to-Decision: fast, cheap, any decision
 
-### It hears what the flagships miss
+A voice agent has to decide something at every pause. The usual way transcribes the speech and asks an LLM to write an
+answer, one generation per question. DuplexJev listens to the raw audio and answers **all** of your questions as
+multiple choice in **one forward pass**, reading a single token per question: no transcription, no text decoding.
+Each answer comes with its probability, so you also get a confidence score.
 
-Paralinguistic understanding means hearing *how* something is said, not only *what*: tone, emotion, stress, pauses,
-laughter, sighs. Three public benchmarks combined: the four audio-only conditions of
-[LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026, built to test whether audio models *listen* or just read the words),
-StressTest (word stress) and MSPB (prosody). 1,128 questions; every model answered the same items.
-
-| model | **combined** | LISTEN, 4-condition mean | StressTest | MSPB |
-|---|---:|---:|---:|---:|
-| 🤗 **DuplexJev-32B-Para v1.3** (open) | **50.9** | **37.8** | 86.5 | **77.3** |
-| Gemini 3.8 Flash | 46.9 | 33.1 | **89.0** | 67.2 |
-| Qwen3-Omni-30B | 44.6 | 33.9 | 70.0 | 71.9 |
-| Gemini 3.1 Pro | 40.1 | 30.1 | 70.5 | 54.7 |
-| GPT-audio-1.5 | 40.1 | 31.6 | 62.5 | 57.8 |
-| Gemini 3.8 Live (realtime) | 38.9 | 30.9 | 66.0 | 46.9 |
-| GPT-realtime-2.1 (realtime) | 34.2 | 25.6 | 60.0 | 47.7 |
-
-- **LISTEN, full set: 38.9**, against **33.0** for the best published model: state of the art on LISTEN. Its largest lead is on
-  emotion the words do not carry (full neutral-text set **51.0** vs 34.9, best published, Gemini 2.5 Pro).
-- **Both vendors' realtime models trail their own offline models** at hearing tone, the ability a voice agent needs most.
-- **Where we are not ahead.** Gemini 3.8 Flash on StressTest (89.0 vs 86.5). Where the words themselves carry the emotion,
-  general models do better (Qwen3-Omni 42.5 vs 38.0). Two corpora of LISTEN's neutral-text set are in our training data;
-  on the unseen ones we score 29.9 vs 28.0 (Qwen3-Omni). Both GPT models and Gemini 3.8 Live mostly answer "neutral" to
-  emotion questions; we score them as asked.
-- Scripts, the item list and every model's raw answer: [`benchmarks/paraling_compare`](benchmarks/paraling_compare);
-  per-test table and protocol in [Detailed results](#against-closed-models-realtime-flagships-included).
-
-### Built to decide, not to chat
-
-| for a voice agent | **DuplexJev** | the usual way |
+| | **DuplexJev** | ASR → LLM, same GPU and LLM |
 |---|:---:|---|
-| ⚡ ten decisions about one utterance (one H200) | **92 ms** | 1,978 ms: ASR → LLM → JSON, same GPU and LLM |
-| 💸 cost | **≈ one forward pass for N questions** · under **$0.50 per million decisions** (4B) | one generation per question |
-| 📚 50 questions over a 5k-token context | **5.5 s** | 111.5 s, one call per question |
-| 👂 emotion from the voice (4 classes) | **91** | 45 Qwen3-Omni-30B, same questions · ~28 speech LLMs trained on transcripts |
-| 🎯 turn-taking, CoDeTT English, zero-shot | **70.0** | 51.4 Smart Turn v3 |
-| 🌍 live end of turn, LiveKit [eot-bench](https://github.com/livekit/eot-bench), 14 languages, 300 ms | **fewer false cut-offs than Smart Turn v3.2 in all 14** | English 20.0% vs 35.2%, Japanese 14.1% vs 34.9%; LiveKit's own detector is still ahead ([details](#live-end-of-turn-livekit-eot-bench-and-pipecat-smart-turn)) |
-| 👁️ voice + picture in one pass (preview) | **94.1** red word = stressed word · **93.5** face ↔ voice | 50 with the picture alone |
-| 🧩 a new decision | **one line of text at runtime** | new data, new model |
+| ten decisions about one utterance (one H200) | **92 ms** | 1,978 ms |
+| throughput, every request under 0.25 s | **~170 decisions / s** on one H200 | one generation per question |
+| 50 questions over a 5k-token context | **5.5 s** | 111.5 s |
+| cost | under **$0.50 per million decisions** (4B) | |
+| a new kind of decision | **one line of text at runtime** | new data, new model |
+| hardware | **~10 GB** (4B) · one 80 GB GPU (32B) | |
 
-**Get a result in 30 seconds:**
+**What it can decide, from one clip:**
 
-```bash
-pip install duplexjev
-python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.adventists.cn/duplexjev').decide('your.wav'))"
-```
-
-**Self-host:** `vllm serve adventists-ai/DuplexJev-4B-Para` (~10 GB GPU) with the `duplexjev-vllm` plugin ([Quick start](#quick-start)) ·
-**Pipecat:** `pip install pipecat-duplexjev` · **LiveKit Agents:** `pip install livekit-plugins-duplexjev` ([integrations/livekit](integrations/livekit)) — audio end-of-turn detection, plus emotion and non-verbal sounds from the same pass.
-
-> 🏢 **Building a product?** Our full-duplex voice API already runs on **300+ AI hardware products and 100,000+ devices**.
-> Contact centres, in-car assistants, devices, voice-agent platforms: weights are CC BY-NC 4.0, and we offer
-> **commercial licences and a hosted Speech-to-Decision API**. Email **jiejin@adventists.ai**.
-
-⭐ **Star the repo** to follow new abilities — image + voice and an open full-duplex pipeline are next.
-
-## What it does
-
-**Input:** an audio clip and the questions you need decided, each with its options. **Output:** for every question,
-the chosen option and its probability. All questions are answered together in one forward pass, with no transcription
-and no text decoding: ten decisions take **about 0.1–0.24 s**, and one H200 serves about **170 decisions per second**
-while keeping every request under 0.25 s.
-
-It decides from the raw audio, so it uses both **what is said** and **what a transcript drops**: who is speaking and how.
-Spoken multiple-choice questions score 90, against 91 when the same LLM reads the transcript (qa100, paper); gender and
-emotion reach about 90, where speech LLMs trained on transcripts sit at chance (~55 / ~28).
+| | decisions |
+|---|---|
+| 🔁 **conversation flow** | turn state (finished, mid-sentence, backchannel, asking to wait) · real barge-in or just a backchannel · speech not meant for the assistant · end of turn right after a pause |
+| 💬 **what is said** | intent · which filler fits · wants a human · any multiple-choice question about the content (spoken QA 90, against 91 for the same LLM reading the transcript) |
+| 🎭 **how it is said** | emotion · which word is stressed · pauses and phrasing · speaking style (whisper, shouting, fast, slow) · laughter, breathing, coughs, sighs |
+| 🧑 **who is speaking** | gender · same speaker or not · accent and dialect region · language |
+| 👁️ **what it sees** (preview) | voice against a picture: stressed word vs. the red word 94.1, face vs. voice 93.5 (picture alone 50) |
 
 **One clip, eight decisions.** 🔊 *"Wait, wait — stop. That's not the address I asked for."* — said while the assistant is talking
 ([listen](docs/audio/ex1.wav), synthetic clip) — one call to DuplexJev-32B-Turn, 0.2 s on one H200:
@@ -173,35 +132,75 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 </details>
 
-## Models
+## 🏆 Paralinguistic understanding: state of the art
 
-Four models, each **one repository with everything needed** (audio encoder + connector + LLM), served with
-[vLLM](https://github.com/vllm-project/vllm) and a small plugin ([Quick start](#quick-start)). Same prompts and plugin for all.
+Paralinguistic understanding means hearing *how* something is said, not only *what*. Three public benchmarks combined:
+the four audio-only conditions of [LISTEN](https://arxiv.org/abs/2510.10444) (EACL 2026, built to test whether audio models
+*listen* or just read the words), StressTest (word stress) and MSPB (prosody); 1,128 questions, every model answered the
+same items.
 
-| model | use it for | GPU | highlights |
-|---|---|---|---|
-| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **best overall**: every ability, best paralinguistics, best live turn-taking | one 80 GB GPU | public paralinguistic benchmarks **50.9** · gender 93.8 · emotion 92.1 · qa100 96 |
-| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.1 | **small GPU**, every ability, also holds a normal conversation; `duplexjev` default | ~10 GB | gender 89.2 · emotion 90.0 · laughter / cough / sigh AUC 0.80 / 0.75 / 0.81 |
-| 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) | small GPU, **live end-of-turn** in LiveKit / Pipecat agents | ~10 GB | eot-bench false cut-offs at 300 ms: en **25.5%** / zh **38.8%** (Smart Turn v3.2: 35.2 / 42.9) |
-| 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (preview) | **voice + picture** in one question | one 80 GB GPU | stressed word vs red word 94.1 · face vs voice 93.5 (picture alone 50) · [try it](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision) |
+| model | **combined** | LISTEN, 4-condition mean | MSPB |
+|---|---:|---:|---:|
+| 🤗 **DuplexJev-32B-Para v1.3** (open) | **50.9** | **37.8** | **77.3** |
+| Gemini 3.8 Flash | 46.9 | 33.1 | 67.2 |
+| Qwen3-Omni-30B | 44.6 | 33.9 | 71.9 |
+| Gemini 3.1 Pro | 40.1 | 30.1 | 54.7 |
+| GPT-audio-1.5 | 40.1 | 31.6 | 57.8 |
+| Gemini 3.8 Live (realtime) | 38.9 | 30.9 | 46.9 |
+| GPT-realtime-2.1 (realtime) | 34.2 | 25.6 | 47.7 |
 
-All on [ModelScope](https://www.modelscope.cn/organization/AdventistsAI) too (same weights):
-`modelscope download --model AdventistsAI/DuplexJev-32B-Para --local_dir ./DuplexJev-32B-Para`, then `vllm serve ./DuplexJev-32B-Para`.
-Weights: CC BY-NC 4.0; commercial licences: jiejin@adventists.ai.
+**How far ahead:**
 
-**Version history, per-version scores, specialised and archived models** (Stress, Turn, Gemma-31B) and the research
-connector checkpoints: **[docs/models.md](docs/models.md)**.
+- **Combined:** +4.0 over Gemini 3.8 Flash, +6.3 over Qwen3-Omni, +12.0 over Gemini 3.8 Live and +16.7 over GPT-realtime-2.1.
+- **LISTEN, full set: 38.9** against **33.0** for the best published model, and ahead of every model we tested.
+- **Emotion the words do not carry** (LISTEN neutral text, full set): **51.0** against 34.9 for the best published result (Gemini 2.5 Pro)¹.
+- **Emotion with no words at all** (LISTEN laughs, sighs, breaths, full set): **26.9** against 21.0 for the best published result (Qwen3-Omni).
+- **Prosody (MSPB): 77.3**, the highest of the seven models.
+- **The realtime flagships trail their own offline models** (Gemini 3.8 Live below 3.8 Flash, GPT-realtime-2.1 below GPT-audio-1.5),
+  yet hearing tone in real time is exactly what a voice agent needs.
 
-## News
+<sub>¹ Two of LISTEN's neutral-text corpora are in our training data. Gemini 3.8 Flash leads StressTest (89.0 vs 86.5).
+Per-test table, protocol and every model's raw answer: [Detailed results](#against-closed-models-realtime-flagships-included),
+[`benchmarks/paraling_compare`](benchmarks/paraling_compare).</sub>
 
-- **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.9**, against 46.9 for Gemini 3.8 Flash.
-- **2026-10-15** · 🏆 Same questions for the realtime flagships (Gemini 3.8 Live, GPT-realtime-2.1) and GPT-audio-1.5, plus LiveKit eot-bench in all 14 languages.
-- **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): live end-of-turn on a ~10 GB GPU.
-- **Coming next:** an open-source full-duplex Jev dialogue pipeline.
+## 🥇 Task by task
 
-All releases: [docs/news.md](docs/news.md).
+Ahead of dedicated models and closed flagships on most decision tasks we measured (same items for every model in a row):
+
+| task | benchmark | **DuplexJev** | next best |
+|---|---|---:|---|
+| which word is stressed, zh / en | held-out sentences† | **95.5 / 96.0** | 71.5 / 88.5 Gemini 3.8 Flash |
+| what the stress means | DEBATE held-out† | **93.0** | 79.5 Gemini 3.8 Flash |
+| emotion from the voice, 4-way | ESD + CREMA-D† | **92.0** | 46.0 Qwen3-Omni-30B |
+| speaking style (whisper, shout, fast …) | EARS held-out speakers† | **79.5** | 68.5 Gemini 3.1 Pro |
+| prosody | MSPB | **77.3** | 71.9 Qwen3-Omni-30B |
+| emotion, neutral words | LISTEN, full set | **51.0** | 34.9 Gemini 2.5 Pro (published) |
+| laughter / breathing / cough / sigh, AUC | NonverbalTTS test (unseen) | **0.88 / 0.81 / 0.85 / 0.80** | 0.71 / 0.75 / 0.85 / 0.76 AudioSet AST tagger |
+| turn action, zero-shot, zh / en | CoDeTT | **69.2 / 70.0** | 59.5 / 65.4 best dedicated turn model (NAMO-Turn / FireRedChat) |
+| live end of turn, 14 languages, 300 ms | LiveKit [eot-bench](https://github.com/livekit/eot-bench) | **fewer false cut-offs than Smart Turn v3.2 in all 14** | English 20.0% vs 35.2%, Japanese 14.1% vs 34.9% |
+| gender | AISHELL-1, LibriSpeech | **93.8** | ~55 speech LLMs trained on transcripts |
+| voice vs. picture (preview) | held-out synthetic sets | **94.1 / 93.5** | 50 picture alone |
+
+<sub>† Test sets from corpora in our training data (held-out speakers or sentences); the other models are zero-shot.
+Full tables: [Detailed results](#detailed-results).</sub>
 
 ## Quick start
+
+**Get a result in 30 seconds:**
+
+```bash
+pip install duplexjev
+python -c "from duplexjev.remote import ApiClient; print(ApiClient('https://api.adventists.cn/duplexjev').decide('your.wav'))"
+```
+
+**Self-host:** `vllm serve adventists-ai/DuplexJev-4B-Para` (~10 GB GPU) with the `duplexjev-vllm` plugin ([Quick start](#quick-start)) ·
+**Pipecat:** `pip install pipecat-duplexjev` · **LiveKit Agents:** `pip install livekit-plugins-duplexjev` ([integrations/livekit](integrations/livekit)) — audio end-of-turn detection, plus emotion and non-verbal sounds from the same pass.
+
+> 🏢 **Building a product?** Our full-duplex voice API already runs on **300+ AI hardware products and 100,000+ devices**.
+> Contact centres, in-car assistants, devices, voice-agent platforms: weights are CC BY-NC 4.0, and we offer
+> **commercial licences and a hosted Speech-to-Decision API**. Email **jiejin@adventists.ai**.
+
+⭐ **Star the repo** to follow new abilities — image + voice and an open full-duplex pipeline are next.
 
 **Without a GPU** — ask our trial API (rate-limited, audio is not stored):
 
@@ -301,6 +300,34 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 Held-out results: stressed word vs. the red word 94.1, face vs. voice 93.5, sound vs. caption 97.5 (picture alone: 50);
 real photos of unseen speakers with their own voice 64.4, happy voices 81.7. Examples with real photos are on the
 [project page](https://adventists-ai.github.io/duplexjev/#ab-vision).
+
+## Models
+
+Four models, each **one repository with everything needed** (audio encoder + connector + LLM), served with
+[vLLM](https://github.com/vllm-project/vllm) and a small plugin ([Quick start](#quick-start)). Same prompts and plugin for all.
+
+| model | use it for | GPU | highlights |
+|---|---|---|---|
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **best overall**: every ability, best paralinguistics, best live turn-taking | one 80 GB GPU | public paralinguistic benchmarks **50.9** · gender 93.8 · emotion 92.1 · qa100 96 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.1 | **small GPU**, every ability, also holds a normal conversation; `duplexjev` default | ~10 GB | gender 89.2 · emotion 90.0 · laughter / cough / sigh AUC 0.80 / 0.75 / 0.81 |
+| 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) | small GPU, **live end-of-turn** in LiveKit / Pipecat agents | ~10 GB | eot-bench false cut-offs at 300 ms: en **25.5%** / zh **38.8%** (Smart Turn v3.2: 35.2 / 42.9) |
+| 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (preview) | **voice + picture** in one question | one 80 GB GPU | stressed word vs red word 94.1 · face vs voice 93.5 (picture alone 50) · [try it](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision) |
+
+All on [ModelScope](https://www.modelscope.cn/organization/AdventistsAI) too (same weights):
+`modelscope download --model AdventistsAI/DuplexJev-32B-Para --local_dir ./DuplexJev-32B-Para`, then `vllm serve ./DuplexJev-32B-Para`.
+Weights: CC BY-NC 4.0; commercial licences: jiejin@adventists.ai.
+
+**Version history, per-version scores, specialised and archived models** (Stress, Turn, Gemma-31B) and the research
+connector checkpoints: **[docs/models.md](docs/models.md)**.
+
+## News
+
+- **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.9**, against 46.9 for Gemini 3.8 Flash.
+- **2026-10-15** · 🏆 Same questions for the realtime flagships (Gemini 3.8 Live, GPT-realtime-2.1) and GPT-audio-1.5, plus LiveKit eot-bench in all 14 languages.
+- **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): live end-of-turn on a ~10 GB GPU.
+- **Coming next:** an open-source full-duplex Jev dialogue pipeline.
+
+All releases: [docs/news.md](docs/news.md).
 
 ## Detailed results
 
