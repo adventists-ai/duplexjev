@@ -145,13 +145,13 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 - **合计：**比 Gemini 3.8 Flash 高 4.0，比 Qwen3-Omni 高 6.3，比 Gemini 3.8 Live 高 12.0，比 GPT-realtime-2.1 高 16.7。
 - **LISTEN 全集 38.9**，此前公开最好成绩 **33.0**，也高于我们测过的所有模型。
-- **听出字面里没有的情绪**（LISTEN 中性文本全集）：**51.0**，此前公开最好为 Gemini 2.5 Pro 的 34.9¹。
-- **完全没有字时的情绪**（LISTEN 笑声、叹气、呼吸，全集）：**26.9**，此前公开最好为 Qwen3-Omni 的 21.0。
+- **听出字面里没有的情绪**（LISTEN 中性文本全集）：**50.6**，此前公开最好为 Gemini 2.5 Pro 的 34.9¹。
+- **完全没有字时的情绪**（LISTEN 笑声、叹气、呼吸，全集）：**28.1**，此前公开最好为 Qwen3-Omni 的 21.0。
 - **韵律（MSPB）77.3**，七个模型里最高。
 - **两家的实时旗舰都不如自家的离线模型**（Gemini 3.8 Live 低于 3.8 Flash，GPT-realtime-2.1 低于 GPT-audio-1.5），
   而实时听出语气，恰恰是语音智能体最需要的能力。
 
-<sub>¹ LISTEN 中性文本里有两个语料在我们的训练数据中。StressTest 上 Gemini 3.8 Flash 领先（89.0 对 86.5）。
+<sub>¹ LISTEN 中性文本里有两个语料在我们的训练数据中；只算另外三个没训练过的语料，29.9 对 Qwen3-Omni-30B 的 28.0。StressTest 上 Gemini 3.8 Flash 领先（89.0 对 86.5）。
 逐项成绩、测试方法和每个模型的原始回答：[详细成绩](#与闭源模型对比包括实时旗舰)、[`benchmarks/paraling_compare`](benchmarks/paraling_compare)。</sub>
 
 ## 🥇 各项任务排名
@@ -165,7 +165,7 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 | 从声音听情绪，四分类 | ESD + CREMA-D† | **92.0** | 46.0 Qwen3-Omni-30B |
 | 说话方式（耳语、大喊、快……） | EARS 留出说话人† | **79.5** | 68.5 Gemini 3.1 Pro |
 | 韵律 | MSPB | **77.3** | 71.9 Qwen3-Omni-30B |
-| 情绪：字面中性 | LISTEN 全集 | **51.0** | 34.9 Gemini 2.5 Pro（公开成绩） |
+| 情绪：字面中性 | LISTEN 全集 | **50.6** | 34.9 Gemini 2.5 Pro（公开成绩） |
 | 笑 / 呼吸 / 咳嗽 / 叹气，AUC | NonverbalTTS 测试集（训练未见） | **0.88 / 0.81 / 0.85 / 0.80** | 0.71 / 0.75 / 0.85 / 0.76 AudioSet AST 检测器 |
 | 话轮动作，零样本，中 / 英 | CoDeTT | **69.2 / 70.0** | 59.5 / 65.4 最好的专用话轮模型（NAMO-Turn / FireRedChat） |
 | 实时话轮结束，14 种语言，300 毫秒 | LiveKit [eot-bench](https://github.com/livekit/eot-bench) | **14 种语言误打断全部少于 Smart Turn v3.2** | 英语 20.0% 对 35.2%，日语 14.1% 对 34.9% |
@@ -336,7 +336,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 † 测试集与我们的训练语料同源（说话人或句子不重叠），其他模型都是零样本。其余各行是公开基准；LISTEN 的语料里只有 ESD、CREMA-D 在我们的情绪训练数据中。
 
 六个公开基准合计，v1.3 为 50.9，其他模型最好的 Gemini 3.8 Flash 为 46.9；MSPB 和 LISTEN 上 v1.3 领先，StressTest 上 Gemini 3.8 Flash 领先（89.0 对 86.5）。LISTEN 纯音频四项平均，DuplexJev 全集 38.9（这批题 37.8），超过所有已公开和我们测过的模型，包括闭源的实时旗舰：在 LISTEN 上副语言理解 SOTA。
-领先最多的是听出字面里没有的情绪；LISTEN 中性文本全集上 51.0，此前公开最好成绩是 Gemini 2.5 Pro 的 34.9（LISTEN 论文）。
+领先最多的是听出字面里没有的情绪；LISTEN 中性文本全集上 50.6，此前公开最好成绩是 Gemini 2.5 Pro 的 34.9（LISTEN 论文）。
 实时模型都不如同家的离线模型（Gemini 3.8 Live 低于 3.8 Flash，GPT-realtime-2.1 低于 GPT-audio-1.5）。两个 GPT 模型和
 Gemini 3.8 Live 对情绪题大多回答“中性”（GPT-realtime-2.1 在 200 道字面中性题里答了 150 次 neutral）；我们按原样计分，
 不清楚这是产品上的有意设计，还是确实听不出来。Gemini 3.8 Flash 在 StressTest 上领先；字面本身带情绪时，通用模型领先。答不出选项字母记为错（GPT-audio-1.5 约 2%，
@@ -438,8 +438,8 @@ Gemini 3.8 Live 0.5%，其他约 0）。脚本、题目列表和每个模型的�
 | 已知系统状态，该怎么做 | CoDeTT 中 / 英（1.8 万，零样本） | **69.2 / 70.0** | Easy-Turn 37.9（中）· Smart-Turn-v3 51.4（英）· NAMO-Turn 59.5（中）· FireRedChat 65.4（英）· GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
 | 性别 | 800 条真实语音（AISHELL-1、LibriSpeech） | **91.5** | 只用转写训练的语音大模型：约 55（瞎猜） |
 | 情绪（4 类） | 800 条（ESD、CREMA-D） | **91.1** | 只用转写训练的语音大模型：约 28（瞎猜）· Qwen3-Omni-30B 45.2（同题，其中 400 条）† |
-| 情绪：字面中性 | LISTEN 中性文本，只给音频（TESS、SAVEE、RAVDESS、ESD、CREMA-D） | **51.0**（全部 4,286 题；对比的 400 题上 50.7） | Qwen3-Omni-30B 32.8（同样的 400 题）· 论文：Gemini 2.5 Pro 34.9、Qwen3-Omni 29.3 |
-| 情绪：完全没有字 | LISTEN 副语言（IEMOCAP 笑、叹气、呼吸） | **26.9**（全部 975 题；对比的 400 题上 26.0） | Qwen3-Omni-30B 18.2（同样的 400 题）· 论文：Qwen3-Omni 21.0、Gemini 2.5 Pro 15.7 |
+| 情绪：字面中性 | LISTEN 中性文本，只给音频（TESS、SAVEE、RAVDESS、ESD、CREMA-D） | **50.6**（v1.3，全部 4,286 题；v1.2 在对比的 400 题上 50.7） | Qwen3-Omni-30B 32.8（同样的 400 题）· 论文：Gemini 2.5 Pro 34.9、Qwen3-Omni 29.3 |
+| 情绪：完全没有字 | LISTEN 副语言（IEMOCAP 笑、叹气、呼吸） | **28.1**（v1.3，全部 975 题；v1.2 在对比的 400 题上 26.0） | Qwen3-Omni-30B 18.2（同样的 400 题）· 论文：Qwen3-Omni 21.0、Gemini 2.5 Pro 15.7 |
 | 是不是同一个人 | 官方 VoxCeleb1-H 列表：不同人之间性别和国籍相同（2,000 个试次） | **EER 36.9%**（4B-Para）/ 40.3%（32B-Para）；研究 checkpoint‡ 29.6% / 31.2% | 只靠性别：瞎猜（50）；专用说话人模型（ECAPA-TDNN）：EER 约 2% |
 | 笑 / 呼吸 / 咳嗽 / 叹气 | NonverbalTTS 测试集（真人语音，训练未见），AUC | **0.88 / 0.81 / 0.85 / 0.80**（32B-Para） | AudioSet AST 检测器 0.71 / 0.75 / 0.85 / 0.76 |
 | 口语知识问答 | VoiceBench OBQA / MMSU | **85.5 / 72.1** | 同一大模型直接读文字：95.4 / 79.3 |

@@ -153,13 +153,13 @@ same items.
 
 - **Combined:** +4.0 over Gemini 3.8 Flash, +6.3 over Qwen3-Omni, +12.0 over Gemini 3.8 Live and +16.7 over GPT-realtime-2.1.
 - **LISTEN, full set: 38.9** against **33.0** for the best published model, and ahead of every model we tested.
-- **Emotion the words do not carry** (LISTEN neutral text, full set): **51.0** against 34.9 for the best published result (Gemini 2.5 Pro)¹.
-- **Emotion with no words at all** (LISTEN laughs, sighs, breaths, full set): **26.9** against 21.0 for the best published result (Qwen3-Omni).
+- **Emotion the words do not carry** (LISTEN neutral text, full set): **50.6** against 34.9 for the best published result (Gemini 2.5 Pro)¹.
+- **Emotion with no words at all** (LISTEN laughs, sighs, breaths, full set): **28.1** against 21.0 for the best published result (Qwen3-Omni).
 - **Prosody (MSPB): 77.3**, the highest of the seven models.
 - **The realtime flagships trail their own offline models** (Gemini 3.8 Live below 3.8 Flash, GPT-realtime-2.1 below GPT-audio-1.5),
   yet hearing tone in real time is exactly what a voice agent needs.
 
-<sub>¹ Two of LISTEN's neutral-text corpora are in our training data. Gemini 3.8 Flash leads StressTest (89.0 vs 86.5).
+<sub>¹ Two of LISTEN's neutral-text corpora are in our training data; on the three it does not contain, 29.9 vs 28.0 for Qwen3-Omni-30B. Gemini 3.8 Flash leads StressTest (89.0 vs 86.5).
 Per-test table, protocol and every model's raw answer: [Detailed results](#against-closed-models-realtime-flagships-included),
 [`benchmarks/paraling_compare`](benchmarks/paraling_compare).</sub>
 
@@ -174,7 +174,7 @@ Ahead of dedicated models and closed flagships on most decision tasks we measure
 | emotion from the voice, 4-way | ESD + CREMA-D† | **92.0** | 46.0 Qwen3-Omni-30B |
 | speaking style (whisper, shout, fast …) | EARS held-out speakers† | **79.5** | 68.5 Gemini 3.1 Pro |
 | prosody | MSPB | **77.3** | 71.9 Qwen3-Omni-30B |
-| emotion, neutral words | LISTEN, full set | **51.0** | 34.9 Gemini 2.5 Pro (published) |
+| emotion, neutral words | LISTEN, full set | **50.6** | 34.9 Gemini 2.5 Pro (published) |
 | laughter / breathing / cough / sigh, AUC | NonverbalTTS test (unseen) | **0.88 / 0.81 / 0.85 / 0.80** | 0.71 / 0.75 / 0.85 / 0.76 AudioSet AST tagger |
 | turn action, zero-shot, zh / en | CoDeTT | **69.2 / 70.0** | 59.5 / 65.4 best dedicated turn model (NAMO-Turn / FireRedChat) |
 | live end of turn, 14 languages, 300 ms | LiveKit [eot-bench](https://github.com/livekit/eot-bench) | **fewer false cut-offs than Smart Turn v3.2 in all 14** | English 20.0% vs 35.2%, Japanese 14.1% vs 34.9% |
@@ -362,7 +362,7 @@ Over the six public benchmarks together, v1.3 scores 50.9 against 46.9 for Gemin
 ahead on MSPB and on LISTEN, Gemini 3.8 Flash on StressTest (89.0 vs 86.5). Averaged over LISTEN's four audio-only
 conditions, DuplexJev scores 38.9 on the full set (37.8 on these items), ahead of
 every published and tested model, closed realtime flagships included: state of the art in paralinguistic understanding on
-LISTEN. Its largest lead is on emotion the words do not carry; on the full LISTEN neutral-text set it scores 51.0, against
+LISTEN. Its largest lead is on emotion the words do not carry; on the full LISTEN neutral-text set it scores 50.6, against
 34.9 for the best published result (Gemini 2.5 Pro, LISTEN paper). The realtime models trail their offline siblings
 (Gemini 3.8 Live below 3.8 Flash, GPT-realtime-2.1 below GPT-audio-1.5), and the GPT models and Gemini 3.8 Live mostly
 answer "neutral" to emotion questions (GPT-realtime-2.1: 150 of the 200 neutral-words items); we score them as asked
@@ -477,8 +477,8 @@ decisions about one clip cost about as much as one.
 | what to do, system state given | CoDeTT zh / en (18 k, zero-shot) | **69.2 / 70.0** | Easy-Turn 37.9 (zh) · Smart-Turn-v3 51.4 (en) · NAMO-Turn 59.5 (zh) · FireRedChat 65.4 (en) · GPT-4o-audio 66.6 / 71.9 · Qwen3-Omni 70.4 / 70.9 · Gemini-3-Pro 80.8 / 81.9 |
 | gender | 800 real utterances (AISHELL-1, LibriSpeech) | **91.5** | speech LLMs trained on transcripts: ~55 (chance) |
 | emotion (4-way) | 800 utterances (ESD, CREMA-D) | **91.1** | speech LLMs trained on transcripts: ~28 (chance) · Qwen3-Omni-30B 45.2 (same questions, 400 of the items)† |
-| emotion, neutral words | LISTEN neutral-text, audio only (TESS, SAVEE, RAVDESS, ESD, CREMA-D) | **51.0** (all 4,286; 50.7 on the 400 compared) | Qwen3-Omni-30B 32.8 (same 400 items) · paper: Gemini 2.5 Pro 34.9, Qwen3-Omni 29.3 |
-| emotion, no words at all | LISTEN paralinguistic (IEMOCAP laughs, sighs, breaths) | **26.9** (all 975; 26.0 on the 400 compared) | Qwen3-Omni-30B 18.2 (same 400 items) · paper: Qwen3-Omni 21.0, Gemini 2.5 Pro 15.7 |
+| emotion, neutral words | LISTEN neutral-text, audio only (TESS, SAVEE, RAVDESS, ESD, CREMA-D) | **50.6** (v1.3, all 4,286; v1.2 on the 400 compared: 50.7) | Qwen3-Omni-30B 32.8 (same 400 items) · paper: Gemini 2.5 Pro 34.9, Qwen3-Omni 29.3 |
+| emotion, no words at all | LISTEN paralinguistic (IEMOCAP laughs, sighs, breaths) | **28.1** (v1.3, all 975; v1.2 on the 400 compared: 26.0) | Qwen3-Omni-30B 18.2 (same 400 items) · paper: Qwen3-Omni 21.0, Gemini 2.5 Pro 15.7 |
 | same speaker? | official VoxCeleb1-H list: different speakers share gender and nationality (2,000 trials) | **EER 36.9%** (4B-Para) / 40.3% (32B-Para); research checkpoints‡ 29.6% / 31.2% | gender alone: chance (50); dedicated speaker models (ECAPA-TDNN): EER ≈ 2% |
 | laughter / breathing / cough / sigh | NonverbalTTS test (real speech, unseen), AUC | **0.88 / 0.81 / 0.85 / 0.80** (32B-Para) | AudioSet AST tagger 0.71 / 0.75 / 0.85 / 0.76 |
 | spoken knowledge QA | VoiceBench OBQA / MMSU | **85.5 / 72.1** | same LLM reading the transcript: 95.4 / 79.3 |
