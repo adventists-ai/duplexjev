@@ -9,7 +9,7 @@
   <a href="README.md">English</a> &nbsp;|&nbsp; <b>中文</b>
 </p>
 
-<h1 align="center">别再先转写、再判断了。</h1>
+<h1 align="center">不转写，直接判断。</h1>
 
 <p align="center">
   <b>DuplexJev 是语音的 System One 模型（JEV 式决策模型）：原始音频进，带概率的判断出。语音智能体的耳朵。</b><br>
@@ -40,7 +40,7 @@
 <p align="center"><img src="docs/assets/race.gif" alt="十个判断：DuplexJev 92 毫秒，ASR → LLM 1,978 毫秒，同一张 H200" width="820"></p>
 <p align="center"><sub>▶ <a href="docs/assets/duplexjev_launch_zh.mp4">看 2 分半中文介绍视频（有声音）</a> · 画面里的答案都是模型真实输出</sub></p>
 
-## ⚡ 语音到决策：快、便宜、什么判断都能做
+## ⚡ 极速语音决策：一次前向，什么判断都能做
 
 DuplexJev 把 Jev 带火的 System One（决策模型）思路用到了原始语音上：文本决策模型只能看转写，而语气、重音、迟疑恰恰在转写这一步丢了。
 
@@ -81,7 +81,7 @@ DuplexJev 把 Jev 带火的 System One（决策模型）思路用到了原始语
 | 助手自己能处理吗？ | 先向用户追问 | 0.51 |
 
 <details>
-<summary><b>听懂文字之外的信息：每种能力一个例子</b></summary>
+<summary><b>每种能力一个例子：听出文字之外的信息</b></summary>
 
 DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序取平均）；带播放器的同一组卡片见
 [项目主页](https://adventists-ai.github.io/duplexjev/#abilities)。重音与断句的真人示例音频来自 MSPB（CC BY 4.0）。最后三行（Para 版）给的是评测分数，不是示例。
@@ -131,32 +131,33 @@ DuplexJev-32B-Stress 在短音频上的真实输出（vLLM，两种选项顺序�
 
 副语言理解，指听出“话是怎么说的”，而不只是“说了什么”。三个公开基准合计：[LISTEN](https://arxiv.org/abs/2510.10444)
 （EACL 2026，专门检验音频模型是在“听”还是只在“读字”）的四项纯音频测试、重音基准 StressTest 和韵律基准 MSPB，
-共 1,128 道题，所有模型回答的是同一批题。
+共 1,035 道题，不含任何训练语料，所有模型回答的是同一批题。
 
 | 模型 | **合计** | LISTEN 四项平均 | MSPB |
 |---|---:|---:|---:|
-| 🤗 **DuplexJev-32B-Para v1.3**（开源） | **50.9** | **37.8** | **77.3** |
-| Gemini 3.8 Flash | 46.9 | 33.1 | 67.2 |
-| Qwen3-Omni-30B | 44.6 | 33.9 | 71.9 |
-| Gemini 3.1 Pro | 40.1 | 30.1 | 54.7 |
-| GPT-audio-1.5 | 40.1 | 31.6 | 57.8 |
-| Gemini 3.8 Live（实时） | 38.9 | 30.9 | 46.9 |
-| GPT-realtime-2.1（实时） | 34.2 | 25.6 | 47.7 |
+| 🤗 **DuplexJev-32B-Para v1.3**（开源） | **50.2** | **34.5** | **77.3** |
+| Gemini 3.8 Flash | 47.8 | 31.9 | 67.2 |
+| Qwen3-Omni-30B | 45.0 | 32.5 | 71.9 |
+| Gemini 3.1 Pro | 41.0 | 29.0 | 54.7 |
+| GPT-audio-1.5 | 40.9 | 30.2 | 57.8 |
+| Gemini 3.8 Live（实时） | 40.0 | 30.5 | 46.9 |
+| GPT-realtime-2.1（实时） | 35.6 | 24.8 | 47.7 |
 
 **领先多少：**
 
-- **合计：**比 Gemini 3.8 Flash 高 4.0，比 Qwen3-Omni 高 6.3，比 Gemini 3.8 Live 高 12.0，比 GPT-realtime-2.1 高 16.7。
-- **LISTEN 全集 38.9**，此前公开最好成绩 **33.0**，也高于我们测过的所有模型。
-- **听出字面里没有的情绪**（LISTEN 中性文本全集）：**50.6**，此前公开最好为 Gemini 2.5 Pro 的 34.9¹。
+- **合计：**比 Gemini 3.8 Flash 高 2.4，比 Qwen3-Omni 高 5.2，比 Gemini 3.8 Live 高 10.2，比 GPT-realtime-2.1 高 14.6。
+- **11 个语料里 8 个第一或并列第一**（对比 Gemini 3.8 Flash 和 Qwen3-Omni）。
+- **从没听过的声音里，听出字面里没有的情绪**（LISTEN 中性文本，TESS）：**38.3**，Qwen3-Omni 25.5，Gemini 3.8 Flash 17.0。
 - **完全没有字时的情绪**（LISTEN 笑声、叹气、呼吸，全集）：**28.1**，此前公开最好为 Qwen3-Omni 的 21.0。
 - **韵律（MSPB）77.3**，七个模型里最高。
 - **两家的实时旗舰都不如自家的离线模型**（Gemini 3.8 Live 低于 3.8 Flash，GPT-realtime-2.1 低于 GPT-audio-1.5），
   而实时听出语气，恰恰是语音智能体最需要的能力。
 
-<sub>¹ LISTEN 中性文本里有两个语料在我们的训练数据中；只算另外三个没训练过的语料，29.9 对 Qwen3-Omni-30B 的 28.0。StressTest 上 Gemini 3.8 Flash 领先（89.0 对 86.5）。
-逐项成绩、测试方法和每个模型的原始回答：[详细成绩](#与闭源模型对比包括实时旗舰)、[`benchmarks/paraling_compare`](benchmarks/paraling_compare)。</sub>
+<sub>StressTest 上 Gemini 3.8 Flash 领先（89.0 对 86.5）；字面本身带情绪时通用模型更好（MELD 对话情绪：Qwen3-Omni 59.6，我们 38.5），
+对话情绪数据已列入下一轮训练。感谢 Dipankar Sarkar 建议这样划分：LISTEN 里的 ESD、CREMA-D 题目在我们的训练数据中，不计入头条；
+算上它们共 1,128 题，DuplexJev 为 50.9。逐项成绩、测试方法和每个模型的原始回答：[详细成绩](#与闭源模型对比含实时旗舰)、[`benchmarks/paraling_compare`](benchmarks/paraling_compare)。</sub>
 
-## 🥇 各项任务排名
+## 🥇 分项成绩
 
 在我们测过的大多数判断任务上，领先专用模型和闭源旗舰（同一行里所有模型答的是同一批题）：
 
@@ -241,7 +242,7 @@ dj.decide(open("call_018.wav", "rb").read(), {
 提示词格式和插件说明见[模型卡](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)和 [`vllm_plugin/`](vllm_plugin)。
 想用 PyTorch 包加载连接器 checkpoint，见 [docs/connectors_zh.md](docs/connectors_zh.md#pytorch-包)。
 
-### 试试新能力
+### 使用新能力
 
 用 Para 模型（`vllm serve adventists-ai/DuplexJev-4B-Para`，或本地 `pip install "duplexjev[speech]"`）时，`duplexjev quick`
 的默认判断表多了两行：*非语言声音* 和 *说话方式*。也可以直接问（下面是模型训练时用的问法；记得保留“没有 / 都没有”选项）：
@@ -260,7 +261,7 @@ dj.decide(clip_zh, {
 （英文：`"Before the silence is a voice sample of someone; after it is another clip. Are they the same speaker?"`，`["different speakers", "same speaker"]`）。
 现成脚本：[`examples/para_abilities.py`](examples/para_abilities.py)。
 
-### 语音 + 图像一起判断（研究预览）
+### 声音 + 画面联合判断（研究预览）
 
 [DuplexJev-32B-Vision](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) 把 Qwen3-VL 的视觉编码器接回
 DuplexJev-32B-Para 的语言模型前面，同一道题可以同时用上**听到的**和**看到的**（单张 80 GB 显卡）。浏览器里直接试：[DuplexJev-Vision Space](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision)。
@@ -290,7 +291,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 | 模型 | 适用 | 显存 | 亮点 |
 |---|---|---|---|
-| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **综合最好**：能力最全，副语言最强，实时话轮最好 | 一张 80 GB 显卡 | 公开副语言基准合计 **50.9** · 性别 93.8 · 情绪 92.1 · qa100 96 |
+| ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **综合最好**：能力最全，副语言最强，实时话轮最好 | 一张 80 GB 显卡 | 公开副语言基准合计 **50.2** · 性别 93.8 · 情绪 92.1 · qa100 96 |
 | ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.1 | **小显卡**，能力最全，还能正常聊天；`duplexjev` 默认模型 | 约 10 GB | 性别 89.2 · 情绪 90.0 · 笑 / 咳嗽 / 叹气 AUC 0.80 / 0.75 / 0.81 |
 | 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) | 小显卡，给 LiveKit / Pipecat 语音 agent 做**实时话轮判断** | 约 10 GB | eot-bench 300 毫秒误打断：英 **25.5%** / 中 **38.8%**（Smart Turn v3.2：35.2 / 42.9） |
 | 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（预览） | **声音 + 画面**一起判断 | 一张 80 GB 显卡 | 重读词 vs 标红词 94.1 · 表情 vs 语气 93.5（只看图 50）· [试一试](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision) |
@@ -303,7 +304,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 ## 最新动态
 
-- **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：听重音大幅提升（StressTest 71.5 → 86.5，MSPB 68.0 → 77.3）。公开副语言基准合计 **50.9**，Gemini 3.8 Flash 46.9。
+- **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：听重音大幅提升（StressTest 71.5 → 86.5，MSPB 68.0 → 77.3）。公开副语言基准合计 **50.2**，Gemini 3.8 Flash 47.8。
 - **2026-10-15** · 🏆 用同一批题测了实时旗舰（Gemini 3.8 Live、GPT-realtime-2.1）和 GPT-audio-1.5；LiveKit eot-bench 补齐全部 14 种语言。
 - **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn)：约 10 GB 显卡上的实时话轮判断。
 - **即将推出：**开源全双工 Jev 对话流水线。
@@ -312,7 +313,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 ## 详细成绩
 
-### 与闭源模型对比，包括实时旗舰
+### 与闭源模型对比（含实时旗舰）
 
 仍是同一批题（每项 200 题，集合较小时 107–174 题）。每个模型每题问一次，选项按原顺序，
 取回复里的第一个选项字母：`gemini-3.1-pro-preview`、`gemini-3.8-flash`（默认思考设置），`gpt-audio-1.5`（chat 接口音频输入），
@@ -321,8 +322,9 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 | 测试 | DuplexJev-32B-Para v1.3 | Qwen3-Omni-30B | Gemini 3.1 Pro | Gemini 3.8 Flash | Gemini 3.8 Live | GPT-audio-1.5 | GPT-realtime-2.1 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| **公开基准合计**（LISTEN 四项、StressTest、MSPB，1,128 题） | **50.9** | 44.6 | 40.1 | 46.9 | 38.9 | 40.1 | 34.2 |
-| **LISTEN 纯音频四项平均** | **37.8** | 33.9 | 30.1 | 33.1 | 30.9 | 31.6 | 25.6 |
+| **公开基准合计**（LISTEN 四项、StressTest、MSPB，1,035 题，不含训练语料） | **50.2** | 45.0 | 41.0 | 47.8 | 40.0 | 40.9 | 35.6 |
+| ……算上 LISTEN 的 ESD、CREMA-D 题（1,128 题） | **50.9** | 44.6 | 40.1 | 46.9 | 38.9 | 40.1 | 34.2 |
+| **LISTEN 纯音频四项平均**（不含训练语料） | **34.5** | 32.5 | 29.0 | 31.9 | 30.5 | 30.2 | 24.8 |
 | LISTEN 字面中性 | **43.0** | 33.5 | 25.0 | 31.0 | 25.0 | 24.5 | 15.5 |
 | ……只算训练没见过的语料（TESS、SAVEE、RAVDESS） | **29.9** | 28.0 | 20.6 | 26.2 | 23.4 | 18.7 | 12.1 |
 | LISTEN 完全没有字 | **26.0** | 18.0 | 15.5 | 19.5 | 14.5 | **25.0** | 13.5 |
@@ -337,7 +339,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 † 测试集与我们的训练语料同源（说话人或句子不重叠），其他模型都是零样本。其余各行是公开基准；LISTEN 的语料里只有 ESD、CREMA-D 在我们的情绪训练数据中。
 
-六个公开基准合计，v1.3 为 50.9，其他模型最好的 Gemini 3.8 Flash 为 46.9；MSPB 和 LISTEN 上 v1.3 领先，StressTest 上 Gemini 3.8 Flash 领先（89.0 对 86.5）。LISTEN 纯音频四项平均，DuplexJev 全集 38.9（这批题 37.8），超过所有已公开和我们测过的模型，包括闭源的实时旗舰：在 LISTEN 上副语言理解 SOTA。
+六个公开基准合计（不含任何训练语料的题目），v1.3 为 50.2，其他模型最好的 Gemini 3.8 Flash 为 47.8，Qwen3-Omni 为 45.0；MSPB 和 LISTEN 上 v1.3 领先，StressTest 上 Gemini 3.8 Flash 领先（89.0 对 86.5）。LISTEN 纯音频四项平均，DuplexJev 全集 38.9（这批题 37.8），超过所有已公开和我们测过的模型，包括闭源的实时旗舰：在 LISTEN 上副语言理解 SOTA。
 领先最多的是听出字面里没有的情绪；LISTEN 中性文本全集上 50.6，此前公开最好成绩是 Gemini 2.5 Pro 的 34.9（LISTEN 论文）。
 实时模型都不如同家的离线模型（Gemini 3.8 Live 低于 3.8 Flash，GPT-realtime-2.1 低于 GPT-audio-1.5）。两个 GPT 模型和
 Gemini 3.8 Live 对情绪题大多回答“中性”（GPT-realtime-2.1 在 200 道字面中性题里答了 150 次 neutral）；我们按原样计分，
@@ -346,7 +348,7 @@ Gemini 3.8 Live 0.5%，其他约 0）。脚本、题目列表和每个模型的�
 
 **打乱选项顺序**（每道 4 选 1 题的 24 种顺序全部测，共 33,508 次请求）：答案改变的比例是 3.3%，全部出现在模型本来就不确定的题上（答案概率 ≥ 0.8 的题只有 0.01%）；没有偏向某个字母位置，单一顺序的准确率和多种顺序平均后一样。详见 [`benchmarks/option_order`](benchmarks/option_order)。
 
-### 实时话轮：LiveKit eot-bench 与 Pipecat Smart Turn
+### 实时话轮检测：LiveKit eot-bench 与 Pipecat Smart Turn
 
 这两个榜考的是实时对话里最难的一刻：用户**刚**停下来，是说完了，还是只是停顿？
 
@@ -387,7 +389,7 @@ Gemini 3.8 Live 0.5%，其他约 0）。脚本、题目列表和每个模型的�
 > （LiveKit 用 `detector.attach(session)`，Pipecat 用 `DuplexJevContextTracker`）。不给助手上一句话，成绩对应“只用音频”那行。
 > eot-bench 完整命令见 [`benchmarks/turn_detection/README.md`](benchmarks/turn_detection/README.md)。
 
-### 速度与口语知识
+### 速度与口语问答
 
 | | DuplexJev-32B(-Turn) | DuplexJev-4B(-Turn) |
 |---|---|---|
@@ -400,7 +402,7 @@ Gemini 3.8 Live 0.5%，其他约 0）。脚本、题目列表和每个模型的�
 完整表格见 [docs/paper_results.md](docs/paper_results.md)。
 
 <details>
-<summary><b>话轮：与专用检测器对比</b>（Easy-Turn、CoDeTT）</summary>
+<summary><b>话轮判断：对比专用检测器</b>（Easy-Turn、CoDeTT）</summary>
 
 以下用 DuplexJev-32B-Turn 测得，它是 Para 版的话轮基础（32B-Para v1.3：Easy-Turn 94.4）。它的话轮判断达到专用检测器的水平；同一次前向里，它还能回答你声明的其他任意问题（意图、情绪、性别、
 是否打断……）。全程不解码，同一段音频问 10 个问题和问 1 个的耗时差不多。
@@ -434,7 +436,7 @@ Gemini 3.8 Live 0.5%，其他约 0）。脚本、题目列表和每个模型的�
 </details>
 
 <details>
-<summary><b>常见判断任务与专用模型对比</b>（性别、情绪、说话人、非语言声音、口语问答）</summary>
+<summary><b>常见判断任务：对比专用模型</b>（性别、情绪、说话人、非语言声音、口语问答）</summary>
 
 | 任务 | 评测集 | DuplexJev | 专用模型和其他模型 |
 |---|---|---:|---|
