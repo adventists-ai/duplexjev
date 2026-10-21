@@ -9,6 +9,7 @@ DuplexJev 背后那些没写进论文的实验和取舍：试过什么、哪些�
 
 | date | note | 中文 |
 |---|---|---|
+| 2026-10-21 | [Why our 4B could not hear Japanese, and how v1.2 fixed it without losing the rest](2026-10-weak-languages.md) | [4B 为什么听不懂日语，v1.2 怎么补上](2026-10-weak-languages_zh.md) |
 | 2026-10-10 | [Keeping a speech-decision LLM able to talk: conversation replay and per-row loss](2026-10-chat-replay.md) | [让语音决策模型继续“会聊天”](2026-10-chat-replay_zh.md) |
 | 2026-10-09 | [One model, more of the voice: non-verbal sounds, speaking style and speaker on top of stress](2026-10-para-abilities.md) | [一个模型听出更多：非语言声音、说话方式和说话人](2026-10-para-abilities_zh.md) |
 | 2026-10-08 | [Teaching a speech-decision LLM to hear stress: data, two gates, negatives and the "source shortcut"](2026-10-stress-understanding.md) | [让语音判断大模型听懂重音](2026-10-stress-understanding_zh.md) |

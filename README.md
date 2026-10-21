@@ -326,7 +326,7 @@ connector checkpoints: **[docs/models.md](docs/models.md)**.
 
 ## News
 
-- **2026-10-21** · 🤗 [**DuplexJev-4B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): hears Japanese, Korean, Vietnamese and Thai (FLEURS error ja 59.6 → 35.8%, ko 61.5 → 20.3%) and much more Mandarin paralinguistics (breath, lip smack, laughter, sniff, stressed word: 57–65% → 81–95% on held-out speakers). Paralinguistic benchmarks combined unchanged (47.6 vs 47.8).
+- **2026-10-21** · 🤗 [**DuplexJev-4B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): hears Japanese, Korean, Vietnamese and Thai (FLEURS error ja 59.6 → 35.8%, ko 61.5 → 20.3%) and much more Mandarin paralinguistics (breath, lip smack, laughter, sniff, stressed word: 57–65% → 81–95% on held-out speakers). Paralinguistic benchmarks combined unchanged (47.6 vs 47.8). [Release note](research/2026-10-weak-languages.md).
 - **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.2**, against 47.8 for Gemini 3.8 Flash.
 - **2026-10-15** · 🏆 Same questions for the realtime flagships (Gemini 3.8 Live, GPT-realtime-2.1) and GPT-audio-1.5, plus LiveKit eot-bench in all 14 languages.
 - **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): live end-of-turn on a ~10 GB GPU.
