@@ -313,7 +313,7 @@ Four models, each **one repository with everything needed** (audio encoder + con
 | model | use it for | GPU | highlights |
 |---|---|---|---|
 | ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **best overall**: every ability, best paralinguistics, best live turn-taking | one 80 GB GPU | public paralinguistic benchmarks **50.2** · gender 93.8 · emotion 92.1 · qa100 96 |
-| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.1 | **small GPU**, every ability, also holds a normal conversation; `duplexjev` default | ~10 GB | gender 89.2 · emotion 90.0 · laughter / cough / sigh AUC 0.80 / 0.75 / 0.81 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.2 | **small GPU**, every ability, also holds a normal conversation; Japanese / Korean / Vietnamese / Thai speech; `duplexjev` default | ~10 GB | FLEURS error ja / ko 35.8 / 20.3% (v1.1: 59.6 / 61.5) · Mandarin breath / laughter 91 / 82% |
 | 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) | small GPU, **live end-of-turn** in LiveKit / Pipecat agents | ~10 GB | eot-bench false cut-offs at 300 ms: en **25.5%** / zh **38.8%** (Smart Turn v3.2: 35.2 / 42.9) |
 | 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision) (preview) | **voice + picture** in one question | one 80 GB GPU | stressed word vs red word 94.1 · face vs voice 93.5 (picture alone 50) · [try it](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision) |
 
@@ -326,6 +326,7 @@ connector checkpoints: **[docs/models.md](docs/models.md)**.
 
 ## News
 
+- **2026-10-21** · 🤗 [**DuplexJev-4B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): hears Japanese, Korean, Vietnamese and Thai (FLEURS error ja 59.6 → 35.8%, ko 61.5 → 20.3%) and much more Mandarin paralinguistics (breath, lip smack, laughter, sniff, stressed word: 57–65% → 81–95% on held-out speakers). Paralinguistic benchmarks combined unchanged (47.6 vs 47.8).
 - **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.2**, against 47.8 for Gemini 3.8 Flash.
 - **2026-10-15** · 🏆 Same questions for the realtime flagships (Gemini 3.8 Live, GPT-realtime-2.1) and GPT-audio-1.5, plus LiveKit eot-bench in all 14 languages.
 - **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): live end-of-turn on a ~10 GB GPU.

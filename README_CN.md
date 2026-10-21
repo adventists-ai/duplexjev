@@ -292,7 +292,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 | 模型 | 适用 | 显存 | 亮点 |
 |---|---|---|---|
 | ⭐ 🤗 [**DuplexJev-32B-Para**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) v1.3 | **综合最好**：能力最全，副语言最强，实时话轮最好 | 一张 80 GB 显卡 | 公开副语言基准合计 **50.2** · 性别 93.8 · 情绪 92.1 · qa100 96 |
-| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.1 | **小显卡**，能力最全，还能正常聊天；`duplexjev` 默认模型 | 约 10 GB | 性别 89.2 · 情绪 90.0 · 笑 / 咳嗽 / 叹气 AUC 0.80 / 0.75 / 0.81 |
+| ⭐ 🤗 [**DuplexJev-4B-Para**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para) v1.2 | **小显卡**，能力最全，还能正常聊天；能听日语 / 韩语 / 越南语 / 泰语；`duplexjev` 默认模型 | 约 10 GB | FLEURS 错误率 日 / 韩 35.8 / 20.3%（v1.1：59.6 / 61.5）· 中文喘气 / 笑声 91 / 82% |
 | 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn) | 小显卡，给 LiveKit / Pipecat 语音 agent 做**实时话轮判断** | 约 10 GB | eot-bench 300 毫秒误打断：英 **25.5%** / 中 **38.8%**（Smart Turn v3.2：35.2 / 42.9） |
 | 🤗 [**DuplexJev-32B-Vision**](https://huggingface.co/adventists-ai/DuplexJev-32B-Vision)（预览） | **声音 + 画面**一起判断 | 一张 80 GB 显卡 | 重读词 vs 标红词 94.1 · 表情 vs 语气 93.5（只看图 50）· [试一试](https://huggingface.co/spaces/BitKnight/DuplexJev-Vision) |
 
@@ -304,6 +304,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 ## 最新动态
 
+- **2026-10-21** · 🤗 [**DuplexJev-4B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：能听懂日语、韩语、越南语、泰语（FLEURS 错误率 日语 59.6 → 35.8%，韩语 61.5 → 20.3%）；中文副语言大幅提升（喘气、咂嘴、笑声、吸鼻子、重读词，在留出说话人上从 57–65% 升到 81–95%）。公开副语言基准合计基本不变（47.6，v1.1 47.8）。
 - **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：听重音大幅提升（StressTest 71.5 → 86.5，MSPB 68.0 → 77.3）。公开副语言基准合计 **50.2**，Gemini 3.8 Flash 47.8。
 - **2026-10-15** · 🏆 用同一批题测了实时旗舰（Gemini 3.8 Live、GPT-realtime-2.1）和 GPT-audio-1.5；LiveKit eot-bench 补齐全部 14 种语言。
 - **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn)：约 10 GB 显卡上的实时话轮判断。
