@@ -134,6 +134,19 @@ state + N typed questions ──► frozen LLM, ONE forward pass
 
 </details>
 
+### Two ways to run it
+
+| | 🏭 **Many devices, one shared time window** (what we recommend for commercial fleets) | ⚡ **One stream, read on the event** |
+|---|---|---|
+| how | every tick (e.g. 160–200 ms) the server collects the newest audio of every connected device or call and answers all of their questions in one batched pass | send a request the moment something happens (the user pauses, or talks over the assistant) and read the answer right away |
+| why | no per-call ASR and no per-question generation: many devices share each pass, so the cost per decision stays tiny (eight events, 80 decisions, finish in 94–103 ms on an 8-GPU node) | no wait for a window boundary: 10 decisions in 92 ms; the 4B answers a turn question in about 40–80 ms |
+| good for | device fleets, in-car assistants, call centers: flow state, routing, monitoring, analytics | end of turn and barge-in in a live voice agent (our LiveKit and Pipecat plugins work this way) |
+
+The two mix well: read latency-critical decisions on the event, everything else on the tick. And in either mode one pass
+answers every question you declare, so a single read at the end of a user turn can settle the turn state, the filler to
+play while the reply is being written, what is worth saving to memory, and which functions or tools the reply will need,
+all in one round.
+
 ## 🏆 Paralinguistic understanding: state of the art
 
 Paralinguistic understanding means hearing *how* something is said, not only *what*. Three public benchmarks combined:
