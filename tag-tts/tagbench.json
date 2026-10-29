@@ -1,0 +1,1378 @@
+[
+ {
+  "id": "ctrl_zh0",
+  "lang": "zh",
+  "tag": "",
+  "pos": "",
+  "text": "好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "breath_start_zh0",
+  "lang": "zh",
+  "tag": "[breath]",
+  "pos": "start",
+  "text": "[breath]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "breath_mid_zh0",
+  "lang": "zh",
+  "tag": "[breath]",
+  "pos": "mid",
+  "text": "好的，[breath]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "breath_end_zh0",
+  "lang": "zh",
+  "tag": "[breath]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[breath]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "quick_breath_start_zh0",
+  "lang": "zh",
+  "tag": "[quick_breath]",
+  "pos": "start",
+  "text": "[quick_breath]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "quick_breath_mid_zh0",
+  "lang": "zh",
+  "tag": "[quick_breath]",
+  "pos": "mid",
+  "text": "好的，[quick_breath]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "quick_breath_end_zh0",
+  "lang": "zh",
+  "tag": "[quick_breath]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[quick_breath]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "laughter_start_zh0",
+  "lang": "zh",
+  "tag": "[laughter]",
+  "pos": "start",
+  "text": "[laughter]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "laughter_mid_zh0",
+  "lang": "zh",
+  "tag": "[laughter]",
+  "pos": "mid",
+  "text": "好的，[laughter]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "laughter_end_zh0",
+  "lang": "zh",
+  "tag": "[laughter]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[laughter]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "sigh_start_zh0",
+  "lang": "zh",
+  "tag": "[sigh]",
+  "pos": "start",
+  "text": "[sigh]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "sigh_mid_zh0",
+  "lang": "zh",
+  "tag": "[sigh]",
+  "pos": "mid",
+  "text": "好的，[sigh]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "sigh_end_zh0",
+  "lang": "zh",
+  "tag": "[sigh]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[sigh]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "cough_start_zh0",
+  "lang": "zh",
+  "tag": "[cough]",
+  "pos": "start",
+  "text": "[cough]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "cough_mid_zh0",
+  "lang": "zh",
+  "tag": "[cough]",
+  "pos": "mid",
+  "text": "好的，[cough]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "cough_end_zh0",
+  "lang": "zh",
+  "tag": "[cough]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[cough]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "lipsmack_start_zh0",
+  "lang": "zh",
+  "tag": "[lipsmack]",
+  "pos": "start",
+  "text": "[lipsmack]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "lipsmack_mid_zh0",
+  "lang": "zh",
+  "tag": "[lipsmack]",
+  "pos": "mid",
+  "text": "好的，[lipsmack]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "lipsmack_end_zh0",
+  "lang": "zh",
+  "tag": "[lipsmack]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[lipsmack]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "mn_start_zh0",
+  "lang": "zh",
+  "tag": "[mn]",
+  "pos": "start",
+  "text": "[mn]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "mn_mid_zh0",
+  "lang": "zh",
+  "tag": "[mn]",
+  "pos": "mid",
+  "text": "好的，[mn]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "mn_end_zh0",
+  "lang": "zh",
+  "tag": "[mn]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[mn]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "noise_start_zh0",
+  "lang": "zh",
+  "tag": "[noise]",
+  "pos": "start",
+  "text": "[noise]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "noise_mid_zh0",
+  "lang": "zh",
+  "tag": "[noise]",
+  "pos": "mid",
+  "text": "好的，[noise]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "noise_end_zh0",
+  "lang": "zh",
+  "tag": "[noise]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[noise]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "clucking_start_zh0",
+  "lang": "zh",
+  "tag": "[clucking]",
+  "pos": "start",
+  "text": "[clucking]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "clucking_mid_zh0",
+  "lang": "zh",
+  "tag": "[clucking]",
+  "pos": "mid",
+  "text": "好的，[clucking]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "clucking_end_zh0",
+  "lang": "zh",
+  "tag": "[clucking]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[clucking]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "accent_start_zh0",
+  "lang": "zh",
+  "tag": "[accent]",
+  "pos": "start",
+  "text": "[accent]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "accent_mid_zh0",
+  "lang": "zh",
+  "tag": "[accent]",
+  "pos": "mid",
+  "text": "好的，[accent]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "accent_end_zh0",
+  "lang": "zh",
+  "tag": "[accent]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[accent]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "hissing_start_zh0",
+  "lang": "zh",
+  "tag": "[hissing]",
+  "pos": "start",
+  "text": "[hissing]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "hissing_mid_zh0",
+  "lang": "zh",
+  "tag": "[hissing]",
+  "pos": "mid",
+  "text": "好的，[hissing]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "hissing_end_zh0",
+  "lang": "zh",
+  "tag": "[hissing]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[hissing]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "vocalized-noise_start_zh0",
+  "lang": "zh",
+  "tag": "[vocalized-noise]",
+  "pos": "start",
+  "text": "[vocalized-noise]好的，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "vocalized-noise_mid_zh0",
+  "lang": "zh",
+  "tag": "[vocalized-noise]",
+  "pos": "mid",
+  "text": "好的，[vocalized-noise]这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "vocalized-noise_end_zh0",
+  "lang": "zh",
+  "tag": "[vocalized-noise]",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，我们一步一步来看[vocalized-noise]。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "span_laughter_start_zh0",
+  "lang": "zh",
+  "tag": "<laughter>",
+  "pos": "start",
+  "text": "<laughter>好的</laughter>，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "span_laughter_mid_zh0",
+  "lang": "zh",
+  "tag": "<laughter>",
+  "pos": "mid",
+  "text": "好的，<laughter>这个问题我明白了</laughter>，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "span_laughter_end_zh0",
+  "lang": "zh",
+  "tag": "<laughter>",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，<laughter>我们一步一步来看</laughter>。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "span_strong_start_zh0",
+  "lang": "zh",
+  "tag": "<strong>",
+  "pos": "start",
+  "text": "<strong>好的</strong>，这个问题我明白了，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "span_strong_mid_zh0",
+  "lang": "zh",
+  "tag": "<strong>",
+  "pos": "mid",
+  "text": "好的，<strong>这个问题我明白了</strong>，我们一步一步来看。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "span_strong_end_zh0",
+  "lang": "zh",
+  "tag": "<strong>",
+  "pos": "end",
+  "text": "好的，这个问题我明白了，<strong>我们一步一步来看</strong>。",
+  "clean": "好的，这个问题我明白了，我们一步一步来看。"
+ },
+ {
+  "id": "ctrl_zh1",
+  "lang": "zh",
+  "tag": "",
+  "pos": "",
+  "text": "哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "breath_start_zh1",
+  "lang": "zh",
+  "tag": "[breath]",
+  "pos": "start",
+  "text": "[breath]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "breath_mid_zh1",
+  "lang": "zh",
+  "tag": "[breath]",
+  "pos": "mid",
+  "text": "哎呀，[breath]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "breath_end_zh1",
+  "lang": "zh",
+  "tag": "[breath]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[breath]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "quick_breath_start_zh1",
+  "lang": "zh",
+  "tag": "[quick_breath]",
+  "pos": "start",
+  "text": "[quick_breath]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "quick_breath_mid_zh1",
+  "lang": "zh",
+  "tag": "[quick_breath]",
+  "pos": "mid",
+  "text": "哎呀，[quick_breath]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "quick_breath_end_zh1",
+  "lang": "zh",
+  "tag": "[quick_breath]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[quick_breath]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "laughter_start_zh1",
+  "lang": "zh",
+  "tag": "[laughter]",
+  "pos": "start",
+  "text": "[laughter]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "laughter_mid_zh1",
+  "lang": "zh",
+  "tag": "[laughter]",
+  "pos": "mid",
+  "text": "哎呀，[laughter]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "laughter_end_zh1",
+  "lang": "zh",
+  "tag": "[laughter]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[laughter]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "sigh_start_zh1",
+  "lang": "zh",
+  "tag": "[sigh]",
+  "pos": "start",
+  "text": "[sigh]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "sigh_mid_zh1",
+  "lang": "zh",
+  "tag": "[sigh]",
+  "pos": "mid",
+  "text": "哎呀，[sigh]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "sigh_end_zh1",
+  "lang": "zh",
+  "tag": "[sigh]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[sigh]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "cough_start_zh1",
+  "lang": "zh",
+  "tag": "[cough]",
+  "pos": "start",
+  "text": "[cough]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "cough_mid_zh1",
+  "lang": "zh",
+  "tag": "[cough]",
+  "pos": "mid",
+  "text": "哎呀，[cough]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "cough_end_zh1",
+  "lang": "zh",
+  "tag": "[cough]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[cough]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "lipsmack_start_zh1",
+  "lang": "zh",
+  "tag": "[lipsmack]",
+  "pos": "start",
+  "text": "[lipsmack]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "lipsmack_mid_zh1",
+  "lang": "zh",
+  "tag": "[lipsmack]",
+  "pos": "mid",
+  "text": "哎呀，[lipsmack]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "lipsmack_end_zh1",
+  "lang": "zh",
+  "tag": "[lipsmack]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[lipsmack]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "mn_start_zh1",
+  "lang": "zh",
+  "tag": "[mn]",
+  "pos": "start",
+  "text": "[mn]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "mn_mid_zh1",
+  "lang": "zh",
+  "tag": "[mn]",
+  "pos": "mid",
+  "text": "哎呀，[mn]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "mn_end_zh1",
+  "lang": "zh",
+  "tag": "[mn]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[mn]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "noise_start_zh1",
+  "lang": "zh",
+  "tag": "[noise]",
+  "pos": "start",
+  "text": "[noise]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "noise_mid_zh1",
+  "lang": "zh",
+  "tag": "[noise]",
+  "pos": "mid",
+  "text": "哎呀，[noise]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "noise_end_zh1",
+  "lang": "zh",
+  "tag": "[noise]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[noise]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "clucking_start_zh1",
+  "lang": "zh",
+  "tag": "[clucking]",
+  "pos": "start",
+  "text": "[clucking]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "clucking_mid_zh1",
+  "lang": "zh",
+  "tag": "[clucking]",
+  "pos": "mid",
+  "text": "哎呀，[clucking]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "clucking_end_zh1",
+  "lang": "zh",
+  "tag": "[clucking]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[clucking]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "accent_start_zh1",
+  "lang": "zh",
+  "tag": "[accent]",
+  "pos": "start",
+  "text": "[accent]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "accent_mid_zh1",
+  "lang": "zh",
+  "tag": "[accent]",
+  "pos": "mid",
+  "text": "哎呀，[accent]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "accent_end_zh1",
+  "lang": "zh",
+  "tag": "[accent]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[accent]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "hissing_start_zh1",
+  "lang": "zh",
+  "tag": "[hissing]",
+  "pos": "start",
+  "text": "[hissing]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "hissing_mid_zh1",
+  "lang": "zh",
+  "tag": "[hissing]",
+  "pos": "mid",
+  "text": "哎呀，[hissing]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "hissing_end_zh1",
+  "lang": "zh",
+  "tag": "[hissing]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[hissing]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "vocalized-noise_start_zh1",
+  "lang": "zh",
+  "tag": "[vocalized-noise]",
+  "pos": "start",
+  "text": "[vocalized-noise]哎呀，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "vocalized-noise_mid_zh1",
+  "lang": "zh",
+  "tag": "[vocalized-noise]",
+  "pos": "mid",
+  "text": "哎呀，[vocalized-noise]今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "vocalized-noise_end_zh1",
+  "lang": "zh",
+  "tag": "[vocalized-noise]",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，从早上忙到现在[vocalized-noise]。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "span_laughter_start_zh1",
+  "lang": "zh",
+  "tag": "<laughter>",
+  "pos": "start",
+  "text": "<laughter>哎呀</laughter>，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "span_laughter_mid_zh1",
+  "lang": "zh",
+  "tag": "<laughter>",
+  "pos": "mid",
+  "text": "哎呀，<laughter>今天真是太累了</laughter>，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "span_laughter_end_zh1",
+  "lang": "zh",
+  "tag": "<laughter>",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，<laughter>从早上忙到现在</laughter>。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "span_strong_start_zh1",
+  "lang": "zh",
+  "tag": "<strong>",
+  "pos": "start",
+  "text": "<strong>哎呀</strong>，今天真是太累了，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "span_strong_mid_zh1",
+  "lang": "zh",
+  "tag": "<strong>",
+  "pos": "mid",
+  "text": "哎呀，<strong>今天真是太累了</strong>，从早上忙到现在。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "span_strong_end_zh1",
+  "lang": "zh",
+  "tag": "<strong>",
+  "pos": "end",
+  "text": "哎呀，今天真是太累了，<strong>从早上忙到现在</strong>。",
+  "clean": "哎呀，今天真是太累了，从早上忙到现在。"
+ },
+ {
+  "id": "ctrl_en0",
+  "lang": "en",
+  "tag": "",
+  "pos": "",
+  "text": "Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "breath_start_en0",
+  "lang": "en",
+  "tag": "[breath]",
+  "pos": "start",
+  "text": "[breath]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "breath_mid_en0",
+  "lang": "en",
+  "tag": "[breath]",
+  "pos": "mid",
+  "text": "Okay, [breath]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "breath_end_en0",
+  "lang": "en",
+  "tag": "[breath]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[breath].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "quick_breath_start_en0",
+  "lang": "en",
+  "tag": "[quick_breath]",
+  "pos": "start",
+  "text": "[quick_breath]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "quick_breath_mid_en0",
+  "lang": "en",
+  "tag": "[quick_breath]",
+  "pos": "mid",
+  "text": "Okay, [quick_breath]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "quick_breath_end_en0",
+  "lang": "en",
+  "tag": "[quick_breath]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[quick_breath].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "laughter_start_en0",
+  "lang": "en",
+  "tag": "[laughter]",
+  "pos": "start",
+  "text": "[laughter]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "laughter_mid_en0",
+  "lang": "en",
+  "tag": "[laughter]",
+  "pos": "mid",
+  "text": "Okay, [laughter]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "laughter_end_en0",
+  "lang": "en",
+  "tag": "[laughter]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[laughter].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "sigh_start_en0",
+  "lang": "en",
+  "tag": "[sigh]",
+  "pos": "start",
+  "text": "[sigh]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "sigh_mid_en0",
+  "lang": "en",
+  "tag": "[sigh]",
+  "pos": "mid",
+  "text": "Okay, [sigh]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "sigh_end_en0",
+  "lang": "en",
+  "tag": "[sigh]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[sigh].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "cough_start_en0",
+  "lang": "en",
+  "tag": "[cough]",
+  "pos": "start",
+  "text": "[cough]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "cough_mid_en0",
+  "lang": "en",
+  "tag": "[cough]",
+  "pos": "mid",
+  "text": "Okay, [cough]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "cough_end_en0",
+  "lang": "en",
+  "tag": "[cough]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[cough].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "lipsmack_start_en0",
+  "lang": "en",
+  "tag": "[lipsmack]",
+  "pos": "start",
+  "text": "[lipsmack]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "lipsmack_mid_en0",
+  "lang": "en",
+  "tag": "[lipsmack]",
+  "pos": "mid",
+  "text": "Okay, [lipsmack]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "lipsmack_end_en0",
+  "lang": "en",
+  "tag": "[lipsmack]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[lipsmack].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "mn_start_en0",
+  "lang": "en",
+  "tag": "[mn]",
+  "pos": "start",
+  "text": "[mn]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "mn_mid_en0",
+  "lang": "en",
+  "tag": "[mn]",
+  "pos": "mid",
+  "text": "Okay, [mn]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "mn_end_en0",
+  "lang": "en",
+  "tag": "[mn]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[mn].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "noise_start_en0",
+  "lang": "en",
+  "tag": "[noise]",
+  "pos": "start",
+  "text": "[noise]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "noise_mid_en0",
+  "lang": "en",
+  "tag": "[noise]",
+  "pos": "mid",
+  "text": "Okay, [noise]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "noise_end_en0",
+  "lang": "en",
+  "tag": "[noise]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[noise].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "clucking_start_en0",
+  "lang": "en",
+  "tag": "[clucking]",
+  "pos": "start",
+  "text": "[clucking]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "clucking_mid_en0",
+  "lang": "en",
+  "tag": "[clucking]",
+  "pos": "mid",
+  "text": "Okay, [clucking]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "clucking_end_en0",
+  "lang": "en",
+  "tag": "[clucking]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[clucking].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "accent_start_en0",
+  "lang": "en",
+  "tag": "[accent]",
+  "pos": "start",
+  "text": "[accent]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "accent_mid_en0",
+  "lang": "en",
+  "tag": "[accent]",
+  "pos": "mid",
+  "text": "Okay, [accent]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "accent_end_en0",
+  "lang": "en",
+  "tag": "[accent]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[accent].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "hissing_start_en0",
+  "lang": "en",
+  "tag": "[hissing]",
+  "pos": "start",
+  "text": "[hissing]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "hissing_mid_en0",
+  "lang": "en",
+  "tag": "[hissing]",
+  "pos": "mid",
+  "text": "Okay, [hissing]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "hissing_end_en0",
+  "lang": "en",
+  "tag": "[hissing]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[hissing].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "vocalized-noise_start_en0",
+  "lang": "en",
+  "tag": "[vocalized-noise]",
+  "pos": "start",
+  "text": "[vocalized-noise]Okay, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "vocalized-noise_mid_en0",
+  "lang": "en",
+  "tag": "[vocalized-noise]",
+  "pos": "mid",
+  "text": "Okay, [vocalized-noise]I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "vocalized-noise_end_en0",
+  "lang": "en",
+  "tag": "[vocalized-noise]",
+  "pos": "end",
+  "text": "Okay, I see what you mean, let's take it step by step[vocalized-noise].",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "span_laughter_start_en0",
+  "lang": "en",
+  "tag": "<laughter>",
+  "pos": "start",
+  "text": "<laughter>Okay</laughter>, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "span_laughter_mid_en0",
+  "lang": "en",
+  "tag": "<laughter>",
+  "pos": "mid",
+  "text": "Okay, <laughter>I see what you mean</laughter>, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "span_laughter_end_en0",
+  "lang": "en",
+  "tag": "<laughter>",
+  "pos": "end",
+  "text": "Okay, I see what you mean, <laughter>let's take it step by step</laughter>.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "span_strong_start_en0",
+  "lang": "en",
+  "tag": "<strong>",
+  "pos": "start",
+  "text": "<strong>Okay</strong>, I see what you mean, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "span_strong_mid_en0",
+  "lang": "en",
+  "tag": "<strong>",
+  "pos": "mid",
+  "text": "Okay, <strong>I see what you mean</strong>, let's take it step by step.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "span_strong_end_en0",
+  "lang": "en",
+  "tag": "<strong>",
+  "pos": "end",
+  "text": "Okay, I see what you mean, <strong>let's take it step by step</strong>.",
+  "clean": "Okay, I see what you mean, let's take it step by step."
+ },
+ {
+  "id": "ctrl_en1",
+  "lang": "en",
+  "tag": "",
+  "pos": "",
+  "text": "Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "breath_start_en1",
+  "lang": "en",
+  "tag": "[breath]",
+  "pos": "start",
+  "text": "[breath]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "breath_mid_en1",
+  "lang": "en",
+  "tag": "[breath]",
+  "pos": "mid",
+  "text": "Oh well, [breath]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "breath_end_en1",
+  "lang": "en",
+  "tag": "[breath]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[breath].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "quick_breath_start_en1",
+  "lang": "en",
+  "tag": "[quick_breath]",
+  "pos": "start",
+  "text": "[quick_breath]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "quick_breath_mid_en1",
+  "lang": "en",
+  "tag": "[quick_breath]",
+  "pos": "mid",
+  "text": "Oh well, [quick_breath]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "quick_breath_end_en1",
+  "lang": "en",
+  "tag": "[quick_breath]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[quick_breath].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "laughter_start_en1",
+  "lang": "en",
+  "tag": "[laughter]",
+  "pos": "start",
+  "text": "[laughter]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "laughter_mid_en1",
+  "lang": "en",
+  "tag": "[laughter]",
+  "pos": "mid",
+  "text": "Oh well, [laughter]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "laughter_end_en1",
+  "lang": "en",
+  "tag": "[laughter]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[laughter].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "sigh_start_en1",
+  "lang": "en",
+  "tag": "[sigh]",
+  "pos": "start",
+  "text": "[sigh]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "sigh_mid_en1",
+  "lang": "en",
+  "tag": "[sigh]",
+  "pos": "mid",
+  "text": "Oh well, [sigh]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "sigh_end_en1",
+  "lang": "en",
+  "tag": "[sigh]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[sigh].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "cough_start_en1",
+  "lang": "en",
+  "tag": "[cough]",
+  "pos": "start",
+  "text": "[cough]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "cough_mid_en1",
+  "lang": "en",
+  "tag": "[cough]",
+  "pos": "mid",
+  "text": "Oh well, [cough]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "cough_end_en1",
+  "lang": "en",
+  "tag": "[cough]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[cough].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "lipsmack_start_en1",
+  "lang": "en",
+  "tag": "[lipsmack]",
+  "pos": "start",
+  "text": "[lipsmack]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "lipsmack_mid_en1",
+  "lang": "en",
+  "tag": "[lipsmack]",
+  "pos": "mid",
+  "text": "Oh well, [lipsmack]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "lipsmack_end_en1",
+  "lang": "en",
+  "tag": "[lipsmack]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[lipsmack].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "mn_start_en1",
+  "lang": "en",
+  "tag": "[mn]",
+  "pos": "start",
+  "text": "[mn]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "mn_mid_en1",
+  "lang": "en",
+  "tag": "[mn]",
+  "pos": "mid",
+  "text": "Oh well, [mn]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "mn_end_en1",
+  "lang": "en",
+  "tag": "[mn]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[mn].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "noise_start_en1",
+  "lang": "en",
+  "tag": "[noise]",
+  "pos": "start",
+  "text": "[noise]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "noise_mid_en1",
+  "lang": "en",
+  "tag": "[noise]",
+  "pos": "mid",
+  "text": "Oh well, [noise]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "noise_end_en1",
+  "lang": "en",
+  "tag": "[noise]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[noise].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "clucking_start_en1",
+  "lang": "en",
+  "tag": "[clucking]",
+  "pos": "start",
+  "text": "[clucking]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "clucking_mid_en1",
+  "lang": "en",
+  "tag": "[clucking]",
+  "pos": "mid",
+  "text": "Oh well, [clucking]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "clucking_end_en1",
+  "lang": "en",
+  "tag": "[clucking]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[clucking].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "accent_start_en1",
+  "lang": "en",
+  "tag": "[accent]",
+  "pos": "start",
+  "text": "[accent]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "accent_mid_en1",
+  "lang": "en",
+  "tag": "[accent]",
+  "pos": "mid",
+  "text": "Oh well, [accent]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "accent_end_en1",
+  "lang": "en",
+  "tag": "[accent]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[accent].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "hissing_start_en1",
+  "lang": "en",
+  "tag": "[hissing]",
+  "pos": "start",
+  "text": "[hissing]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "hissing_mid_en1",
+  "lang": "en",
+  "tag": "[hissing]",
+  "pos": "mid",
+  "text": "Oh well, [hissing]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "hissing_end_en1",
+  "lang": "en",
+  "tag": "[hissing]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[hissing].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "vocalized-noise_start_en1",
+  "lang": "en",
+  "tag": "[vocalized-noise]",
+  "pos": "start",
+  "text": "[vocalized-noise]Oh well, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "vocalized-noise_mid_en1",
+  "lang": "en",
+  "tag": "[vocalized-noise]",
+  "pos": "mid",
+  "text": "Oh well, [vocalized-noise]what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "vocalized-noise_end_en1",
+  "lang": "en",
+  "tag": "[vocalized-noise]",
+  "pos": "end",
+  "text": "Oh well, what a long day, I've been busy since this morning[vocalized-noise].",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "span_laughter_start_en1",
+  "lang": "en",
+  "tag": "<laughter>",
+  "pos": "start",
+  "text": "<laughter>Oh well</laughter>, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "span_laughter_mid_en1",
+  "lang": "en",
+  "tag": "<laughter>",
+  "pos": "mid",
+  "text": "Oh well, <laughter>what a long day</laughter>, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "span_laughter_end_en1",
+  "lang": "en",
+  "tag": "<laughter>",
+  "pos": "end",
+  "text": "Oh well, what a long day, <laughter>I've been busy since this morning</laughter>.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "span_strong_start_en1",
+  "lang": "en",
+  "tag": "<strong>",
+  "pos": "start",
+  "text": "<strong>Oh well</strong>, what a long day, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "span_strong_mid_en1",
+  "lang": "en",
+  "tag": "<strong>",
+  "pos": "mid",
+  "text": "Oh well, <strong>what a long day</strong>, I've been busy since this morning.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ },
+ {
+  "id": "span_strong_end_en1",
+  "lang": "en",
+  "tag": "<strong>",
+  "pos": "end",
+  "text": "Oh well, what a long day, <strong>I've been busy since this morning</strong>.",
+  "clean": "Oh well, what a long day, I've been busy since this morning."
+ }
+]
