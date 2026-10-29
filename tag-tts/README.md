@@ -7,14 +7,18 @@ DuplexJev hears what a voice does besides the words: laughter, coughs, sighs, wh
 loop and trained the language model of [Fun-CosyVoice3-0.5B](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512)
 until its inline tags actually happen in real-time (bi-streaming) synthesis.
 
-| Tag (bi-streaming, cloned voice, no instruction) | CosyVoice3 | **tag-tts** |
-|---|---|---|
-| `[laughter]` – laugh heard (DuplexJev) | 62% | **100%** |
-| `<laughter>…</laughter>` | 12% | **88%** |
-| `[cough]` | 42% | **79%** |
-| `[sigh]` | 4% | **17%** |
-| `<strong>word</strong>` – stress on the tagged word (held-out) | 28.6% | **35.0%** |
-| Seed-TTS-eval zh CER / en WER (same setting) | 1.53 / 2.58 | **1.29 / 2.02** |
+| Tag (bi-streaming, cloned voice, no instruction) | CosyVoice3 | tag-tts v1.0 | **tag-tts v1.1** |
+|---|---|---|---|
+| `[laughter]` – laugh heard (DuplexJev) | 62% | 100% | **100%** |
+| `<laughter>…</laughter>` | 12% | 88% | **92%** |
+| `[cough]` | 42% | 79% | **71%** |
+| `[sigh]` (held-out) | 4.3% | 15.0% | **17.9%** |
+| `<strong>word</strong>` – stress on the tagged word (held-out) | 28.6% | 35.0% | **40.7%** |
+| Seed-TTS-eval zh CER / en WER / zh-hard CER (same setting) | 1.53 / 2.58 / 6.00 | 1.29 / 2.02 / 6.42 | **1.27 / 1.96 / 6.24** |
+
+**v1.1 (2026-10-30)**: two more rounds with GRPO. For sentences where the model never stressed the tagged word,
+we sampled with a short pause before the word as a hint, kept the candidates DuplexJev judged as stressed, and trained
+on the original text, so the model learns to stress from `<strong>` alone.
 
 Full numbers, audio examples and usage: see the [model card](https://huggingface.co/adventists-ai/tag-tts).
 
@@ -26,7 +30,8 @@ sentence + tag ──► CosyVoice3 LM (policy) ──► 8 candidates, bi-strea
            DuplexJev-32B-Para: "which word is stressed?" / "which sound besides speech?"
            + AudioSet-AST, ASR error, speaker similarity, speaking-rate checks
                                                    │
-                 best vs worst in each group ──► DPO on the 0.5B LM ──► next round (3 rounds)
+                 best vs worst in each group ──► DPO on the 0.5B LM ──► next round (3 rounds, v1.0)
+                 group-normalised reward + guided positives ──► GRPO (2 rounds, v1.1)
 ```
 
 Only `llm.pt` changes; flow matching and vocoder are untouched. Training uses model-generated audio only.
@@ -66,9 +71,10 @@ DuplexJev 能听出文字之外的东西：笑、咳嗽、叹气，重音落在�
 用 DuplexJev-32B-Para 做强化学习的奖励模型，训练 Fun-CosyVoice3-0.5B 的语言模型，
 让它在实时逐字双流合成里真正执行文本里的标签。
 
-- 笑声命中 62% → **100%**，成对写法 `<laughter>` 12% → **88%**，咳嗽 42% → **79%**，叹气 4% → **17%**
-- 重音落在 `<strong>` 标注的词上：28.6% → **35.0%**（留出句）
-- Seed-TTS-eval 中文字错率 1.53 → **1.29**，英文 2.58 → **2.02**（同一流式设置）
+- 笑声命中 62% → **100%**，成对写法 `<laughter>` 12% → **92%**，咳嗽 42% → **71%**，叹气（留出句）4.3% → **17.9%**
+- 重音落在 `<strong>` 标注的词上：28.6% → **40.7%**（留出句；v1.0 为 35.0%）
+- Seed-TTS-eval 中文字错率 1.53 → **1.27**，英文 2.58 → **1.96**，绕口令 6.00 → 6.24（同一流式设置）
+- v1.1（10-30）：再做两轮 GRPO；对模型从来读不出重音的句子，采样时在目标词前加停顿作引导，挑出 DuplexJev 判为重读的样本，训练时换回原文本
 
 模型：[Hugging Face](https://huggingface.co/adventists-ai/tag-tts) · [ModelScope](https://www.modelscope.cn/models/AdventistsAI/tag-tts)（Apache-2.0）。
 `judge_tags.py` 可以直接拿 DuplexJev 给你自己的 TTS 打分。
