@@ -334,11 +334,14 @@ All on [ModelScope](https://www.modelscope.cn/organization/AdventistsAI) too (sa
 `modelscope download --model AdventistsAI/DuplexJev-32B-Para --local_dir ./DuplexJev-32B-Para`, then `vllm serve ./DuplexJev-32B-Para`.
 Weights: CC BY-NC 4.0; commercial licences: jiejin@adventists.ai.
 
+**Built on DuplexJev:** 🎙️ [**tag-tts**](tag-tts/) — CosyVoice3-0.5B trained with DuplexJev as the RL judge, so inline `[laughter]`, `[cough]`, `<strong>` tags actually happen in streaming TTS ([🤗](https://huggingface.co/adventists-ai/tag-tts) · [ModelScope](https://www.modelscope.cn/models/AdventistsAI/tag-tts), Apache-2.0).
+
 **Version history, per-version scores, specialised and archived models** (Stress, Turn, Gemma-31B) and the research
 connector checkpoints: **[docs/models.md](docs/models.md)**.
 
 ## News
 
+- **2026-10-29** · 🎙️ [**tag-tts**](tag-tts/): **DuplexJev as the judge.** We used DuplexJev-32B-Para as the reward model to RL-train CosyVoice3-0.5B until its inline tags really happen in streaming TTS: laughter 62 → 100%, `<laughter>` 12 → 88%, cough 42 → 79%, stress on the tagged word 28.6 → 35.0%; Seed-TTS error zh / en 1.53 / 2.58 → 1.29 / 2.02. Weights (Apache-2.0) on 🤗 [Hugging Face](https://huggingface.co/adventists-ai/tag-tts) and [ModelScope](https://www.modelscope.cn/models/AdventistsAI/tag-tts); [`judge_tags.py`](tag-tts/judge_tags.py) scores your own TTS with DuplexJev.
 - **2026-10-22** · 🤗 [**DuplexJev-32B-Para v1.4**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) and [**DuplexJev-4B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): Japanese becomes a third language (FLEURS error 32B 32.7 → 11.6%, 4B 35.8 → 17.2%; conversational Japanese 11.1% / 13.1%); 32B also Korean 31.8 → 7.6%, Vietnamese 41.7 → 14.6%, plus much better Mandarin paralinguistics. Earlier versions stay available as revisions. [Release note](research/2026-10-japanese.md).
 - **2026-10-21** · 🤗 [**DuplexJev-4B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): hears Japanese, Korean, Vietnamese and Thai (FLEURS error ja 59.6 → 35.8%, ko 61.5 → 20.3%) and much more Mandarin paralinguistics (breath, lip smack, laughter, sniff, stressed word: 57–65% → 81–95% on held-out speakers). Paralinguistic benchmarks combined unchanged (47.6 vs 47.8). [Release note](research/2026-10-weak-languages.md).
 - **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.2**, against 47.8 for Gemini 3.8 Flash.
@@ -557,6 +560,7 @@ checkpoints in [docs/connectors.md](docs/connectors.md) use earlier versions of 
 | [`training/`](training) | Ultravox configs and patches, data recipe, 100-pack split, encoder ports |
 | [`research/`](research) | research notes: experiments and design decisions, with numbers and noise levels |
 | [`docs/`](docs) | project page, [connector checkpoints](docs/connectors.md), [paper results](docs/paper_results.md), [package details](docs/package.md) |
+| [`tag-tts/`](tag-tts) | tag-tts: CosyVoice3 trained with DuplexJev as the RL judge; [`judge_tags.py`](tag-tts/judge_tags.py) uses DuplexJev to score expressive TTS |
 | [`duplexjev/research/`](duplexjev/research), [`tests/`](tests), [`benchmarks/`](benchmarks) | paper code (readout, question contract, fused encoder), equivalence tests, latency and capacity experiments |
 
 The paper code still contains paths from our cluster; see [docs/PATHS.md](docs/PATHS.md).
