@@ -317,6 +317,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 ## 最新动态
 
+- **2026-10-30** · 🎙️ [**tag-tts v1.1**](tag-tts/)：再做两轮强化学习（GRPO，DuplexJev 打分，重音用引导正样本）。重音落在标注词上 35.0 → **40.7%**，叹气 15.0 → **17.9%**，Seed-TTS 中 / 英 / 绕口令 1.27 / 1.96 / 6.24。直接替换 `llm.pt`，见 🤗 [Hugging Face](https://huggingface.co/adventists-ai/tag-tts) 和 [魔搭](https://www.modelscope.cn/models/AdventistsAI/tag-tts)。
 - **2026-10-29** · 🎙️ [**tag-tts**](tag-tts/)：**让 DuplexJev 当裁判。**用 DuplexJev-32B-Para 做奖励模型，强化学习训练 CosyVoice3-0.5B，让文本里的标签在流式合成中真正生效：笑声 62 → 100%，`<laughter>` 12 → 88%，咳嗽 42 → 79%，重音落在标注词上 28.6 → 35.0%；Seed-TTS 中 / 英错误率 1.53 / 2.58 → 1.29 / 2.02。权重（Apache-2.0）见 🤗 [Hugging Face](https://huggingface.co/adventists-ai/tag-tts) 和 [魔搭](https://www.modelscope.cn/models/AdventistsAI/tag-tts)；[`judge_tags.py`](tag-tts/judge_tags.py) 可以用 DuplexJev 给你自己的 TTS 打分。
 - **2026-10-22** · 🤗 [**DuplexJev-32B-Para v1.4**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 和 [**DuplexJev-4B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：日语成为第三语言（FLEURS 错误率 32B 32.7 → 11.6%，4B 35.8 → 17.2%；对话日语 11.1% / 13.1%）；32B 的韩语 31.8 → 7.6%、越南语 41.7 → 14.6%，中文副语言也明显提升。旧版本仍可按 revision 使用。[发布说明](research/2026-10-japanese_zh.md)。
 - **2026-10-21** · 🤗 [**DuplexJev-4B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：能听懂日语、韩语、越南语、泰语（FLEURS 错误率 日语 59.6 → 35.8%，韩语 61.5 → 20.3%）；中文副语言大幅提升（喘气、咂嘴、笑声、吸鼻子、重读词，在留出说话人上从 57–65% 升到 81–95%）。公开副语言基准合计基本不变（47.6，v1.1 47.8）。[发布说明](research/2026-10-weak-languages_zh.md)。
