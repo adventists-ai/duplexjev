@@ -313,8 +313,11 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 **各版本成绩、版本间对比、专项和归档模型**（Stress、Turn、Gemma-31B）以及研究用连接器 checkpoint：**[docs/models_zh.md](docs/models_zh.md)**。
 
+**基于 DuplexJev：** 🎙️ [**tag-tts**](tag-tts/) —— 用 DuplexJev 当强化学习裁判训练的 CosyVoice3-0.5B，`[laughter]`、`[cough]`、`<strong>` 等标签在流式合成里真正生效（[🤗](https://huggingface.co/adventists-ai/tag-tts) · [魔搭](https://www.modelscope.cn/models/AdventistsAI/tag-tts)，Apache-2.0）。
+
 ## 最新动态
 
+- **2026-10-29** · 🎙️ [**tag-tts**](tag-tts/)：**让 DuplexJev 当裁判。**用 DuplexJev-32B-Para 做奖励模型，强化学习训练 CosyVoice3-0.5B，让文本里的标签在流式合成中真正生效：笑声 62 → 100%，`<laughter>` 12 → 88%，咳嗽 42 → 79%，重音落在标注词上 28.6 → 35.0%；Seed-TTS 中 / 英错误率 1.53 / 2.58 → 1.29 / 2.02。权重（Apache-2.0）见 🤗 [Hugging Face](https://huggingface.co/adventists-ai/tag-tts) 和 [魔搭](https://www.modelscope.cn/models/AdventistsAI/tag-tts)；[`judge_tags.py`](tag-tts/judge_tags.py) 可以用 DuplexJev 给你自己的 TTS 打分。
 - **2026-10-22** · 🤗 [**DuplexJev-32B-Para v1.4**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para) 和 [**DuplexJev-4B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：日语成为第三语言（FLEURS 错误率 32B 32.7 → 11.6%，4B 35.8 → 17.2%；对话日语 11.1% / 13.1%）；32B 的韩语 31.8 → 7.6%、越南语 41.7 → 14.6%，中文副语言也明显提升。旧版本仍可按 revision 使用。[发布说明](research/2026-10-japanese_zh.md)。
 - **2026-10-21** · 🤗 [**DuplexJev-4B-Para v1.2**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：能听懂日语、韩语、越南语、泰语（FLEURS 错误率 日语 59.6 → 35.8%，韩语 61.5 → 20.3%）；中文副语言大幅提升（喘气、咂嘴、笑声、吸鼻子、重读词，在留出说话人上从 57–65% 升到 81–95%）。公开副语言基准合计基本不变（47.6，v1.1 47.8）。[发布说明](research/2026-10-weak-languages_zh.md)。
 - **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：听重音大幅提升（StressTest 71.5 → 86.5，MSPB 68.0 → 77.3）。公开副语言基准合计 **50.2**，Gemini 3.8 Flash 47.8。
@@ -510,6 +513,7 @@ checkpoint 用的是这套配方的早期版本。
 | [`training/`](training) | Ultravox 配置和补丁、数据配方、100 包切分、编码器移植 |
 | [`research/`](research) | 研究笔记：实验和设计取舍，附数字和误差范围 |
 | [`docs/`](docs) | 项目主页、[连接器 checkpoint](docs/connectors_zh.md)、[论文结果](docs/paper_results.md)、[包的细节](docs/package.md) |
+| [`tag-tts/`](tag-tts) | tag-tts：用 DuplexJev 当裁判强化学习训练的 CosyVoice3；[`judge_tags.py`](tag-tts/judge_tags.py) 用 DuplexJev 给表现力 TTS 打分 |
 | [`duplexjev/research/`](duplexjev/research)、[`tests/`](tests)、[`benchmarks/`](benchmarks) | 论文代码（读出、问题约定、融合编码器）、等价性测试、延迟和容量实验 |
 
 论文代码里还留有我们集群上的路径，见 [docs/PATHS.md](docs/PATHS.md)。
