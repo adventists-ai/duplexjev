@@ -211,7 +211,7 @@ footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--rule);font-si
       <a href="https://www.modelscope.cn/organization/AdventistsAI" data-i18n="l_ms"></a>
     </nav>
     <aside class="news" aria-labelledby="news-h"><h2 id="news-h" data-i18n="news_h"></h2>
-      <ul><li data-i18n="n0v"></li><li data-i18n="n0s"></li><li data-i18n="n0l"></li><li data-i18n="n0"></li></ul>
+      <ul><li data-i18n="n15"></li><li data-i18n="n0v"></li><li data-i18n="n0s"></li><li data-i18n="n0l"></li><li data-i18n="n0"></li></ul>
     </aside>
     <p class="lede" data-i18n="lede"></p>
   </header>
@@ -347,6 +347,7 @@ const T = {
   s4:"things it hears beyond the words: emotion, stress, pauses, laughter, breathing, turn state …",
   l_models:"Weights 🤗",
   news_h:"New",
+  n15:"<time>2026-11-03</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.5</b></a>: hears the whole clip. Earlier versions dropped the last ~4% of each 30 s audio chunk (the encoder emits 6.5 tokens/s, not 6.25). Retrained on the true length: Smart Turn 93.3 → 94.4 (Chinese 91.4 → 94.6), eot-bench English false cut-offs at 300 ms 20.4 → 17.7%, StressTest 81.7 → 85.3, LISTEN 32.4 → 33.2. Needs <code>duplexjev-vllm&gt;=0.4</code>. <a href=\"https://github.com/adventists-ai/duplexjev/blob/main/research/2026-11-full-length.md\">Release note</a>",
   n0v:"<time>2026-10-15</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.3</b></a>: much better at hearing stress. Same items as the closed models: StressTest 71.5 → 86.5 (Gemini 3.8 Flash 89.0), MSPB 68.0 → 77.3 (ahead of every model tested). The six public paralinguistic benchmarks combined (1,035 items, none from our training corpora): 50.2, against 47.8 for Gemini 3.8 Flash and 45.0 for Qwen3-Omni.",
   n0s:"<time>2026-10-15</time><b>Closed flagships, realtime ones included.</b> On the same LISTEN questions DuplexJev-32B-Para leads all seven models we tested (mean of 4 audio-only conditions 37.3; Qwen3-Omni 33.9, Gemini 3.8 Flash 33.1, GPT-audio-1.5 31.6, Gemini 3.8 Live 30.9, Gemini 3.1 Pro 30.1, GPT-realtime-2.1 25.6). Gemini 3.8 Flash stays ahead on StressTest. LiveKit eot-bench, all 14 languages: fewer false cut-offs than Smart Turn v3.2 in every one at 300 ms (12 of them zero-shot). <a href=\"https://github.com/adventists-ai/duplexjev/tree/main/benchmarks/paraling_compare\">Scripts and every prediction</a>",
   n0l:"<time>2026-10-14</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn\"><b>DuplexJev-4B-Para-LiveTurn</b></a>: the 32B-Para v1.2 turn-taking recipe on the 4B model, for live end-of-turn in LiveKit / Pipecat agents on a ~10 GB GPU. eot-bench false cut-offs at a 300 ms budget: 25.5% English, 38.8% Chinese (4B-Para v1.1 audio-only: 46.4% / 48.5%). 4B-Para stays the general 4B model.",
@@ -414,6 +415,7 @@ const T = {
   s4:"种文字之外的信息：情绪、重音、停顿、笑声、呼吸、话轮状态……",
   l_models:"权重 🤗",
   news_h:"最新",
+  n15:"<time>2026-11-03</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.5</b></a>：整段音频都听进去了。此前版本会丢掉每个 30 秒音频块末尾约 4%（编码器每秒出 6.5 个 token，而不是 6.25）。按真实长度重训后：Smart Turn 93.3 → 94.4（中文 91.4 → 94.6），eot-bench 英文 300 ms 误打断 20.4 → 17.7%，StressTest 81.7 → 85.3，LISTEN 32.4 → 33.2。需要 <code>duplexjev-vllm&gt;=0.4</code>。<a href=\"https://github.com/adventists-ai/duplexjev/blob/main/research/2026-11-full-length_zh.md\">发布说明</a>",
   n0v:"<time>2026-10-15</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-32B-Para\"><b>DuplexJev-32B-Para v1.3</b></a>：听重音大幅提升。与闭源模型同一批题：StressTest 71.5 → 86.5（Gemini 3.8 Flash 89.0），MSPB 68.0 → 77.3（测过的模型里最高）。六个公开副语言基准合计（1,035 题，不含训练语料）50.2，Gemini 3.8 Flash 47.8、Qwen3-Omni 45.0。",
   n0s:"<time>2026-10-15</time><b>对比闭源旗舰，包括实时模型。</b>同一批 LISTEN 题上，DuplexJev-32B-Para 在测过的 7 个模型里排第一（纯音频四项平均 37.3；Qwen3-Omni 33.9、Gemini 3.8 Flash 33.1、GPT-audio-1.5 31.6、Gemini 3.8 Live 30.9、Gemini 3.1 Pro 30.1、GPT-realtime-2.1 25.6）。StressTest 上 Gemini 3.8 Flash 仍领先。LiveKit eot-bench 全部 14 种语言：300 ms 预算下误打断都少于 Smart Turn v3.2（其中 12 种为零样本）。<a href=\"https://github.com/adventists-ai/duplexjev/tree/main/benchmarks/paraling_compare\">脚本和每道题的预测</a>",
   n0l:"<time>2026-10-14</time><a href=\"https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn\"><b>DuplexJev-4B-Para-LiveTurn</b></a>：把 32B-Para v1.2 的话轮训练用到 4B 上，给 LiveKit / Pipecat 语音 agent 在约 10 GB 显卡上做实时话轮判断。eot-bench 300 ms 预算下误打断率：英文 25.5%、中文 38.8%（4B-Para v1.1 仅音频：46.4% / 48.5%）。通用 4B 仍是 4B-Para。",
