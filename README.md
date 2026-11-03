@@ -239,6 +239,7 @@ what to do     reply now                          0.50
 Your own questions: `--questions table.json` (a list of `{"id", "text", "options"}`), or in Python
 `quick("call.wav", questions=[Question("product", "Which product is the user asking about?", ["phone", "laptop", "other"])])`.
 The same page with a recorder is at [api.adventists.cn/duplexjev](https://api.adventists.cn/duplexjev/).
+How to write good questions (options, positions, templates): [docs/questions.md](docs/questions.md).
 
 **On your own GPU** with vLLM:
 

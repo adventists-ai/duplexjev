@@ -225,6 +225,7 @@ duplexjev quick call_zh.wav --api https://api.adventists.cn/duplexjev --lang zh
 换成自己的题目：`--questions table.json`（`{"id", "text", "options"}` 的列表），或在 Python 里
 `quick("call.wav", lang="zh", questions=[Question("product", "用户在问哪个产品？", ["手机", "电脑", "其他"], lang="zh")])`。
 带录音功能的网页版在 [api.adventists.cn/duplexjev](https://api.adventists.cn/duplexjev/)。
+怎么写好判断题（选项、位置题、常用模板）：[docs/questions_zh.md](docs/questions_zh.md)。
 
 **用自己的显卡**，vLLM 部署：
 
