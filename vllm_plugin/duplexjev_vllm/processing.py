@@ -1,10 +1,12 @@
 """Audio + text preprocessing for DuplexJev checkpoints inside vLLM.
 
 Same maths as the Ultravox processor the connectors were trained with (Whisper-style 128-bin log-mel, 30 s chunks,
-audio_token_len = ceil(mel_frames / (encoder_ds_factor * stack_factor))), plus the right-padding the duplexjev
+audio_token_len = ceil(mel_frames / (encoder_ds_factor * stack_factor)), or the encoder's true output length for
+checkpoints with "audio_full_length": true), plus the right-padding the duplexjev
 package applies: every clip is padded with silence to a whole number of audio tokens, so a clip reads the same
 whatever it is batched with.
 """
+import os
 from typing import List, Optional
 
 import numpy as np
@@ -17,11 +19,17 @@ HOP = 160
 
 class DuplexJevProcessor:
     def __init__(self, feature_extractor, tokenizer, *, stack_factor: int = 2, encoder_ds_factor: int = 8,
-                 audio_context_size: int = 3000, audio_placeholder: str = "<|audio|>"):
+                 audio_context_size: int = 3000, audio_placeholder: str = "<|audio|>", full_length: bool = False):
         self.audio_processor = feature_extractor  # vLLM reads the WhisperFeatureExtractor from here
         self.tokenizer = tokenizer
         self.stack_factor = stack_factor
         self.encoder_ds_factor = encoder_ds_factor
+        # Full-length audio tokens (DuplexJev-32B-Para v1.5+): the Qwen3-ASR encoder emits 13 frames per second
+        # (100 mel frames), i.e. 6.5 audio tokens/s, so ceil(mel / 16) drops about 4% at the end of every 30 s chunk.
+        # Checkpoints trained on the true length set "audio_full_length": true in config.json. DJ_FULL_LEN=1/0
+        # overrides the config either way.
+        env = os.environ.get("DJ_FULL_LEN")
+        self.full_length = (env == "1") if env in ("0", "1") else bool(full_length)
         self.audio_context_size = audio_context_size
         self.audio_placeholder = audio_placeholder
         self.vocab = tokenizer.get_vocab()
@@ -73,6 +81,10 @@ class DuplexJevProcessor:
             is_cont = data.pop("audio_is_continuation")
             data["audio_token_len"] = torch.ceil(
                 data["audio_lens"] / (self.encoder_ds_factor * self.stack_factor)).to(torch.int)
+            if self.full_length and self.encoder_ds_factor == 8:
+                from .modeling_qwen3_asr_encoder import _get_feat_extract_output_lengths
+                data["audio_token_len"] = torch.ceil(
+                    _get_feat_extract_output_lengths(data["audio_lens"]).float() / self.stack_factor).to(torch.int)
         if text is not None:
             parts = self.tokenizer(text.split(self.audio_placeholder), add_special_tokens=False)["input_ids"]
             rep = self.vocab[self.audio_token_replacement]

@@ -9,6 +9,7 @@ DuplexJev 背后那些没写进论文的实验和取舍：试过什么、哪些�
 
 | date | note | 中文 |
 |---|---|---|
+| 2026-11-03 | [Hearing the whole clip: the 6.5 vs 6.25 tokens-per-second bug and 32B-Para v1.5](2026-11-full-length.md) | [整段音频都听进去：6.5 与 6.25 的错位和 32B-Para v1.5](2026-11-full-length_zh.md) |
 | 2026-10-22 | [Japanese as a third language: 4B-Para v1.3 and 32B-Para v1.4](2026-10-japanese.md) | [让日语成为第三语言](2026-10-japanese_zh.md) |
 | 2026-10-21 | [Why our 4B could not hear Japanese, and how v1.2 fixed it without losing the rest](2026-10-weak-languages.md) | [4B 为什么听不懂日语，v1.2 怎么补上](2026-10-weak-languages_zh.md) |
 | 2026-10-10 | [Keeping a speech-decision LLM able to talk: conversation replay and per-row loss](2026-10-chat-replay.md) | [让语音决策模型继续“会聊天”](2026-10-chat-replay_zh.md) |

@@ -34,10 +34,10 @@ def _make_tower(*, vllm_config, prefix: str = "", enable_pp: bool = False):
 
 
 @lru_cache(maxsize=8)
-def _processor(model: str, revision, trust_remote_code: bool, stack_factor: int, ds: int):
+def _processor(model: str, revision, trust_remote_code: bool, stack_factor: int, ds: int, full: bool = False):
     fe = WhisperFeatureExtractor.from_pretrained(model, revision=revision)
     tok = AutoTokenizer.from_pretrained(model, revision=revision, trust_remote_code=trust_remote_code)
-    return DuplexJevProcessor(fe, tok, stack_factor=stack_factor, encoder_ds_factor=ds)
+    return DuplexJevProcessor(fe, tok, stack_factor=stack_factor, encoder_ds_factor=ds, full_length=full)
 
 
 class DuplexJevProcessingInfo(U.UltravoxProcessingInfo):
@@ -45,7 +45,8 @@ class DuplexJevProcessingInfo(U.UltravoxProcessingInfo):
         mc = self.ctx.model_config
         cfg = mc.hf_config
         p = _processor(mc.model, mc.revision, mc.trust_remote_code,
-                       cfg.stack_factor, int(getattr(cfg.audio_config, "encoder_ds_factor", 8)))
+                       cfg.stack_factor, int(getattr(cfg.audio_config, "encoder_ds_factor", 8)),
+                       bool(getattr(cfg, "audio_full_length", False)))
         p.audio_token_replacement = U._AUDIO_PLACEHOLDER_OVERRIDE
         p.audio_replacement_token_id = cfg.audio_token_index
         return p

@@ -1,3 +1,4 @@
+import os
 import dataclasses
 import transformers as _transformers_module
 
@@ -131,6 +132,7 @@ class UltravoxProcessor(transformers.ProcessorMixin):
         audio_placeholder: str = "<|audio|>",
         # Defaults to whisper encoder context size
         audio_context_size: Optional[int] = 3000,
+        full_length: bool = False,
     ):
         """
         Args:
@@ -147,6 +149,11 @@ class UltravoxProcessor(transformers.ProcessorMixin):
         self.stack_factor = stack_factor
         self.audio_placeholder = audio_placeholder
         self.audio_context_size = audio_context_size
+        # True-length audio tokens for checkpoints with "audio_full_length": true (DuplexJev-32B-Para v1.5+):
+        # Qwen3-ASR emits 13 frames per 100 mel frames, so ceil(mel / 16) drops ~4% of each 30 s chunk.
+        # DJ_FULL_LEN=1/0 overrides.
+        _env = os.environ.get("DJ_FULL_LEN")
+        self.full_length = (_env == "1") if _env in ("0", "1") else bool(full_length)
         assert (
             tokenizer.eos_token is not None
         ), "The tokenizer has no EOS token. Cannot recover."
@@ -195,6 +202,7 @@ class UltravoxProcessor(transformers.ProcessorMixin):
             # assuming the Whisper default, otherwise the predicted
             # audio_token_len mismatches the encoders real output length.
             encoder_ds_factor=getattr(config.audio_config, "encoder_ds_factor", 2),
+            full_length=bool(getattr(config, "audio_full_length", False)),
         )
 
     def _chunk_and_pad_audio(
@@ -363,6 +371,11 @@ class UltravoxProcessor(transformers.ProcessorMixin):
             data["audio_token_len"] = torch.ceil(
                 data["audio_lens"] / (self.encoder_ds_factor * self.stack_factor)
             ).to(dtype=torch.int)
+            if self.full_length and self.encoder_ds_factor == 8:
+                from .modeling_qwen3_asr_encoder import _get_feat_extract_output_lengths
+                data["audio_token_len"] = torch.ceil(
+                    _get_feat_extract_output_lengths(data["audio_lens"]).float() / self.stack_factor
+                ).to(dtype=torch.int)
 
         if text is not None:
             if not isinstance(text, str):

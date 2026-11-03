@@ -100,6 +100,7 @@ def _build_processor(name_or_path: str, cfg):
         tokenizer=tokenizer,
         stack_factor=cfg.stack_factor,
         encoder_ds_factor=getattr(cfg.audio_config, "encoder_ds_factor", 2),
+        **({"full_length": True} if getattr(cfg, "audio_full_length", False) else {}),
     )
 
 
@@ -155,7 +156,8 @@ def _load_full(name_or_path: str, *, dmap, dtype, dkw: str, **kwargs):
         tok.pad_token = tok.eos_token
     fe = transformers.WhisperFeatureExtractor.from_pretrained(path)
     ds = 8 if "qwen3_asr" in str(c.get("audio_config", {}).get("model_type", "")) else 2  # Qwen3-ASR encoder: 8x
-    pc = {"encoder_ds_factor": ds, "audio_context_size": 3000, "audio_padding": "longest"}
+    pc = {"encoder_ds_factor": ds, "audio_context_size": 3000, "audio_padding": "longest",
+          "full_length": bool(c.get("audio_full_length", False))}
     if os.path.exists(os.path.join(path, "processor_config.json")):
         pc.update({k: v for k, v in json.load(open(os.path.join(path, "processor_config.json"))).items() if k in pc})
     processor = _uv.UltravoxProcessor(

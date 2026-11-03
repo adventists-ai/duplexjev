@@ -4,7 +4,7 @@ vLLM plugin for [DuplexJev](https://github.com/adventists-ai/duplexjev) speech-d
 [`adventists-ai/DuplexJev-4B-Para`](https://huggingface.co/adventists-ai/DuplexJev-4B-Para).
 
 ```bash
-pip install "vllm[audio]>=0.29" duplexjev-vllm
+pip install "vllm[audio]>=0.29" "duplexjev-vllm>=0.4"
 vllm serve adventists-ai/DuplexJev-4B-Para --max-model-len 4096
 ```
 
@@ -19,6 +19,14 @@ and the LLM run on vLLM's own code.
 Each question is one request with `max_tokens=1`; the answer is the next-token distribution over the option letters.
 A client that asks several questions about one clip concurrently is in
 [`examples/vllm_client.py`](https://github.com/adventists-ai/duplexjev/blob/main/examples/vllm_client.py).
+
+## Full-length audio tokens (0.4.0)
+
+The Qwen3-ASR encoder emits 13 frames per second (100 mel frames), i.e. 6.5 audio tokens per second after stacking.
+Up to 0.3.x the plugin counted `ceil(mel_frames / 16)` tokens, 6.25 per second, so the last ~4 % of every 30 s chunk
+was dropped. Checkpoints trained on the true length (DuplexJev-32B-Para v1.5+) carry `"audio_full_length": true` in
+`config.json`; 0.4.0 reads it and feeds the whole clip. Older checkpoints keep the old count, so their behaviour does
+not change. `DJ_FULL_LEN=1` / `DJ_FULL_LEN=0` force either count for any checkpoint.
 
 ## Speech + image (DuplexJev-32B-Vision, 0.3.0)
 

@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: duplexjev
-Version: 0.6.1
+Version: 0.7.0
 Summary: Jev-style typed decisions about speech with zero decode steps: one forward pass answers many option groups about many clips.
 Author: Adventists.ai
 License: Apache-2.0
