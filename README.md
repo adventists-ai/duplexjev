@@ -18,7 +18,8 @@
   under <b>$0.50 per million decisions</b>, and a new kind of decision is <b>one line of text</b>.<br>
   🏆 <b>State of the art in paralinguistic understanding</b> on public benchmarks (<a href="https://arxiv.org/abs/2510.10444">LISTEN</a>, StressTest and MSPB combined):
   ahead of <b>Gemini 3.8 Flash, Gemini 3.8 Live, GPT-realtime-2.1, GPT-audio-1.5 and Qwen3-Omni</b> on the same questions.<br>
-  👁️ <b>It also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same pass (preview) — <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">try it with a photo + your voice</a>.
+  👁️ <b>It also sees.</b> <a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> checks the voice against a picture in the same pass (preview) — <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">try it with a photo + your voice</a>.<br>
+  🗣️ <b>Now it talks back.</b> <a href="https://github.com/adventists-ai/sophon-realtime">Sophon-Realtime v1</a>, our open full-duplex voice model, uses DuplexJev as its ears: it hears your tone and speaks with one. Open source on Nov 9, 2026.
 </p>
 
 <p align="center">
@@ -35,6 +36,7 @@
   <a href="https://www.modelscope.cn/organization/AdventistsAI"><img src="https://img.shields.io/badge/ModelScope-mirror-624aff" alt="ModelScope"></a>
   <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
   <a href="https://adventists-ai.github.io/duplexjev/"><img src="https://img.shields.io/badge/project-page-0b7285" alt="Project page"></a>
+  <a href="https://github.com/adventists-ai/sophon-realtime"><img src="https://img.shields.io/badge/Sophon--Realtime-full--duplex%20voice%20model-22D3A6" alt="Sophon-Realtime"></a>
 </p>
 
 <p align="center"><img src="docs/assets/race.gif" alt="Ten decisions: DuplexJev 92 ms vs ASR → LLM 1,978 ms on the same H200" width="820"></p>
@@ -342,6 +344,7 @@ connector checkpoints: **[docs/models.md](docs/models.md)**.
 
 ## News
 
+- **2026-11-06** · 🗣️ [**Sophon-Realtime v1**](https://github.com/adventists-ai/sophon-realtime): DuplexJev now has a voice. Sophon-Realtime v1 is an open full-duplex voice model built on DuplexJev-32B-Para: VoiceBench 82.8 and Big Bench Audio 81.8% (#1 among open full-duplex models on both), and it laughs, sighs and clears its throat when the conversation calls for it. Weights open on Nov 9, 2026 (Apache-2.0).
 - **2026-10-30** · 🎙️ [**tag-tts v1.1**](tag-tts/): two more RL rounds (GRPO, DuplexJev rewards, guided positives for stress). Stress on the tagged word 35.0 → **40.7%**, sigh 15.0 → **17.9%**, Seed-TTS zh / en / zh-hard 1.27 / 1.96 / 6.24. Same drop-in `llm.pt` on 🤗 [Hugging Face](https://huggingface.co/adventists-ai/tag-tts) and [ModelScope](https://www.modelscope.cn/models/AdventistsAI/tag-tts).
 - **2026-11-04** · 🤗 [**DuplexJev-4B-Para v1.4**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para): **live turn-taking on the small model.** Retrained in one pass on the full mix and the true audio length, with the LiveTurn end-of-turn data added: Smart Turn v3.2 test set 71.0 → **92.9**, LiveKit eot-bench false cut-offs at 300 ms English 25.8 → **21.8%**, Chinese 42.9 → **39.6%**; emotion (LISTEN 25.6 → **30.9**, ESD zh 90.8 → **95.0**), stress (StressPresso 80.7 → **87.6**, DEBATE 87.7 → **91.8**) and coughs / sighs also improve. Needs `duplexjev-vllm>=0.4`; v1.3 stays available as revision `v1.3`.
 - **2026-11-03** · 🤗 [**DuplexJev-32B-Para v1.5**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): **hears the whole clip.** Every Qwen3-ASR-based DuplexJev so far dropped the last ~4% of each 30 s audio chunk (the encoder emits 6.5 audio tokens per second, not 6.25). Retrained on the true length: end of turn (Smart Turn test set 93.3 → **94.4**, Chinese 91.4 → **94.6**; eot-bench English false cut-offs at 300 ms 20.4 → **17.7%**), stress (StressTest 81.7 → **85.3**), emotion in natural speech (LISTEN 32.4 → **33.2**) and spoken QA all improve. Needs `duplexjev-vllm>=0.4` / `duplexjev>=0.7`, which read the new `audio_full_length` flag. v1.4 stays available as revision `v1.4`. [Release note](research/2026-11-full-length.md).
@@ -351,7 +354,7 @@ connector checkpoints: **[docs/models.md](docs/models.md)**.
 - **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para): much better at hearing stress (StressTest 71.5 → 86.5, MSPB 68.0 → 77.3). Public paralinguistic benchmarks combined **50.2**, against 47.8 for Gemini 3.8 Flash.
 - **2026-10-15** · 🏆 Same questions for the realtime flagships (Gemini 3.8 Live, GPT-realtime-2.1) and GPT-audio-1.5, plus LiveKit eot-bench in all 14 languages.
 - **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn): live end-of-turn on a ~10 GB GPU.
-- **Coming next:** an open-source full-duplex Jev dialogue pipeline.
+- **Coming next:** [Sophon-Realtime v1](https://github.com/adventists-ai/sophon-realtime), the open full-duplex dialogue model built on DuplexJev, on Nov 9, 2026.
 
 All releases: [docs/news.md](docs/news.md).
 

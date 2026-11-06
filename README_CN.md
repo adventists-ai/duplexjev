@@ -18,7 +18,8 @@
   <b>每百万次判断不到 0.5 美元</b>，新增一种判断只要<b>写一行文字</b>。<br>
   🏆 <b>副语言理解 SOTA</b>：在 <a href="https://arxiv.org/abs/2510.10444">LISTEN</a>、StressTest、MSPB 三个公开基准合计上，
   同一批题超过 <b>Gemini 3.8 Flash、Gemini 3.8 Live、GPT-realtime-2.1、GPT-audio-1.5 和 Qwen3-Omni</b>。<br>
-  👁️ <b>它还看得见。</b><a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> 在同一次前向里把声音和画面对照着判断（预览版）——<a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">传张照片、录句话试试</a>。
+  👁️ <b>它还看得见。</b><a href="https://huggingface.co/adventists-ai/DuplexJev-32B-Vision">DuplexJev-32B-Vision</a> 在同一次前向里把声音和画面对照着判断（预览版）——<a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision">传张照片、录句话试试</a>。<br>
+  🗣️ <b>它还会开口说话了。</b>我们的开源全双工语音模型 <a href="https://github.com/adventists-ai/sophon-realtime/blob/main/README_CN.md">Sophon-Realtime v1</a> 用 DuplexJev 当耳朵：听得懂语气，也说得出语气。2026 年 11 月 9 日开源。
 </p>
 
 <p align="center">
@@ -33,6 +34,7 @@
   <a href="https://huggingface.co/adventists-ai"><img src="https://img.shields.io/badge/%F0%9F%A4%97-%E5%BC%80%E6%94%BE%E6%9D%83%E9%87%8D%204B%20%C2%B7%2032B-yellow" alt="开放权重"></a>
   <a href="https://www.modelscope.cn/organization/AdventistsAI"><img src="https://img.shields.io/badge/ModelScope-%E5%9B%BD%E5%86%85%E9%95%9C%E5%83%8F-624aff" alt="ModelScope 魔搭"></a>
   <a href="https://pypi.org/project/duplexjev/"><img src="https://img.shields.io/pypi/v/duplexjev" alt="PyPI"></a>
+  <a href="https://github.com/adventists-ai/sophon-realtime/blob/main/README_CN.md"><img src="https://img.shields.io/badge/Sophon--Realtime-%E5%85%A8%E5%8F%8C%E5%B7%A5%E8%AF%AD%E9%9F%B3%E6%A8%A1%E5%9E%8B-22D3A6" alt="Sophon-Realtime"></a>
   <a href="https://huggingface.co/spaces/BitKnight/DuplexJev"><img src="https://img.shields.io/badge/%F0%9F%A4%97-HF%20%E6%BC%94%E7%A4%BA-orange" alt="HF 演示"></a>
   <a href="https://huggingface.co/spaces/BitKnight/DuplexJev-Vision"><img src="https://img.shields.io/badge/%F0%9F%91%81%EF%B8%8F-%E8%A7%86%E8%A7%89%E7%89%88%E6%BC%94%E7%A4%BA-0EA5E9" alt="视觉版演示"></a>
 </p>
@@ -318,6 +320,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 
 ## 最新动态
 
+- **2026-11-06** · 🗣️ [**Sophon-Realtime v1**](https://github.com/adventists-ai/sophon-realtime/blob/main/README_CN.md)：DuplexJev 有了自己的声音。Sophon-Realtime v1 是基于 DuplexJev-32B-Para 的开源全双工语音模型：VoiceBench 82.8、Big Bench Audio 81.8%，两项都是开源全双工第一；聊到该笑、该叹气、嗓子干了的时候，它会自己笑、叹气、清嗓子。2026 年 11 月 9 日开放权重（Apache-2.0）。
 - **2026-10-30** · 🎙️ [**tag-tts v1.1**](tag-tts/)：再做两轮强化学习（GRPO，DuplexJev 打分，重音用引导正样本）。重音落在标注词上 35.0 → **40.7%**，叹气 15.0 → **17.9%**，Seed-TTS 中 / 英 / 绕口令 1.27 / 1.96 / 6.24。直接替换 `llm.pt`，见 🤗 [Hugging Face](https://huggingface.co/adventists-ai/tag-tts) 和 [魔搭](https://www.modelscope.cn/models/AdventistsAI/tag-tts)。
 - **2026-11-04** · 🤗 [**DuplexJev-4B-Para v1.4**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para)：**小模型也能做好实时话轮。**用完整配比、按真实音频长度一次训完，并加入 LiveTurn 的话轮数据：Smart Turn v3.2 测试集 71.0 → **92.9**，LiveKit eot-bench 300 ms 误打断英文 25.8 → **21.8%**、中文 42.9 → **39.6%**；情绪（LISTEN 25.6 → **30.9**，ESD 中文 90.8 → **95.0**）、重音（StressPresso 80.7 → **87.6**，DEBATE 87.7 → **91.8**）和咳嗽、叹气判断也都提升。需要 `duplexjev-vllm>=0.4`；v1.3 仍可用 revision `v1.3`。
 - **2026-11-03** · 🤗 [**DuplexJev-32B-Para v1.5**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：**整段音频都听进去了。**此前所有基于 Qwen3-ASR 的 DuplexJev 都会丢掉每个 30 秒音频块末尾约 4%（编码器每秒出 6.5 个音频 token，而不是 6.25）。按真实长度重训后：话轮判断（Smart Turn 测试集 93.3 → **94.4**，中文 91.4 → **94.6**；eot-bench 英文 300 ms 误打断 20.4 → **17.7%**）、重音（StressTest 81.7 → **85.3**）、自然语音情绪（LISTEN 32.4 → **33.2**）和语音问答都有提升。需要 `duplexjev-vllm>=0.4` / `duplexjev>=0.7`（读取新的 `audio_full_length` 开关）。v1.4 仍可用 revision `v1.4`。[发布说明](research/2026-11-full-length_zh.md)。
@@ -327,7 +330,7 @@ python examples/vllm_vision_client.py clip.wav face.jpg
 - **2026-10-15** · 🤗 [**DuplexJev-32B-Para v1.3**](https://huggingface.co/adventists-ai/DuplexJev-32B-Para)：听重音大幅提升（StressTest 71.5 → 86.5，MSPB 68.0 → 77.3）。公开副语言基准合计 **50.2**，Gemini 3.8 Flash 47.8。
 - **2026-10-15** · 🏆 用同一批题测了实时旗舰（Gemini 3.8 Live、GPT-realtime-2.1）和 GPT-audio-1.5；LiveKit eot-bench 补齐全部 14 种语言。
 - **2026-10-14** · 🤗 [**DuplexJev-4B-Para-LiveTurn**](https://huggingface.co/adventists-ai/DuplexJev-4B-Para-LiveTurn)：约 10 GB 显卡上的实时话轮判断。
-- **即将推出：**开源全双工 Jev 对话流水线。
+- **即将推出：**基于 DuplexJev 的开源全双工对话模型 [Sophon-Realtime v1](https://github.com/adventists-ai/sophon-realtime/blob/main/README_CN.md)，2026 年 11 月 9 日发布。
 
 全部发布记录：[docs/news_zh.md](docs/news_zh.md)。
 
